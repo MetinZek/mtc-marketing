@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 800" role="img" aria-labelledby="t">
+  <title id="t">MTC studio — placeholder portrait 02</title>
+  <rect width="640" height="800" fill="#efece4"/>
+  <circle cx="320" cy="272" r="138" fill="none" stroke="#17191e" stroke-width="6"/>
+  <path d="M176 648 C176 520 240 462 320 462 C400 462 464 520 464 648" fill="none" stroke="#17191e" stroke-width="6"/>
+  <rect x="50" y="120" width="34" height="34" fill="#1d4bff"/>
+  <line x1="50" y1="700" x2="590" y2="700" stroke="#d6d1c6" stroke-width="2"/>
+  <text x="50" y="742" font-family="Arial, Helvetica, sans-serif" font-size="20" letter-spacing="3" fill="#5c606b">STUDIO — 02</text>
+</svg>

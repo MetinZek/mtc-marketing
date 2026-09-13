@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-labelledby="title">
+  <title id="title">Web &amp; App Development — placeholder interface fragment</title>
+  <rect width="480" height="360" fill="#ffffff"/>
+  <rect x="1" y="1" width="478" height="358" fill="none" stroke="#e6e2da" stroke-width="2"/>
+  <rect x="32" y="32" width="70" height="14" fill="#17191e"/>
+  <line x1="32" y1="60" x2="448" y2="60" stroke="#e6e2da" stroke-width="2"/>
+  <rect x="32" y="92" width="416" height="128" fill="#e9edff"/>
+  <rect x="32" y="240" width="130" height="80" fill="#f6f4f0"/>
+  <rect x="176" y="240" width="130" height="80" fill="#f6f4f0"/>
+  <rect x="320" y="240" width="128" height="80" fill="#1d4bff"/>
+</svg>

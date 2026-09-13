@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="t">
+  <title id="t">Journal placeholder — 06</title>
+  <rect width="1200" height="800" fill="#efece4"/>
+  <text x="96" y="560" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="440" letter-spacing="-12" fill="#17191e">06</text>
+  <line x1="120" y1="620" x2="1080" y2="620" stroke="#d6d1c6" stroke-width="2"/>
+  <rect x="980" y="150" width="100" height="100" fill="#1d4bff"/>
+  <text x="120" y="710" font-family="Arial, Helvetica, sans-serif" font-size="22" letter-spacing="3" fill="#5c606b">JOURNAL — 06</text>
+</svg>

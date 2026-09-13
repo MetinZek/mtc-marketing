@@ -1,0 +1,257 @@
+@import "tailwindcss";
+
+/* ============================================================
+   MTC — Design System
+   Light mode only. Blue is a strategic accent, never a wash.
+   ============================================================ */
+
+@theme {
+  /* ---- Color -------------------------------------------------
+     canvas / paper / ink drive 95% of the site.
+     blue is reserved for buttons, links, labels, active + selected
+     states, and thin graphic details. Never large fills, never
+     gradients, never the logo. */
+  --color-canvas: #ffffff;
+  --color-paper: #f6f4f0; /* warm off-white section ground */
+  --color-paper-deep: #efece4; /* rare, slightly deeper neutral */
+
+  --color-ink: #17191e; /* primary text */
+  --color-ink-muted: #5c606b; /* metadata, captions, secondary copy */
+  --color-ink-faint: #8b8f99; /* disabled, hint text */
+
+  --color-line: #e6e2da; /* hairline borders on light ground */
+  --color-line-strong: #d6d1c6; /* hairline on paper ground */
+
+  --color-blue: #1d4bff; /* MTC accent — provisional until logo lands */
+  --color-blue-strong: #1637c9; /* hover / pressed */
+  --color-blue-tint: #e9edff; /* selection bg, subtle chips */
+  --color-blue-contrast: #ffffff; /* text on a blue fill */
+
+  --color-focus: #1d4bff;
+
+  /* Inline form-validation only — deliberately outside the editorial
+     palette, used for invalid field underlines and error messages. */
+  --color-danger: #c4362b;
+
+  /* ---- Typography -----------------------------------------
+     One variable family (Inter), loaded in app/layout.tsx via
+     next/font as --font-inter. Sizes, weights, tracking and line
+     heights are unchanged; Inter has no width axis, so the display
+     role's font-stretch rules below are currently inert. */
+  --font-sans:
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-display: var(--font-sans);
+
+  /* Fluid, editorial scale. Hierarchy = size + weight + tracking. */
+  --text-display-1: clamp(3rem, 1.6rem + 6.8vw, 7.25rem);
+  --text-display-1--line-height: 1.02;
+  --text-display-1--letter-spacing: -0.035em;
+
+  --text-display-2: clamp(2.4rem, 1.5rem + 4.2vw, 4.75rem);
+  --text-display-2--line-height: 1.04;
+  --text-display-2--letter-spacing: -0.03em;
+
+  --text-display-3: clamp(1.9rem, 1.4rem + 2.4vw, 3rem);
+  --text-display-3--line-height: 1.08;
+  --text-display-3--letter-spacing: -0.025em;
+
+  --text-title: clamp(1.35rem, 1.15rem + 0.9vw, 1.85rem);
+  --text-title--line-height: 1.18;
+  --text-title--letter-spacing: -0.015em;
+
+  --text-lead: clamp(1.1rem, 1rem + 0.5vw, 1.375rem);
+  --text-lead--line-height: 1.5;
+  --text-lead--letter-spacing: -0.005em;
+
+  --text-body: 1rem;
+  --text-body--line-height: 1.62;
+
+  --text-meta: 0.8125rem;
+  --text-meta--line-height: 1.5;
+
+  --text-label: 0.72rem;
+  --text-label--line-height: 1.2;
+  --text-label--letter-spacing: 0.14em;
+
+  /* ---- Radius (restrained) -------------------------------- */
+  --radius-xs: 2px;
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-pill: 999px;
+
+  /* ---- Shadow (used sparingly) --------------------------- */
+  --shadow-subtle: 0 1px 2px rgba(23, 25, 30, 0.04), 0 8px 24px rgba(23, 25, 30, 0.06);
+  --shadow-lift: 0 2px 6px rgba(23, 25, 30, 0.06), 0 20px 50px rgba(23, 25, 30, 0.1);
+
+  /* ---- Layout ------------------------------------------- */
+  --container-max: 1440px;
+  --gutter: clamp(1.25rem, 5vw, 5rem);
+
+  /* ---- Motion ------------------------------------------- */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --duration-fast: 180ms;
+  --duration-base: 320ms;
+  --duration-slow: 620ms;
+}
+
+/* ============================================================
+   Base layer
+   ============================================================ */
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-canvas);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: var(--text-body--line-height);
+    font-stretch: 100%;
+  }
+
+  /* Display role. font-stretch is kept unchanged; Inter has no width
+     axis so it currently has no effect. */
+  h1, h2, h3, .font-display {
+    font-family: var(--font-display);
+    font-stretch: 118%;
+    font-weight: 700;
+    text-wrap: balance;
+  }
+
+  h4, h5, h6 {
+    font-weight: 600;
+    letter-spacing: -0.01em;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  ::selection {
+    background: var(--color-blue-tint);
+    color: var(--color-blue-strong);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-focus);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  ::placeholder {
+    color: var(--color-ink-faint);
+  }
+
+  img,
+  picture,
+  svg,
+  video {
+    display: block;
+    max-width: 100%;
+  }
+}
+
+/* ============================================================
+   Utilities
+   ============================================================ */
+@layer utilities {
+  /* Page-consistent horizontal padding + max width. */
+  .container-mtc {
+    width: 100%;
+    max-width: var(--container-max);
+    margin-inline: auto;
+    padding-inline: var(--gutter);
+  }
+
+  /* Small tracked eyebrow labels. */
+  .label {
+    font-size: var(--text-label);
+    line-height: var(--text-label--line-height);
+    letter-spacing: var(--text-label--letter-spacing);
+    text-transform: uppercase;
+    font-weight: 600;
+    font-stretch: 100%;
+  }
+
+  .text-expanded {
+    font-stretch: 118%;
+  }
+}
+
+/* ============================================================
+   Hero background motion — extremely slow, decorative only.
+   Pure CSS so the reduced-motion block below neutralises it for
+   free via animation-duration/-iteration-count, no JS required.
+   ============================================================ */
+@keyframes hero-rotate-slow {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes hero-pulse {
+  0%,
+  100% {
+    opacity: 0.15;
+    transform: scale(0.85);
+  }
+  50% {
+    opacity: 0.65;
+    transform: scale(1);
+  }
+}
+
+/* ============================================================
+   Trusted Clients marquee — content is duplicated so translating
+   exactly -50% loops seamlessly. Slow and calm; the reduced-motion
+   block below neutralises it for free, settling on a complete,
+   still-correct row of logos either way.
+   ============================================================ */
+@keyframes clients-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ============================================================
+   Custom cursor — the `custom-cursor-active` class is added by
+   components/ui/CustomCursor.tsx only after JS confirms a fine
+   pointer (mouse/trackpad), never on touch. Hiding the native
+   cursor only under that class means touch devices, and any
+   no-JS fallback, keep the ordinary system cursor untouched.
+   ============================================================ */
+html.custom-cursor-active,
+html.custom-cursor-active a,
+html.custom-cursor-active button {
+  cursor: none;
+}
+
+/* ============================================================
+   Reduced motion — honour the OS setting globally
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}

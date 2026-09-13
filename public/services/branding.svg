@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-labelledby="title">
+  <title id="title">Branding &amp; Visual Identity — placeholder type specimen</title>
+  <rect width="480" height="360" fill="#f6f4f0"/>
+  <text x="36" y="235" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="180" fill="#17191e">Aa</text>
+  <line x1="36" y1="268" x2="444" y2="268" stroke="#d6d1c6" stroke-width="2"/>
+  <text x="36" y="304" font-family="Arial, Helvetica, sans-serif" font-size="16" letter-spacing="3" fill="#5c606b">TYPE SPECIMEN — 01</text>
+  <rect x="392" y="52" width="36" height="36" fill="#1d4bff"/>
+</svg>

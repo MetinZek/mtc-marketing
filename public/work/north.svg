@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 1200" role="img" aria-labelledby="title">
+  <title id="title">NORTH — placeholder campaign grid composition</title>
+  <rect width="900" height="1200" fill="#f6f4f0"/>
+  <text x="60" y="115" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="40" letter-spacing="2" fill="#17191e">NORTH</text>
+  <line x1="60" y1="145" x2="840" y2="145" stroke="#d6d1c6" stroke-width="2"/>
+  <rect x="60" y="195" width="500" height="380" fill="#1d4bff"/>
+  <rect x="580" y="195" width="260" height="180" fill="#ffffff" stroke="#e6e2da" stroke-width="2"/>
+  <rect x="580" y="395" width="260" height="180" fill="#efece4"/>
+  <rect x="60" y="595" width="260" height="260" fill="#ffffff" stroke="#e6e2da" stroke-width="2"/>
+  <rect x="340" y="595" width="220" height="260" fill="#efece4"/>
+  <rect x="580" y="595" width="260" height="260" fill="#17191e"/>
+  <text x="60" y="1130" font-family="Arial, Helvetica, sans-serif" font-size="20" letter-spacing="3" fill="#5c606b">CAMPAIGN SYSTEM — GRID 03</text>
+</svg>

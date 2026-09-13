@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1000" role="img" aria-labelledby="title">
+  <title id="title">NOMA — placeholder brand identity composition</title>
+  <rect width="1600" height="1000" fill="#efece4"/>
+  <text x="90" y="600" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="360" letter-spacing="-8" fill="#17191e">NOMA</text>
+  <line x1="90" y1="700" x2="1510" y2="700" stroke="#d6d1c6" stroke-width="2"/>
+  <rect x="90" y="760" width="60" height="60" fill="#1d4bff"/>
+  <rect x="164" y="760" width="60" height="60" fill="#17191e"/>
+  <rect x="238" y="760" width="60" height="60" fill="#ffffff" stroke="#d6d1c6" stroke-width="2"/>
+  <text x="90" y="880" font-family="Arial, Helvetica, sans-serif" font-size="22" letter-spacing="3" fill="#5c606b">BRAND IDENTITY — SYSTEM 01</text>
+</svg>

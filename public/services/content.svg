@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 360" role="img" aria-labelledby="title">
+  <title id="title">Content Creation &amp; Advertising — placeholder campaign artwork</title>
+  <rect width="480" height="360" fill="#ffffff"/>
+  <rect x="40" y="40" width="260" height="220" fill="#f6f4f0" transform="rotate(-2 170 150)"/>
+  <rect x="120" y="80" width="260" height="220" fill="#efece4" stroke="#d6d1c6" stroke-width="2" transform="rotate(2 250 190)"/>
+  <text x="40" y="330" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="60" letter-spacing="-2" fill="#17191e">AD / 01</text>
+  <rect x="416" y="40" width="24" height="24" fill="#1d4bff"/>
+</svg>

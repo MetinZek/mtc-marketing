@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="t">
+  <title id="t">Journal placeholder — 01</title>
+  <rect width="1200" height="800" fill="#f6f4f0"/>
+  <g fill="none" stroke="#d6d1c6" stroke-width="2">
+    <rect x="120" y="140" width="420" height="260"/>
+    <rect x="120" y="440" width="420" height="220"/>
+    <rect x="580" y="140" width="500" height="520"/>
+  </g>
+  <rect x="120" y="140" width="120" height="120" fill="#1d4bff"/>
+  <rect x="880" y="500" width="200" height="160" fill="#17191e"/>
+  <text x="120" y="710" font-family="Arial, Helvetica, sans-serif" font-size="22" letter-spacing="3" fill="#5c606b">JOURNAL — 01</text>
+</svg>

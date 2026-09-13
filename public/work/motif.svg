@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" role="img" aria-labelledby="title">
+  <title id="title">MOTIF — placeholder content &amp; advertising composition</title>
+  <rect width="1600" height="900" fill="#ffffff"/>
+  <rect x="80" y="80" width="640" height="460" fill="#efece4" transform="rotate(-3 400 310)"/>
+  <rect x="360" y="200" width="640" height="460" fill="#f6f4f0" stroke="#d6d1c6" stroke-width="2" transform="rotate(2 680 430)"/>
+  <text x="120" y="760" font-family="Arial, Helvetica, sans-serif" font-weight="800" font-size="200" letter-spacing="-6" fill="#17191e">MOTIF</text>
+  <rect x="1190" y="640" width="46" height="46" fill="#1d4bff"/>
+  <text x="120" y="830" font-family="Arial, Helvetica, sans-serif" font-size="20" letter-spacing="3" fill="#5c606b">CONTENT SYSTEM — CAMPAIGN 04</text>
+</svg>

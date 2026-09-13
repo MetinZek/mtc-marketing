@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 800" role="img" aria-labelledby="t">
+  <title id="t">Journal placeholder — 03</title>
+  <rect width="1200" height="800" fill="#f6f4f0"/>
+  <g fill="#17191e">
+    <polygon points="120,660 360,140 460,140 220,660"/>
+    <polygon points="320,660 560,140 660,140 420,660"/>
+  </g>
+  <polygon points="520,660 760,140 860,140 620,660" fill="#1d4bff"/>
+  <line x1="120" y1="140" x2="1080" y2="140" stroke="#d6d1c6" stroke-width="2"/>
+  <text x="120" y="710" font-family="Arial, Helvetica, sans-serif" font-size="22" letter-spacing="3" fill="#5c606b">JOURNAL — 03</text>
+</svg>
