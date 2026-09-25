@@ -2,9 +2,10 @@ import Link from "next/link";
 import { Reveal } from "@/components/motion/Reveal";
 import { imageReveal } from "@/components/motion/variants";
 import { FinalCta } from "@/components/sections/FinalCta";
+import { ProjectVideo } from "@/components/sections/ProjectVideo";
 import { Label } from "@/components/ui/Label";
 import { Section } from "@/components/ui/Section";
-import type { HomepageContent, ImageRef, Project } from "@/content/types";
+import type { HomepageContent, ImageRef, Project, ProjectMediaItem } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { interpolate } from "@/i18n/format";
 import type { Locale } from "@/i18n/locales";
@@ -35,16 +36,16 @@ function isPortrait(image: ImageRef) {
 }
 
 /**
- * Group gallery images into an editorial rhythm: a full-width image,
- * then a two-up row, then full-width again, and so on. Two images pair
- * up directly; a single trailing image in a "pair" slot falls back to
+ * Group gallery media into an editorial rhythm: a full-width item,
+ * then a two-up row, then full-width again, and so on. Two items pair
+ * up directly; a single trailing item in a "pair" slot falls back to
  * full-width, so the layout still reads as intentional at any count.
  */
-function buildRows(images: ImageRef[]): ImageRef[][] {
+function buildRows<T>(images: T[]): T[][] {
   if (images.length <= 1) return images.length ? [images] : [];
   if (images.length === 2) return [images];
 
-  const rows: ImageRef[][] = [];
+  const rows: T[][] = [];
   let cursor = 0;
   let solo = true;
 
@@ -57,14 +58,21 @@ function buildRows(images: ImageRef[]): ImageRef[][] {
   return rows;
 }
 
+/** The project's media in saved order. Projects that predate the
+ * media list (`media` unset) show their image gallery, unchanged. */
+function mediaOf(project: Project): ProjectMediaItem[] {
+  return project.media ?? project.gallery.map((image) => ({ type: "image" as const, ...image }));
+}
+
 /**
  * /work/[slug] — a single case study, image-led. The CMS gives one
- * short `description` and a `gallery`; everything here is driven by
- * that. Sections whose data is empty (gallery, results) simply don't
- * render, so a project with only a hero image still looks finished.
+ * short `description` and an ordered list of images and videos;
+ * everything here is driven by that. Sections whose data is empty
+ * (media, results) simply don't render, so a project with only a hero
+ * image still looks finished.
  */
 export function ProjectDetail({ project, moreProjects, cta, dict, locale }: ProjectDetailProps) {
-  const rows = buildRows(project.gallery);
+  const rows = buildRows(mediaOf(project));
 
   return (
     <article>
@@ -109,25 +117,25 @@ export function ProjectDetail({ project, moreProjects, cta, dict, locale }: Proj
         </Reveal>
       </Section>
 
-      {/* 2 — Visuals: flexible editorial image layout */}
+      {/* 2 — Visuals: flexible editorial media layout, in saved order */}
       {rows.length > 0 && (
         <Section ground="canvas" spacing="sm">
           <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8">
             {rows.map((row, i) => (
               <Reveal
-                key={row.map((image) => image.src).join("|")}
+                key={row.map((item) => item.src).join("|")}
                 variants={imageReveal}
                 amount={0.15}
                 delay={0.03 * (i % 4)}
               >
                 {row.length >= 2 ? (
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:gap-8">
-                    {row.map((image) => (
-                      <GalleryFigure key={image.src} image={image} />
+                    {row.map((item) => (
+                      <GalleryItem key={item.src} item={item} title={project.title} />
                     ))}
                   </div>
                 ) : (
-                  row[0] && <GalleryFigure image={row[0]} full />
+                  row[0] && <GalleryItem item={row[0]} title={project.title} full />
                 )}
               </Reveal>
             ))}
@@ -264,6 +272,28 @@ function RelatedProjectCard({
         </p>
       </div>
     </Link>
+  );
+}
+
+function GalleryItem({
+  item,
+  title,
+  full = false,
+}: {
+  item: ProjectMediaItem;
+  title: string;
+  full?: boolean;
+}) {
+  return item.type === "video" ? (
+    <ProjectVideo
+      src={item.src}
+      title={item.alt || title}
+      width={item.width}
+      height={item.height}
+      full={full}
+    />
+  ) : (
+    <GalleryFigure image={item} full={full} />
   );
 }
 

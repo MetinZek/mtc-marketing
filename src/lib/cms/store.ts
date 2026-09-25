@@ -3,27 +3,40 @@ import "server-only";
 import { promises as fs } from "node:fs";
 import path from "node:path";
 import type { CollectionName } from "@/content/schema";
-import { collectionSeeds } from "@/content/seed";
+import { seedRowsFor } from "@/content/seed";
+import { isDatabaseConfigured } from "@/lib/db/client";
+import * as postgresStore from "./store-postgres";
 
 /**
- * The live content store: one JSON file per collection under `.data/`
- * (git-ignored, writable at runtime). Reads fall back to the seed until
- * the file exists; writes are serialised per file and land atomically.
+ * The live content store behind the CMS (public reads + admin writes).
  *
- * This works with `next dev` and a self-hosted Node deployment. On a
- * read-only serverless filesystem the seed is served and writes fail —
- * a real deployment would swap this store for a database provider,
- * which the ContentProvider interface already allows.
+ * - DATABASE_URL set → Postgres (Supabase). Required in production:
+ *   see src/lib/cms/store-postgres.ts and db/migrations.
+ * - No DATABASE_URL, local only → the original JSON-file store below:
+ *   one file per collection under `.data/` (git-ignored), falling back
+ *   to the seed until the file exists. Never used on Vercel — without a
+ *   database the deployment fails loudly instead of writing to its
+ *   ephemeral filesystem.
  */
 
 export type StoreKey = CollectionName | "submissions";
 
+function databaseEnabled(): boolean {
+  if (isDatabaseConfigured()) return true;
+  if (process.env.VERCEL) {
+    throw new Error(
+      "[cms] DATABASE_URL is not set. The CMS needs a Postgres database on Vercel — the local .data/ file store is development-only.",
+    );
+  }
+  return false;
+}
+
+/* ================= local file store (development only) ================= */
+
 const DATA_DIR = path.join(process.cwd(), ".data");
 const fileFor = (key: StoreKey) => path.join(DATA_DIR, `${key}.json`);
 
-function seedFor(key: StoreKey): unknown[] {
-  return key === "submissions" ? [] : [...collectionSeeds[key]];
-}
+const seedFor = seedRowsFor;
 
 /* ---- per-file write serialisation ---- */
 const chains = new Map<StoreKey, Promise<unknown>>();
@@ -53,8 +66,11 @@ async function persist(key: StoreKey, rows: unknown[]): Promise<void> {
   await fs.rename(tmp, fileFor(key));
 }
 
-/** Raw rows for a collection — the store file if present, else the seed. */
+/* ============================ public API ============================ */
+
+/** Raw rows for a collection — stored rows if present, else the seed. */
 export async function readRows(key: StoreKey): Promise<unknown[]> {
+  if (databaseEnabled()) return postgresStore.readRows(key);
   return (await readFileRows(key)) ?? seedFor(key);
 }
 
@@ -63,6 +79,7 @@ export async function mutateRows(
   key: StoreKey,
   transform: (rows: unknown[]) => unknown[],
 ): Promise<void> {
+  if (databaseEnabled()) return postgresStore.mutateRows(key, transform);
   await runExclusive(key, async () => {
     const current = (await readFileRows(key)) ?? seedFor(key);
     await persist(key, transform(current));

@@ -202,6 +202,40 @@ export async function setPublished(
   revalidatePath(`/admin/${collection}`);
 }
 
+/**
+ * Moves an entry one place up/down in display order. Renumbers the
+ * whole collection 1…n in its current order first, so ties and gaps
+ * from hand-typed `order` values never make a move a no-op.
+ */
+export async function moveEntry(
+  collection: Exclude<CmsCollection, "posts">,
+  id: string,
+  direction: "up" | "down",
+): Promise<void> {
+  const orderOf = (row: unknown) =>
+    Number((row as { order?: unknown }).order ?? 0) || 0;
+
+  await mutateRows(collection, (rows) => {
+    const sorted = rows
+      .map((row, index) => ({ row, index }))
+      .sort((a, b) => orderOf(a.row) - orderOf(b.row) || a.index - b.index)
+      .map(({ row }) => row);
+
+    const from = sorted.findIndex((r) => idOf(r) === id);
+    const to = direction === "up" ? from - 1 : from + 1;
+    if (from !== -1 && to >= 0 && to < sorted.length) {
+      [sorted[from], sorted[to]] = [sorted[to], sorted[from]];
+    }
+
+    return sorted.map((row, i) => ({
+      ...(row as Record<string, unknown>),
+      order: i + 1,
+    }));
+  });
+  revalidateSite();
+  revalidatePath(`/admin/${collection}`);
+}
+
 export async function counts(): Promise<Record<CmsCollection | "submissions", number>> {
   const keys = [...CMS_COLLECTIONS, "submissions"] as const;
   const lengths = await Promise.all(keys.map((k) => readRows(k).then((r) => r.length)));

@@ -21,3 +21,8 @@ export const collectionSeeds: Record<CollectionName, readonly unknown[]> = {
   team,
   posts,
 };
+
+/** Seed rows for a store key (contact submissions start empty). */
+export function seedRowsFor(key: CollectionName | "submissions"): unknown[] {
+  return key === "submissions" ? [] : [...collectionSeeds[key]];
+}

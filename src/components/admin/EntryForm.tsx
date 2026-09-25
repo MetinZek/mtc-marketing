@@ -2,14 +2,21 @@
 
 import Link from "next/link";
 import { useActionState, useCallback, useMemo, useRef, useState } from "react";
-import { saveEntryAction, uploadImageAction, type SaveState } from "@/app/admin/_actions";
+import {
+  prepareVideoUploadAction,
+  saveEntryAction,
+  uploadImageAction,
+  type SaveState,
+} from "@/app/admin/_actions";
 import { Button } from "@/components/ui/Button";
 import {
   slugify,
   type CollectionDef,
   type FieldDef,
   type ImageFieldConfig,
+  type VideoFieldConfig,
 } from "@/lib/admin/collections";
+import { imageUrlError, linkUrlError, videoUrlError } from "@/lib/media-url";
 import { cn } from "@/lib/utils";
 
 type ImageValue = { src: string; alt: string; width: string; height: string };
@@ -17,10 +24,23 @@ type Values = Record<string, unknown>;
 
 const EMPTY_IMAGE: ImageValue = { src: "", alt: "", width: "", height: "" };
 
+/** One `media-list` item in the form. `key` is form-only (stable React
+ * key across reorders) and never sent to the server. */
+type MediaValue = ImageValue & { key: string; type: "image" | "video" };
+
+let mediaKeySeq = 0;
+const newMediaKey = () => `media-${++mediaKeySeq}`;
+
 /** Applies when a field doesn't declare its own `image` constraints. */
 const DEFAULT_IMAGE_CONFIG: ImageFieldConfig = {
-  maxSizeMB: 5,
+  maxSizeMB: 4, // Vercel caps request bodies at 4.5MB
   accept: ["image/jpeg", "image/png", "image/webp"],
+};
+
+/** Applies when a `media-list` field doesn't declare `video` limits. */
+const DEFAULT_VIDEO_CONFIG: VideoFieldConfig = {
+  maxSizeMB: 50,
+  accept: ["video/mp4", "video/webm"],
 };
 
 const MIME_LABELS: Record<string, string> = {
@@ -28,6 +48,8 @@ const MIME_LABELS: Record<string, string> = {
   "image/png": "PNG",
   "image/webp": "WEBP",
   "image/svg+xml": "SVG",
+  "video/mp4": "MP4",
+  "video/webm": "WEBM",
 };
 
 function formatAccept(accept: string[]): string {
@@ -68,6 +90,11 @@ function asImage(raw: unknown): ImageValue {
   return { ...EMPTY_IMAGE };
 }
 
+function asMedia(raw: unknown): MediaValue {
+  const type = (raw as { type?: unknown } | null)?.type === "video" ? "video" : "image";
+  return { key: newMediaKey(), type, ...asImage(raw) };
+}
+
 function initValues(def: CollectionDef, entry: Values): Values {
   const out: Values = {};
   for (const field of def.fields) {
@@ -88,6 +115,13 @@ function initValues(def: CollectionDef, entry: Values): Values {
       case "string-list":
         out[field.key] = Array.isArray(raw) ? raw.join("\n") : "";
         break;
+      case "media-list": {
+        // Not set yet → start from the legacy field (e.g. the gallery),
+        // so saving keeps the images the page already shows.
+        const source = raw ?? (field.initialFrom ? entry[field.initialFrom] : undefined);
+        out[field.key] = Array.isArray(source) ? source.map(asMedia) : [];
+        break;
+      }
       default:
         out[field.key] = raw != null ? String(raw) : "";
     }
@@ -126,6 +160,17 @@ function buildPayload(def: CollectionDef, values: Values): Values {
             alt: img.alt.trim(),
             ...(img.width ? { width: Number(img.width) } : {}),
             ...(img.height ? { height: Number(img.height) } : {}),
+          }));
+        break;
+      case "media-list":
+        out[field.key] = (v as MediaValue[])
+          .filter((m) => m.src.trim())
+          .map((m) => ({
+            type: m.type,
+            src: m.src.trim(),
+            ...(m.type === "image" || m.alt.trim() ? { alt: m.alt.trim() } : {}),
+            ...(m.width ? { width: Number(m.width) } : {}),
+            ...(m.height ? { height: Number(m.height) } : {}),
           }));
         break;
       case "string-list":
@@ -178,6 +223,8 @@ export function EntryForm({
 
   const set = (key: string, value: unknown) =>
     setValues((v) => ({ ...v, [key]: value }));
+  const update = (key: string, fn: (value: unknown) => unknown) =>
+    setValues((v) => ({ ...v, [key]: fn(v[key]) }));
 
   const fieldError = (key: string) => state.fieldErrors?.[key];
 
@@ -222,6 +269,7 @@ export function EntryForm({
             error={fieldError(field.key)}
             childErrors={state.fieldErrors}
             onChange={(v) => set(field.key, v)}
+            onUpdate={(fn) => update(field.key, fn)}
             onUploadingChange={registerUploading}
             onSlugFromTitle={
               field.type === "slug" && field.slugFrom
@@ -275,6 +323,7 @@ function Field({
   error,
   childErrors,
   onChange,
+  onUpdate,
   onUploadingChange,
   onSlugFromTitle,
 }: {
@@ -283,6 +332,7 @@ function Field({
   error?: string;
   childErrors?: Record<string, string>;
   onChange: (value: unknown) => void;
+  onUpdate: (fn: (value: unknown) => unknown) => void;
   onUploadingChange: (delta: number) => void;
   onSlugFromTitle?: () => void;
 }) {
@@ -321,6 +371,36 @@ function Field({
         )}
         <ErrorText message={error} />
       </label>
+    );
+  }
+
+  if (field.type === "video-url" || field.type === "image-url" || field.type === "url") {
+    return <UrlField field={field} value={value} error={error} onChange={onChange} />;
+  }
+
+  if (field.type === "video" && field.video) {
+    return (
+      <VideoField
+        field={field}
+        config={field.video}
+        value={String(value ?? "")}
+        error={error}
+        onChange={onChange}
+        onUploadingChange={onUploadingChange}
+      />
+    );
+  }
+
+  if (field.type === "media-list") {
+    return (
+      <MediaListField
+        field={field}
+        value={value}
+        error={error}
+        childErrors={childErrors}
+        onUpdate={onUpdate}
+        onUploadingChange={onUploadingChange}
+      />
     );
   }
 
@@ -376,6 +456,482 @@ function Field({
       )}
       <ErrorText message={error} />
     </label>
+  );
+}
+
+const URL_CHECKS = {
+  "video-url": videoUrlError,
+  "image-url": imageUrlError,
+  url: linkUrlError,
+} as const;
+
+/**
+ * Plain URL input (no upload) with the same validation the server runs
+ * on save, plus a small preview for video/image URLs. The preview only
+ * updates on blur so typing doesn't fire a request per keystroke.
+ */
+function UrlField({
+  field,
+  value,
+  error,
+  onChange,
+}: {
+  field: FieldDef;
+  value: unknown;
+  error?: string;
+  onChange: (value: unknown) => void;
+}) {
+  const text = String(value ?? "");
+  const check = URL_CHECKS[field.type as keyof typeof URL_CHECKS];
+  const [committed, setCommitted] = useState(text.trim());
+  const [loadFailed, setLoadFailed] = useState(false);
+
+  const commit = () => {
+    const next = text.trim();
+    if (next !== committed) {
+      setCommitted(next);
+      setLoadFailed(false);
+    }
+  };
+
+  const localError = committed ? check(committed) : null;
+  const preview = committed && !localError ? committed : null;
+
+  return (
+    <div>
+      <label className="block">
+        <FieldLabel field={field} />
+        <input
+          type="text"
+          inputMode="url"
+          spellCheck={false}
+          autoComplete="off"
+          placeholder={field.type === "url" ? "/work/project-slug" : "https://…"}
+          value={text}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={commit}
+          className={cn(inputCls, "mt-2")}
+        />
+      </label>
+      {field.help && <p className="mt-1.5 text-meta text-ink-faint">{field.help}</p>}
+      {localError && !error && (
+        <p role="alert" className="mt-1.5 text-meta text-danger">
+          {localError}
+        </p>
+      )}
+      <ErrorText message={error} />
+
+      {preview && field.type === "video-url" && (
+        <div className="mt-3">
+          <video
+            key={preview}
+            src={preview}
+            muted
+            playsInline
+            loop
+            controls
+            preload="metadata"
+            onError={() => setLoadFailed(true)}
+            onLoadedData={() => setLoadFailed(false)}
+            className="aspect-video w-64 rounded-sm border border-line bg-paper object-cover"
+          />
+          {loadFailed && (
+            <p className="mt-1.5 text-meta text-danger">
+              This video couldn&apos;t be loaded in the browser. Check that the URL is a public,
+              direct video file (MP4/H.264 is the safest format).
+            </p>
+          )}
+        </div>
+      )}
+      {preview && field.type === "image-url" && (
+        <div className="mt-3">
+          {/* eslint-disable-next-line @next/next/no-img-element -- admin preview of an arbitrary external URL */}
+          <img
+            key={preview}
+            src={preview}
+            alt=""
+            onError={() => setLoadFailed(true)}
+            onLoad={() => setLoadFailed(false)}
+            className="h-20 w-28 rounded-sm border border-line bg-paper object-cover"
+          />
+          {loadFailed && (
+            <p className="mt-1.5 text-meta text-danger">
+              This image couldn&apos;t be loaded. Check the URL.
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/** PUTs the raw file to `url`, reporting progress (0–1). XHR rather
+ * than fetch: fetch has no upload-progress events, and videos are big. */
+function putFile(url: string, file: File, onProgress: (ratio: number) => void): Promise<void> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.open("PUT", url);
+    xhr.setRequestHeader("Content-Type", file.type);
+    xhr.setRequestHeader("Cache-Control", "max-age=31536000");
+    xhr.setRequestHeader("x-upsert", "false");
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress(e.loaded / e.total);
+    };
+    xhr.onload = () =>
+      xhr.status >= 200 && xhr.status < 300
+        ? resolve()
+        : reject(new Error(`Upload failed (${xhr.status}).`));
+    xhr.onerror = () => reject(new Error("Upload failed — check your connection."));
+    xhr.send(file);
+  });
+}
+
+/** Reads a video file's intrinsic size client-side (null if unknown),
+ * so the page can reserve its aspect ratio before the video loads.
+ * Time-boxed: browsers may never fire `loadedmetadata` (background tab,
+ * unreadable codec), and the upload must not wait on it forever — the
+ * page falls back to measuring the video itself. */
+function readVideoDimensions(file: File): Promise<{ width: number; height: number } | null> {
+  return new Promise((resolve) => {
+    const url = URL.createObjectURL(file);
+    const video = document.createElement("video");
+    const timer = setTimeout(() => done(null), 4000);
+    const done = (result: { width: number; height: number } | null) => {
+      clearTimeout(timer);
+      video.onloadedmetadata = video.onerror = null;
+      video.removeAttribute("src");
+      URL.revokeObjectURL(url);
+      resolve(result);
+    };
+    video.preload = "metadata";
+    video.muted = true;
+    video.onloadedmetadata = () =>
+      done(
+        video.videoWidth > 0 && video.videoHeight > 0
+          ? { width: video.videoWidth, height: video.videoHeight }
+          : null,
+      );
+    video.onerror = () => done(null);
+    video.src = url;
+  });
+}
+
+/**
+ * Upload/preview/replace/remove for one video. The file goes from the
+ * browser straight to storage — `prepareVideoUploadAction` only checks
+ * type/size and hands back a signed upload URL — so large files never
+ * hit the server's request-size limits.
+ */
+function VideoUploader({
+  src,
+  config,
+  onUploaded,
+  onRemove,
+  onUploadingChange,
+}: {
+  src: string;
+  config: VideoFieldConfig;
+  onUploaded: (url: string, dims: { width: number; height: number } | null) => void;
+  onRemove: () => void;
+  onUploadingChange: (delta: number) => void;
+}) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [progress, setProgress] = useState<number | null>(null);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
+  const uploading = progress !== null;
+
+  const upload = async (file: File) => {
+    setUploadError(null);
+    if (!config.accept.includes(file.type)) {
+      setUploadError(`Unsupported format. Use ${formatAccept(config.accept)}.`);
+      return;
+    }
+    if (file.size > config.maxSizeMB * 1024 * 1024) {
+      setUploadError(`File is too large — maximum is ${config.maxSizeMB} MB.`);
+      return;
+    }
+
+    setProgress(0);
+    onUploadingChange(1);
+    try {
+      const dims = readVideoDimensions(file);
+      const target = await prepareVideoUploadAction({ type: file.type, size: file.size });
+      if (!target.ok) {
+        setUploadError(target.error);
+        return;
+      }
+      await putFile(target.uploadUrl, file, setProgress);
+      setLoadFailed(false);
+      onUploaded(target.url, await dims);
+    } catch (e) {
+      setUploadError(e instanceof Error ? e.message : "Upload failed. Please try again.");
+    } finally {
+      setProgress(null);
+      onUploadingChange(-1);
+    }
+  };
+
+  const onFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = ""; // allow re-selecting the same file later
+    if (file) void upload(file);
+  };
+
+  const uploadingLabel = `Uploading… ${Math.round((progress ?? 0) * 100)}%`;
+
+  return (
+    <div className="space-y-3">
+      <input
+        ref={inputRef}
+        type="file"
+        accept={config.accept.join(",")}
+        onChange={onFileSelected}
+        className="sr-only"
+        aria-label="Upload video"
+      />
+
+      {src ? (
+        <div>
+          <video
+            key={src}
+            src={src}
+            controls
+            muted
+            playsInline
+            preload="metadata"
+            onError={() => setLoadFailed(true)}
+            onLoadedData={() => setLoadFailed(false)}
+            className="aspect-video w-full max-w-md rounded-sm border border-line bg-paper object-contain"
+          />
+          {loadFailed && (
+            <p className="mt-1.5 text-meta text-danger">
+              This video couldn&apos;t be loaded in the browser.
+            </p>
+          )}
+          <p className="mt-2 truncate text-meta text-ink-muted" title={src}>
+            {src}
+          </p>
+          <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+            <button
+              type="button"
+              onClick={() => inputRef.current?.click()}
+              disabled={uploading}
+              className="text-meta text-blue hover:underline disabled:opacity-50"
+            >
+              {uploading ? uploadingLabel : "Replace video"}
+            </button>
+            <button
+              type="button"
+              onClick={onRemove}
+              disabled={uploading}
+              className="text-meta text-ink-muted hover:text-danger disabled:opacity-50"
+            >
+              Remove video
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button
+          type="button"
+          onClick={() => inputRef.current?.click()}
+          disabled={uploading}
+          className="flex w-full flex-col items-center justify-center gap-1 rounded-sm border border-dashed border-line-strong bg-paper py-6 text-center transition-colors hover:border-blue disabled:opacity-50"
+        >
+          <span className="text-sm font-medium text-ink">
+            {uploading ? uploadingLabel : "Upload video"}
+          </span>
+          <span className="text-meta text-ink-faint">Click to choose a file from your computer</span>
+        </button>
+      )}
+
+      <p className="text-meta text-ink-faint">
+        Max {config.maxSizeMB} MB · {formatAccept(config.accept)}
+      </p>
+      {uploadError && (
+        <p role="alert" className="text-meta text-danger">
+          {uploadError}
+        </p>
+      )}
+    </div>
+  );
+}
+
+/** Single uploaded video stored as its URL (e.g. the cover video). */
+function VideoField({
+  field,
+  config,
+  value,
+  error,
+  onChange,
+  onUploadingChange,
+}: {
+  field: FieldDef;
+  config: VideoFieldConfig;
+  value: string;
+  error?: string;
+  onChange: (value: unknown) => void;
+  onUploadingChange: (delta: number) => void;
+}) {
+  return (
+    <fieldset className="rounded-sm border border-line p-4">
+      <legend className="label px-1 text-ink-muted">
+        {field.label}
+        {field.required && <span className="ml-1 text-danger">*</span>}
+      </legend>
+      <VideoUploader
+        src={value}
+        config={config}
+        onUploaded={(url) => onChange(url)}
+        onRemove={() => onChange("")}
+        onUploadingChange={onUploadingChange}
+      />
+      {field.help && <p className="mt-3 text-meta text-ink-faint">{field.help}</p>}
+      <ErrorText message={error} />
+    </fieldset>
+  );
+}
+
+/**
+ * Ordered list of images and videos (the project page's media). Items
+ * are updated by a stable key through functional state updates, so an
+ * upload that finishes after the list was reordered or edited still
+ * lands on the right item.
+ */
+function MediaListField({
+  field,
+  value,
+  error,
+  childErrors,
+  onUpdate,
+  onUploadingChange,
+}: {
+  field: FieldDef;
+  value: unknown;
+  error?: string;
+  childErrors?: Record<string, string>;
+  onUpdate: (fn: (value: unknown) => unknown) => void;
+  onUploadingChange: (delta: number) => void;
+}) {
+  const list = (value as MediaValue[]) ?? [];
+  const videoConfig = field.video ?? DEFAULT_VIDEO_CONFIG;
+
+  const updateList = (fn: (items: MediaValue[]) => MediaValue[]) =>
+    onUpdate((current) => fn((current as MediaValue[]) ?? []));
+  const patch = (key: string, next: Partial<MediaValue>) =>
+    updateList((items) => items.map((m) => (m.key === key ? { ...m, ...next } : m)));
+  const move = (key: string, delta: number) =>
+    updateList((items) => {
+      const from = items.findIndex((m) => m.key === key);
+      const to = from + delta;
+      if (from < 0 || to < 0 || to >= items.length) return items;
+      const copy = [...items];
+      [copy[from], copy[to]] = [copy[to]!, copy[from]!];
+      return copy;
+    });
+  const remove = (key: string) => updateList((items) => items.filter((m) => m.key !== key));
+  const add = (type: MediaValue["type"]) =>
+    updateList((items) => [...items, { key: newMediaKey(), type, ...EMPTY_IMAGE }]);
+
+  const control =
+    "text-meta text-ink-muted hover:text-blue disabled:opacity-30 disabled:hover:text-ink-muted";
+
+  return (
+    <fieldset className="rounded-sm border border-line p-4">
+      <legend className="label px-1 text-ink-muted">{field.label}</legend>
+      {field.help && <p className="text-meta text-ink-faint">{field.help}</p>}
+
+      {list.length > 0 ? (
+        <ol className="mt-4 space-y-4">
+          {list.map((item, i) => (
+            <li key={item.key} className="rounded-sm bg-paper p-3">
+              <div className="mb-3 flex items-center justify-between gap-3">
+                <span className="label text-ink-muted">
+                  {i + 1} · {item.type === "video" ? "Video" : "Image"}
+                </span>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => move(item.key, -1)}
+                    disabled={i === 0}
+                    aria-label={`Move item ${i + 1} up`}
+                    className={control}
+                  >
+                    ↑
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => move(item.key, 1)}
+                    disabled={i === list.length - 1}
+                    aria-label={`Move item ${i + 1} down`}
+                    className={control}
+                  >
+                    ↓
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => remove(item.key)}
+                    className="text-meta text-ink-muted hover:text-danger"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+
+              {item.type === "image" ? (
+                <ImageRow
+                  value={item}
+                  labelPrefix={`${field.key}.${i}`}
+                  errors={childErrors}
+                  image={field.image}
+                  onUploadingChange={onUploadingChange}
+                  onChange={(next) => patch(item.key, next)}
+                />
+              ) : (
+                <div className="space-y-3">
+                  <VideoUploader
+                    src={item.src}
+                    config={videoConfig}
+                    onUploaded={(url, dims) =>
+                      patch(item.key, {
+                        src: url,
+                        width: dims ? String(dims.width) : "",
+                        height: dims ? String(dims.height) : "",
+                      })
+                    }
+                    onRemove={() => patch(item.key, { src: "", width: "", height: "" })}
+                    onUploadingChange={onUploadingChange}
+                  />
+                  <ErrorText message={childErrors?.[`${field.key}.${i}.src`]} />
+                  <label className="block">
+                    <span className="text-meta text-ink-muted">
+                      Description (optional, for screen readers)
+                    </span>
+                    <input
+                      value={item.alt}
+                      onChange={(e) => patch(item.key, { alt: e.target.value })}
+                      className={cn(inputCls, "mt-1 text-[0.8125rem]")}
+                    />
+                  </label>
+                </div>
+              )}
+            </li>
+          ))}
+        </ol>
+      ) : (
+        <p className="mt-4 text-meta text-ink-faint">No media yet.</p>
+      )}
+
+      <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+        <button type="button" onClick={() => add("image")} className="text-meta text-blue hover:underline">
+          + Add image
+        </button>
+        <button type="button" onClick={() => add("video")} className="text-meta text-blue hover:underline">
+          + Add video
+        </button>
+      </div>
+      <ErrorText message={error} />
+    </fieldset>
   );
 }
 

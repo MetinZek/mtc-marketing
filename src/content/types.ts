@@ -5,6 +5,7 @@ import type {
   homepageSchema,
   imageSchema,
   postSchema,
+  projectMediaSchema,
   projectSchema,
   seoSchema,
   serviceSchema,
@@ -20,6 +21,7 @@ export type Seo = z.infer<typeof seoSchema>;
 export type ImageRef = z.infer<typeof imageSchema>;
 
 export type Project = z.infer<typeof projectSchema>;
+export type ProjectMediaItem = z.infer<typeof projectMediaSchema>;
 export type Service = z.infer<typeof serviceSchema>;
 export type Testimonial = z.infer<typeof testimonialSchema>;
 export type Client = z.infer<typeof clientSchema>;

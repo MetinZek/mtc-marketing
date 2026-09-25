@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { deleteEntryAction } from "@/app/admin/_actions";
+import { deleteEntryAction, moveEntryAction } from "@/app/admin/_actions";
 import { Button } from "@/components/ui/Button";
 import type { CollectionDef } from "@/lib/admin/collections";
 import { isPublished, listEntries, type CmsCollection } from "@/lib/cms/admin";
@@ -45,7 +45,7 @@ export async function CollectionTable({ def }: { def: CollectionDef }) {
             </tr>
           </thead>
           <tbody>
-            {entries.map((entry) => {
+            {entries.map((entry, index) => {
               const id = String(entry.id);
               return (
                 <tr key={id} className="border-b border-line last:border-b-0">
@@ -76,6 +76,22 @@ export async function CollectionTable({ def }: { def: CollectionDef }) {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center justify-end gap-3">
+                      {def.reorderable && (
+                        <div className="flex items-center gap-1">
+                          <MoveButton
+                            collection={def.key}
+                            id={id}
+                            direction="up"
+                            disabled={index === 0}
+                          />
+                          <MoveButton
+                            collection={def.key}
+                            id={id}
+                            direction="down"
+                            disabled={index === entries.length - 1}
+                          />
+                        </div>
+                      )}
                       <Link
                         href={`/admin/${def.key}/${id}`}
                         className="text-meta text-ink-muted hover:text-blue"
@@ -113,6 +129,35 @@ export async function CollectionTable({ def }: { def: CollectionDef }) {
         </p>
       )}
     </div>
+  );
+}
+
+function MoveButton({
+  collection,
+  id,
+  direction,
+  disabled,
+}: {
+  collection: string;
+  id: string;
+  direction: "up" | "down";
+  disabled: boolean;
+}) {
+  return (
+    <form action={moveEntryAction}>
+      <input type="hidden" name="collection" value={collection} />
+      <input type="hidden" name="id" value={id} />
+      <input type="hidden" name="direction" value={direction} />
+      <button
+        type="submit"
+        disabled={disabled}
+        aria-label={direction === "up" ? "Move up" : "Move down"}
+        title={direction === "up" ? "Move up" : "Move down"}
+        className="flex h-6 w-6 items-center justify-center rounded-sm border border-line text-meta text-ink-muted transition-colors hover:border-blue hover:text-blue disabled:pointer-events-none disabled:opacity-30"
+      >
+        {direction === "up" ? "↑" : "↓"}
+      </button>
+    </form>
   );
 }
 

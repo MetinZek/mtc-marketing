@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { imageUrlError, linkUrlError, videoUrlError } from "@/lib/media-url";
 
 /* ============================================================
    MTC — CMS content schemas
@@ -25,12 +26,46 @@ export const imageSchema = z.object({
   focal: z.object({ x: z.number().min(0).max(1), y: z.number().min(0).max(1) }).optional(),
 });
 
+/** Optional URL field validated by one of the rules in @/lib/media-url. */
+const urlField = (check: (value: string) => string | null) =>
+  z
+    .string()
+    .trim()
+    .optional()
+    .superRefine((value, ctx) => {
+      const error = value ? check(value) : null;
+      if (error) ctx.addIssue({ code: "custom", message: error });
+    });
+
 const slug = z
   .string()
   .min(1)
   .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "must be a lowercase, hyphenated slug");
 
 /* ---------------- Work / Projects ------------------------- */
+
+/** One item of a project's detail-page media sequence. Images keep the
+ * ImageRef shape (alt required); videos are direct MP4/WebM files.
+ * width/height are the intrinsic size, recorded at upload so the page
+ * can reserve the right aspect ratio before anything loads. */
+export const projectMediaSchema = z.discriminatedUnion("type", [
+  imageSchema.extend({ type: z.literal("image") }),
+  z.object({
+    type: z.literal("video"),
+    src: z
+      .string()
+      .trim()
+      .min(1)
+      .superRefine((value, ctx) => {
+        const error = videoUrlError(value);
+        if (error) ctx.addIssue({ code: "custom", message: error });
+      }),
+    /** Optional description for screen readers. */
+    alt: z.string().optional(),
+    width: z.number().int().positive().optional(),
+    height: z.number().int().positive().optional(),
+  }),
+]);
 
 export const projectResultSchema = z.object({
   label: z.string().min(1), // e.g. "Organic reach"
@@ -48,10 +83,26 @@ export const projectSchema = seoSchema.extend({
   /** Long-form case-study copy (markdown). Optional. */
   content: z.string().default(""),
   services: z.array(z.string().min(1)).default([]),
-  /** Card thumbnail. Falls back to heroImage when absent. */
+  /** Cover image for the homepage Selected Work card. Falls back to
+   * posterUrl, then heroImage. */
   thumbnail: imageSchema.optional(),
   heroImage: imageSchema,
+  /** Legacy images-only gallery. Still rendered while `media` is unset;
+   * never rewritten by the admin once `media` exists. */
   gallery: z.array(imageSchema).default([]),
+  /** Detail-page media (images + videos) in display order. Undefined →
+   * the project predates it and `gallery` is shown; [] → none. */
+  media: z.array(projectMediaSchema).optional(),
+  /** Selected Work cover video — direct MP4/WebM URLs (desktopVideoUrl
+   * is the admin's uploaded "Project Cover Video"), played muted over
+   * the cover image. Either may be empty: mobile falls back to desktop
+   * and vice versa; neither → the cover image alone. */
+  desktopVideoUrl: urlField(videoUrlError),
+  mobileVideoUrl: urlField(videoUrlError),
+  /** Cover image URL alternative, used when no `thumbnail` is set. */
+  posterUrl: urlField(imageUrlError),
+  /** "View case study" target. Falls back to /work/[slug]. */
+  caseStudyUrl: urlField(linkUrlError),
   results: z.array(projectResultSchema).default([]),
   testimonialId: z.string().optional(),
   featured: z.boolean().default(false),
@@ -269,6 +320,9 @@ export const contactInputSchema = z.object({
 
 /** A stored contact submission. Never exposed on the public site. */
 export const submissionSchema = contactInputSchema.extend({
+  // Input rules (e.g. the 20-char minimum) apply to new submissions
+  // only — stored rows from before a rule existed must still load.
+  message: z.string().max(4000),
   id: z.string().min(1),
   submittedAt: z.string(), // ISO timestamp
   status: z.enum(submissionStatuses).default("New"),

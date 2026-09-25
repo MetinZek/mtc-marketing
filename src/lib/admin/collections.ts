@@ -16,7 +16,17 @@ export type FieldType =
   | "date"
   | "image"
   | "image-list"
-  | "string-list";
+  | "string-list"
+  /** Uploaded video file, with preview/replace/remove. */
+  | "video"
+  /** Ordered, reorderable list of uploaded images and videos. */
+  | "media-list"
+  /** Direct video file URL, with inline preview. */
+  | "video-url"
+  /** Image URL (no upload), with inline preview. */
+  | "image-url"
+  /** Site path or absolute link. */
+  | "url";
 
 /** Upload constraints for an `image`/`image-list` field, enforced both
  * client-side (before upload) and server-side (in `uploadImageAction`). */
@@ -24,6 +34,13 @@ export type ImageFieldConfig = {
   maxSizeMB: number;
   recommendedWidth?: number;
   recommendedHeight?: number;
+  accept: string[];
+};
+
+/** Upload constraints for a `video` field, enforced client-side before
+ * upload and server-side when the upload URL is issued. */
+export type VideoFieldConfig = {
+  maxSizeMB: number;
   accept: string[];
 };
 
@@ -41,6 +58,11 @@ export type FieldDef = {
   rows?: number;
   /** For `image`/`image-list`: upload constraints for this field. */
   image?: ImageFieldConfig;
+  /** For `video`/`media-list`: upload constraints for videos. */
+  video?: VideoFieldConfig;
+  /** For `media-list`: while the entry has no value for this field yet,
+   * start the editor from this image-list field's items. */
+  initialFrom?: string;
 };
 
 export type CollectionDef = {
@@ -51,6 +73,8 @@ export type CollectionDef = {
   canDelete: boolean;
   /** Label for the publish flag in this collection. */
   publishLabel: string;
+  /** Show ↑/↓ controls in the list that rewrite `order`. */
+  reorderable?: boolean;
   listColumns: { key: string; label: string }[];
   fields: FieldDef[];
 };
@@ -65,20 +89,31 @@ const CLIENT_LOGO_IMAGE: ImageFieldConfig = {
   accept: [...RASTER_FORMATS, "image/svg+xml"],
 };
 
-/** Project hero/gallery — large editorial photography. */
+/** Project hero/gallery — large editorial photography. Capped at 4MB:
+ * Vercel rejects function request bodies over 4.5MB, and uploads are
+ * sent through a Server Action. */
 const PROJECT_IMAGE: ImageFieldConfig = {
-  maxSizeMB: 5,
+  maxSizeMB: 4,
   recommendedWidth: 2400,
   recommendedHeight: 1600,
   accept: RASTER_FORMATS,
 };
 
-/** Project thumbnail — smaller crop used in index/listing cards. */
+/** Project cover image — the homepage Selected Work card (4:3). */
 const PROJECT_THUMBNAIL_IMAGE: ImageFieldConfig = {
   maxSizeMB: 3,
   recommendedWidth: 1600,
-  recommendedHeight: 1067,
+  recommendedHeight: 1200,
   accept: RASTER_FORMATS,
+};
+
+/** Project videos (cover + detail media) — uploaded straight from the
+ * browser to Supabase Storage (never through a Vercel function, so the
+ * 4.5MB body cap doesn't apply). 50MB is Supabase's default per-file
+ * limit. */
+export const PROJECT_VIDEO: VideoFieldConfig = {
+  maxSizeMB: 50,
+  accept: ["video/mp4", "video/webm"],
 };
 
 const seo: FieldDef[] = [
@@ -100,6 +135,7 @@ export const COLLECTION_DEFS: Record<CmsCollection, CollectionDef> = {
     canCreate: true,
     canDelete: true,
     publishLabel: "Published",
+    reorderable: true,
     listColumns: [
       { key: "title", label: "Title" },
       { key: "category", label: "Category" },
@@ -127,12 +163,6 @@ export const COLLECTION_DEFS: Record<CmsCollection, CollectionDef> = {
         help: "One per line.",
       },
       {
-        key: "thumbnail",
-        label: "Thumbnail image",
-        type: "image",
-        image: PROJECT_THUMBNAIL_IMAGE,
-      },
-      {
         key: "heroImage",
         label: "Hero image",
         type: "image",
@@ -140,14 +170,58 @@ export const COLLECTION_DEFS: Record<CmsCollection, CollectionDef> = {
         image: PROJECT_IMAGE,
       },
       {
-        key: "gallery",
-        label: "Project gallery",
-        type: "image-list",
+        key: "media",
+        label: "Project media",
+        type: "media-list",
         image: PROJECT_IMAGE,
+        video: PROJECT_VIDEO,
+        initialFrom: "gallery",
+        help: "Images and videos shown on the project page below the hero, in this order. Videos keep their own proportions and play with controls.",
       },
-      { key: "featured", label: "Featured on homepage", type: "boolean" },
+      {
+        key: "thumbnail",
+        label: "Project Cover Image",
+        type: "image",
+        image: PROJECT_THUMBNAIL_IMAGE,
+        help: "Homepage Selected Work card (4:3 crop). Empty → the hero image is used.",
+      },
+      {
+        key: "desktopVideoUrl",
+        label: "Project Cover Video",
+        type: "video",
+        video: PROJECT_VIDEO,
+        help: "Optional. Replaces the cover image on the homepage card — plays muted and looped, no controls. The cover image shows until it plays and if it can't. Landscape works best.",
+      },
+      {
+        key: "mobileVideoUrl",
+        label: "Mobile cover video URL",
+        type: "video-url",
+        help: "Optional direct video URL used on phones instead of the Cover Video (e.g. a lighter or 9:16 file). Empty → the Cover Video is used.",
+      },
+      {
+        key: "posterUrl",
+        label: "Cover image URL (alternative)",
+        type: "image-url",
+        help: "Only used when no Project Cover Image is uploaded. Empty → the hero image is used.",
+      },
+      {
+        key: "caseStudyUrl",
+        label: "Case study URL",
+        type: "url",
+        help: 'Where "View case study" links to, e.g. /work/noma or https://…. Empty → this project’s own /work page.',
+      },
+      {
+        key: "featured",
+        label: "Show in Selected Work (homepage)",
+        type: "boolean",
+      },
       { key: "published", label: "Published", type: "boolean" },
-      { key: "order", label: "Display order", type: "number" },
+      {
+        key: "order",
+        label: "Display order",
+        type: "number",
+        help: "Lower comes first (1 = first). Also adjustable with ↑/↓ in the project list.",
+      },
       ...seo,
     ],
   },

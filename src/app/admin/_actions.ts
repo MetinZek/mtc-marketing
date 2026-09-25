@@ -4,11 +4,20 @@ import { promises as fs } from "node:fs";
 import path from "node:path";
 import { redirect } from "next/navigation";
 import { submissionStatuses, type SubmissionStatus } from "@/content/schema";
-import { endSession, hasValidSession, startSession } from "@/lib/admin/auth";
-import { getCollectionDef } from "@/lib/admin/collections";
+import {
+  endSession,
+  hasValidSession,
+  requireSession,
+  startSession,
+} from "@/lib/admin/auth";
+import { getCollectionDef, PROJECT_VIDEO } from "@/lib/admin/collections";
 import { passwordMatches } from "@/lib/admin/session";
+import { saveMedia } from "@/lib/cms/media";
+import { createVideoUpload, isVideoStorageConfigured } from "@/lib/cms/video-storage";
+import { isDatabaseConfigured } from "@/lib/db/client";
 import {
   deleteEntry,
+  moveEntry,
   rawEntry,
   saveEntry,
   setPublished,
@@ -39,17 +48,16 @@ export async function logoutAction(): Promise<void> {
 /* ---------------- image uploads ---------------- */
 
 /**
- * Admin-uploaded images land in `public/uploads` (git-ignored, like
- * `.data/`) and are served by Next as ordinary static files — same
- * "works with next dev / a self-hosted Node deployment" caveat as the
- * JSON content store: a read-only serverless filesystem would need a
- * real object-storage provider instead.
+ * Admin-uploaded images go to the database (`cms_media`, served by
+ * /api/media/[name]) whenever DATABASE_URL is set — always the case in
+ * production. Only local development without a database still writes
+ * to `public/uploads` (git-ignored, like `.data/`).
  */
 const UPLOAD_DIR = path.join(process.cwd(), "public", "uploads");
 
 /** Hard ceiling regardless of what the field/client claims — defence in
  * depth against an abusive request, independent of the per-field limits
- * (1–5MB) the admin UI already enforces before it ever gets here. */
+ * (1–4MB) the admin UI already enforces before it ever gets here. */
 const ABSOLUTE_MAX_UPLOAD_BYTES = 10 * 1024 * 1024;
 
 const UPLOAD_EXTENSIONS: Record<string, string> = {
@@ -79,7 +87,7 @@ export async function uploadImageAction(formData: FormData): Promise<UploadState
     return { ok: false, error: `Unsupported file type: ${file.type || "unknown"}.` };
   }
 
-  // The field's own limit (1MB/3MB/5MB depending on where the upload
+  // The field's own limit (1MB/3MB/4MB depending on where the upload
   // happened), narrowed by the absolute server-side ceiling either way.
   const requestedMax = Number(formData.get("maxBytes"));
   const maxBytes =
@@ -96,10 +104,80 @@ export async function uploadImageAction(formData: FormData): Promise<UploadState
   const filename = `${Date.now()}-${crypto.randomUUID()}.${extension}`;
   const bytes = Buffer.from(await file.arrayBuffer());
 
+  if (isDatabaseConfigured()) {
+    return { ok: true, url: await saveMedia(filename, file.type, bytes) };
+  }
+  if (process.env.VERCEL) {
+    return { ok: false, error: "Uploads need a database — DATABASE_URL is not set." };
+  }
+
   await fs.mkdir(UPLOAD_DIR, { recursive: true });
   await fs.writeFile(path.join(UPLOAD_DIR, filename), bytes);
 
   return { ok: true, url: `/uploads/${filename}` };
+}
+
+/* ---------------- video uploads ---------------- */
+
+const VIDEO_EXTENSIONS: Record<string, string> = {
+  "video/mp4": "mp4",
+  "video/webm": "webm",
+};
+
+export type VideoUploadTarget =
+  | { ok: true; uploadUrl: string; url: string }
+  | { ok: false; error: string };
+
+/**
+ * Step 1 of a project video upload: validates the file's type/size and
+ * returns where the browser should PUT the file itself, plus the URL to
+ * store once that succeeds. The file never passes through this action
+ * (Vercel's 4.5MB body cap) — it goes straight to Supabase Storage via a
+ * signed URL, or, in local development without a database, to the
+ * session-checked /api/admin/video-upload route (public/uploads).
+ */
+export async function prepareVideoUploadAction(file: {
+  type: string;
+  size: number;
+}): Promise<VideoUploadTarget> {
+  if (!(await hasValidSession())) {
+    return { ok: false, error: "Your session has expired. Please sign in again." };
+  }
+
+  const extension = VIDEO_EXTENSIONS[file.type];
+  if (!extension || !PROJECT_VIDEO.accept.includes(file.type)) {
+    return { ok: false, error: `Unsupported file type: ${file.type || "unknown"}. Use MP4 or WebM.` };
+  }
+  const maxBytes = PROJECT_VIDEO.maxSizeMB * 1024 * 1024;
+  if (!(file.size > 0)) return { ok: false, error: "That file is empty." };
+  if (file.size > maxBytes) {
+    return { ok: false, error: `File is too large — maximum is ${PROJECT_VIDEO.maxSizeMB} MB.` };
+  }
+
+  const filename = `${Date.now()}-${crypto.randomUUID()}.${extension}`;
+
+  if (isVideoStorageConfigured()) {
+    try {
+      const { uploadUrl, publicUrl } = await createVideoUpload(`projects/${filename}`);
+      return { ok: true, uploadUrl, url: publicUrl };
+    } catch (error) {
+      console.error(error);
+      return { ok: false, error: "Could not prepare the upload. Please try again." };
+    }
+  }
+  // With a database the site is (or shares data with) production, where
+  // a local public/uploads path would 404 — require real storage.
+  if (isDatabaseConfigured() || process.env.VERCEL) {
+    return {
+      ok: false,
+      error: "Video uploads need Supabase Storage — set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY.",
+    };
+  }
+  return {
+    ok: true,
+    uploadUrl: `/api/admin/video-upload?name=${encodeURIComponent(filename)}`,
+    url: `/uploads/${filename}`,
+  };
 }
 
 /* ---------------- sanitising ---------------- */
@@ -146,6 +224,9 @@ export async function saveEntryAction(
   _prev: SaveState,
   formData: FormData,
 ): Promise<SaveState> {
+  // Server actions are reachable by POST from any route, not only the
+  // proxy-gated /admin pages — every mutation re-checks the session.
+  await requireSession();
   const def = getCollectionDef(String(formData.get("collection") ?? ""));
   if (!def) return { formError: "Unknown collection." };
 
@@ -179,13 +260,25 @@ export async function saveEntryAction(
 }
 
 export async function togglePublishedAction(formData: FormData): Promise<void> {
+  await requireSession();
   const def = getCollectionDef(String(formData.get("collection") ?? ""));
   const id = String(formData.get("id") ?? "");
   if (!def || !id) return;
   await setPublished(def.key, id, formData.get("next") === "true");
 }
 
+export async function moveEntryAction(formData: FormData): Promise<void> {
+  await requireSession();
+  const def = getCollectionDef(String(formData.get("collection") ?? ""));
+  const id = String(formData.get("id") ?? "");
+  const direction = formData.get("direction");
+  if (!def || !def.reorderable || def.key === "posts" || !id) return;
+  if (direction !== "up" && direction !== "down") return;
+  await moveEntry(def.key, id, direction);
+}
+
 export async function deleteEntryAction(formData: FormData): Promise<void> {
+  await requireSession();
   const def = getCollectionDef(String(formData.get("collection") ?? ""));
   const id = String(formData.get("id") ?? "");
   if (!def || !def.canDelete || !id) return;
@@ -196,6 +289,7 @@ export async function deleteEntryAction(formData: FormData): Promise<void> {
 export async function updateSubmissionStatusAction(
   formData: FormData,
 ): Promise<void> {
+  await requireSession();
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "") as SubmissionStatus;
   if (!id || !submissionStatuses.includes(status)) return;
