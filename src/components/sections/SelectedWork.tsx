@@ -20,7 +20,7 @@ type SelectedWorkProps = {
 };
 
 /**
- * Selected Work as a compact editorial index: a fixed, controlled
+ * Selected Work as a large editorial index: a fixed, controlled
  * thumbnail proportion for every project (no giant hero blocks), a
  * tight hairline-divided rhythm, and the thumbnail alternating sides
  * per row — asymmetry from alternation rather than from wildly
@@ -97,13 +97,13 @@ function ProjectRow({
   );
 
   return (
-    <Reveal as="div" delay={(number - 1) * 0.05} className="group py-8 sm:py-9 lg:py-10">
+    <Reveal as="div" delay={(number - 1) * 0.05} className="group py-8 sm:py-9 lg:py-14">
       <Grid className="items-center">
         {/* Thumbnail — fixed, controlled proportion for every project */}
         <div
           className={cn(
-            "col-span-12 sm:col-span-5 lg:col-span-4",
-            reverse && "sm:order-2 lg:col-start-9",
+            "col-span-12 sm:col-span-5 lg:col-span-5",
+            reverse && "sm:order-2 lg:col-start-8",
           )}
         >
           <Link
@@ -136,12 +136,12 @@ function ProjectRow({
               <span
                 aria-hidden="true"
                 className={cn(
-                  "pointer-events-none absolute bottom-3 flex h-8 w-8 items-center justify-center rounded-full",
-                  "bg-canvas text-sm text-ink opacity-0 shadow-lift transition-all duration-[var(--duration-base)]",
+                  "pointer-events-none absolute bottom-3 flex h-8 w-8 items-center justify-center rounded-full lg:bottom-4 lg:h-10 lg:w-10",
+                  "bg-canvas text-sm lg:text-base text-ink opacity-0 shadow-lift transition-all duration-[var(--duration-base)]",
                   "ease-[var(--ease-out-soft)] group-hover:opacity-100",
                   reverse
-                    ? "left-3 translate-x-1 group-hover:translate-x-0"
-                    : "right-3 -translate-x-1 group-hover:translate-x-0",
+                    ? "left-3 translate-x-1 group-hover:translate-x-0 lg:left-4"
+                    : "right-3 -translate-x-1 lg:right-4 group-hover:translate-x-0",
                 )}
               >
                 &rarr;
@@ -153,22 +153,22 @@ function ProjectRow({
         {/* Meta — compact, clearly structured */}
         <div
           className={cn(
-            "col-span-12 mt-4 sm:col-span-7 sm:mt-0 lg:col-span-7",
-            reverse ? "sm:order-1 lg:col-start-1" : "lg:col-start-6",
+            "col-span-12 mt-4 sm:col-span-7 sm:mt-0 lg:col-span-6",
+            reverse ? "sm:order-1 lg:col-start-1" : "lg:col-start-7",
           )}
         >
-          <div className="flex items-baseline gap-3">
-            <span className="label text-ink-faint transition-colors duration-[var(--duration-base)] group-hover:text-blue">
+          <div className="flex items-baseline gap-3 lg:gap-4">
+            <span className="label text-ink-faint lg:text-[0.875rem]! transition-colors duration-[var(--duration-base)] group-hover:text-blue">
               {display}
             </span>
-            <h3 className="text-title text-ink transition-colors duration-[var(--duration-base)] group-hover:text-blue">
+            <h3 className="text-title text-ink lg:text-[clamp(1.6rem,1.3rem+1.2vw,2.4rem)] lg:leading-[1.15] lg:tracking-[-0.02em] transition-colors duration-[var(--duration-base)] group-hover:text-blue">
               {project.title}
             </h3>
           </div>
-          <p className="label mt-1.5 text-ink-muted">
+          <p className="label mt-1.5 text-ink-muted lg:mt-3 lg:text-[0.875rem]!">
             {project.category} &middot; {project.year}
           </p>
-          <ArrowLink href={href} external={external} className="mt-3.5">
+          <ArrowLink href={href} external={external} className="mt-3.5 lg:mt-6 lg:text-[1.0625rem]">
             {dict.work.viewCaseStudy}
           </ArrowLink>
         </div>
