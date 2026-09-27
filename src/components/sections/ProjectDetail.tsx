@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Reveal } from "@/components/motion/Reveal";
 import { imageReveal } from "@/components/motion/variants";
+import { CaseStudySections } from "@/components/sections/CaseStudySections";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { ProjectVideo } from "@/components/sections/ProjectVideo";
 import { Label } from "@/components/ui/Label";
@@ -171,6 +172,9 @@ export function ProjectDetail({ project, moreProjects, cta, dict, locale }: Proj
           </p>
         </Reveal>
       </Section>
+
+      {/* 4a — Case study: CMS sections (title, text, media), in order */}
+      <CaseStudySections sections={project.sections} title={project.title} />
 
       {/* 4b — Outcomes: only when the CMS carries measured results */}
       {project.results.length > 0 && (

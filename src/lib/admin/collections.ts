@@ -21,6 +21,8 @@ export type FieldType =
   | "video"
   /** Ordered, reorderable list of uploaded images and videos. */
   | "media-list"
+  /** Ordered case-study sections: one image + optional description each. */
+  | "sections"
   /** Direct video file URL, with inline preview. */
   | "video-url"
   /** Image URL (no upload), with inline preview. */
@@ -177,6 +179,13 @@ export const COLLECTION_DEFS: Record<CmsCollection, CollectionDef> = {
         video: PROJECT_VIDEO,
         initialFrom: "gallery",
         help: "Images and videos shown on the project page below the hero, in this order. Videos keep their own proportions and play with controls.",
+      },
+      {
+        key: "sections",
+        label: "Case Study",
+        type: "sections",
+        image: PROJECT_IMAGE,
+        help: "Large images shown on the project page below the project details, in this order, each at its own proportions. A description is optional per image. Drag ⠿ or use ↑/↓ to reorder.",
       },
       {
         key: "thumbnail",

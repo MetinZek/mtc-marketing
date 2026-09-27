@@ -67,6 +67,20 @@ export const projectMediaSchema = z.discriminatedUnion("type", [
   }),
 ]);
 
+/** One case-study section: a single image (shown at its own proportions)
+ * with an optional description. Images only — no video. Stored in
+ * `case_study_sections`; array position = display order. */
+export const caseStudySectionSchema = z.object({
+  id: z.string().min(1),
+  /** Alt text is optional here; the page falls back to the project title. */
+  image: z.object(
+    { ...imageSchema.shape, alt: z.string().optional() },
+    { error: "Upload an image for this section." },
+  ),
+  /** Plain text; a blank line starts a new paragraph. */
+  description: z.string().optional(),
+});
+
 export const projectResultSchema = z.object({
   label: z.string().min(1), // e.g. "Organic reach"
   value: z.string().min(1), // e.g. "+240%"
@@ -93,6 +107,8 @@ export const projectSchema = seoSchema.extend({
   /** Detail-page media (images + videos) in display order. Undefined →
    * the project predates it and `gallery` is shown; [] → none. */
   media: z.array(projectMediaSchema).optional(),
+  /** Case-study sections shown below the project details, in order. */
+  sections: z.array(caseStudySectionSchema).default([]),
   /** Selected Work cover video — direct MP4/WebM URLs (desktopVideoUrl
    * is the admin's uploaded "Project Cover Video"), played muted over
    * the cover image. Either may be empty: mobile falls back to desktop

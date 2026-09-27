@@ -44,7 +44,100 @@ async function selectRows(sql: Tx, key: StoreKey): Promise<Row[]> {
                   order by ${sql.unsafe(spec.orderBy)}`
       : await sql`select * from ${sql(spec.table)}
                   order by ${sql.unsafe(spec.orderBy)}`;
-  return records.map((r) => fromRecord(key, r as DbRecord));
+  const rows = records.map((r) => fromRecord(key, r as DbRecord));
+  return key === "projects" ? attachSections(sql, rows) : rows;
+}
+
+/* ---- case-study sections (case_study_sections) ----
+ * Projects carry `sections` (one image + optional description each) in
+ * the CMS row; here they live in their own table. Until migration 0005
+ * is applied that table doesn't have this shape: reads then return no
+ * sections and only a save that has sections fails. */
+
+let sectionTableReady = false;
+
+async function hasSectionTable(sql: Tx): Promise<boolean> {
+  if (sectionTableReady) return true;
+  const [row] = await sql`
+    select exists (
+      select 1 from information_schema.columns
+      where table_schema = current_schema()
+        and table_name = 'case_study_sections' and column_name = 'image_src'
+    ) as ok`;
+  sectionTableReady = row?.ok === true;
+  return sectionTableReady;
+}
+
+async function attachSections(sql: Tx, rows: Row[]): Promise<Row[]> {
+  if (rows.length === 0 || !(await hasSectionTable(sql))) return rows;
+  const records = await sql`
+    select id, project_id, image_src, image_alt, image_width, image_height, description
+    from case_study_sections
+    order by project_id, sort_order, id`;
+
+  const byProject = new Map<string, Row[]>();
+  for (const r of records) {
+    const image: Row = { src: r.image_src };
+    if (r.image_alt !== null) image.alt = r.image_alt;
+    if (r.image_width !== null) image.width = r.image_width;
+    if (r.image_height !== null) image.height = r.image_height;
+    const section: Row = { id: r.id, image };
+    if (r.description !== null) section.description = r.description;
+    const list = byProject.get(r.project_id) ?? [];
+    list.push(section);
+    byProject.set(r.project_id, list);
+  }
+
+  return rows.map((row) => {
+    const list = byProject.get(idOf(row));
+    return list ? { ...row, sections: list } : row;
+  });
+}
+
+type SectionRow = {
+  id: string;
+  image: { src: string; alt?: string; width?: number; height?: number };
+  description?: string;
+};
+
+/** Replace the case-study sections of the given projects. */
+async function writeSections(tx: Tx, projects: Row[]): Promise<void> {
+  if (projects.length === 0) return;
+  const hasAny = projects.some((p) => Array.isArray(p.sections) && p.sections.length > 0);
+  if (!(await hasSectionTable(tx))) {
+    if (hasAny) {
+      throw new Error(
+        "[cms] Case-study sections need database migration 0005 — run `npm run db:migrate`.",
+      );
+    }
+    return;
+  }
+
+  await tx`delete from case_study_sections where project_id in ${tx(projects.map(idOf))}`;
+  if (!hasAny) return;
+
+  const records: Record<string, Param>[] = projects.flatMap((project) =>
+    ((project.sections ?? []) as SectionRow[]).map((section, i) => ({
+      id: section.id,
+      project_id: idOf(project),
+      image_src: section.image.src,
+      image_alt: section.image.alt ?? null,
+      image_width: section.image.width ?? null,
+      image_height: section.image.height ?? null,
+      description: section.description ?? null,
+      sort_order: i,
+    })),
+  );
+  await tx`insert into case_study_sections ${tx(records, [
+    "id",
+    "project_id",
+    "image_src",
+    "image_alt",
+    "image_width",
+    "image_height",
+    "description",
+    "sort_order",
+  ])}`;
 }
 
 export async function readRows(key: StoreKey): Promise<unknown[]> {
@@ -94,7 +187,7 @@ export async function mutateRows(
     // Upsert only rows that are new, changed, or (for JSON documents)
     // moved position. A fresh collection writes everything.
     const before = new Map(current.map((row, i) => [idOf(row), { json: JSON.stringify(row), i }]));
-    const changed = next
+    const changedRows = next
       .map((row, i) => ({ row, i }))
       .filter(({ row, i }) => {
         if (!wasInitialized) return true;
@@ -104,8 +197,8 @@ export async function mutateRows(
           prev.json !== JSON.stringify(row) ||
           (spec.table === "cms_entries" && prev.i !== i)
         );
-      })
-      .map(({ row, i }) => prepare(tx, toRecord(key, row, i)));
+      });
+    const changed = changedRows.map(({ row, i }) => prepare(tx, toRecord(key, row, i)));
 
     if (changed.length > 0) {
       const updates = spec.columns
@@ -118,6 +211,9 @@ export async function mutateRows(
         on conflict (${tx(spec.key)}) do update set ${tx.unsafe(updates)}
       `;
     }
+
+    // Child rows go in after their project rows exist (foreign key).
+    if (key === "projects") await writeSections(tx, changedRows.map(({ row }) => row));
 
     if (!wasInitialized) {
       await tx`insert into cms_collections (name) values (${key})

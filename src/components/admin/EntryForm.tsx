@@ -31,6 +31,18 @@ type MediaValue = ImageValue & { key: string; type: "image" | "video" };
 let mediaKeySeq = 0;
 const newMediaKey = () => `media-${++mediaKeySeq}`;
 
+/** One case-study section in the form: an image and optional text.
+ * `key` doubles as the section's persisted id, so it must be unique
+ * across all projects. */
+type SectionValue = { key: string; image: ImageValue; description: string };
+
+/** crypto.randomUUID only exists in secure contexts (not plain-http LAN
+ * access), hence the fallback. */
+const newSectionId = () =>
+  typeof crypto !== "undefined" && typeof crypto.randomUUID === "function"
+    ? crypto.randomUUID()
+    : `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+
 /** Applies when a field doesn't declare its own `image` constraints. */
 const DEFAULT_IMAGE_CONFIG: ImageFieldConfig = {
   maxSizeMB: 4, // Vercel caps request bodies at 4.5MB
@@ -95,6 +107,79 @@ function asMedia(raw: unknown): MediaValue {
   return { key: newMediaKey(), type, ...asImage(raw) };
 }
 
+function asSection(raw: unknown): SectionValue {
+  const o = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+  return {
+    key: typeof o.id === "string" && o.id ? o.id : newSectionId(),
+    image: asImage(o.image),
+    description: typeof o.description === "string" ? o.description : "",
+  };
+}
+
+/** Moves the item keyed `from` to the position of the item keyed `to`. */
+function moveByKey<T extends { key: string }>(items: T[], from: string, to: string): T[] {
+  const i = items.findIndex((it) => it.key === from);
+  const j = items.findIndex((it) => it.key === to);
+  if (i < 0 || j < 0 || i === j) return items;
+  const copy = [...items];
+  const [moved] = copy.splice(i, 1);
+  copy.splice(j, 0, moved!);
+  return copy;
+}
+
+/**
+ * Drag-to-reorder for a keyed list. Only the ⠿ handle arms dragging
+ * (the row becomes `draggable` while it's pressed), so text inside the
+ * row stays selectable. Events stop at the innermost list, which lets
+ * lists nest (media inside a section).
+ */
+function useDragReorder(onMove: (from: string, to: string) => void) {
+  const [dragKey, setDragKey] = useState<string | null>(null);
+  const [overKey, setOverKey] = useState<string | null>(null);
+  const reset = () => {
+    setDragKey(null);
+    setOverKey(null);
+  };
+
+  const row = (key: string) => ({
+    draggable: dragKey === key,
+    onDragStart: (e: React.DragEvent) => {
+      if (dragKey !== key) return;
+      e.stopPropagation();
+      e.dataTransfer.effectAllowed = "move";
+      e.dataTransfer.setData("text/plain", key);
+    },
+    onDragOver: (e: React.DragEvent) => {
+      if (!dragKey) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (overKey !== key) setOverKey(key);
+    },
+    onDrop: (e: React.DragEvent) => {
+      if (!dragKey) return;
+      e.preventDefault();
+      e.stopPropagation();
+      if (dragKey !== key) onMove(dragKey, key);
+      reset();
+    },
+    onDragEnd: reset,
+  });
+
+  const handle = (key: string, label: string) => ({
+    type: "button" as const,
+    "aria-label": label,
+    title: "Drag to reorder",
+    onPointerDown: () => setDragKey(key),
+    onPointerUp: () => setDragKey(null),
+    className: "cursor-grab px-1 text-ink-faint hover:text-ink active:cursor-grabbing",
+  });
+
+  const rowCls = (key: string) =>
+    cn(dragKey === key && "opacity-50", overKey === key && dragKey !== key && "ring-2 ring-blue/40");
+
+  return { row, handle, rowCls };
+}
+
 function initValues(def: CollectionDef, entry: Values): Values {
   const out: Values = {};
   for (const field of def.fields) {
@@ -122,6 +207,9 @@ function initValues(def: CollectionDef, entry: Values): Values {
         out[field.key] = Array.isArray(source) ? source.map(asMedia) : [];
         break;
       }
+      case "sections":
+        out[field.key] = Array.isArray(raw) ? raw.map(asSection) : [];
+        break;
       default:
         out[field.key] = raw != null ? String(raw) : "";
     }
@@ -172,6 +260,24 @@ function buildPayload(def: CollectionDef, values: Values): Values {
             ...(m.width ? { width: Number(m.width) } : {}),
             ...(m.height ? { height: Number(m.height) } : {}),
           }));
+        break;
+      case "sections":
+        // A section without an image is sent without one, so the save
+        // fails with "image required" on it instead of dropping its text.
+        out[field.key] = (v as SectionValue[]).map(({ key, image, description }) => ({
+          id: key,
+          ...(image.src.trim()
+            ? {
+                image: {
+                  src: image.src.trim(),
+                  ...(image.alt.trim() ? { alt: image.alt.trim() } : {}),
+                  ...(image.width ? { width: Number(image.width) } : {}),
+                  ...(image.height ? { height: Number(image.height) } : {}),
+                },
+              }
+            : {}),
+          ...(description.trim() ? { description: description.trim() } : {}),
+        }));
         break;
       case "string-list":
         out[field.key] = String(v)
@@ -394,6 +500,19 @@ function Field({
   if (field.type === "media-list") {
     return (
       <MediaListField
+        field={field}
+        value={value}
+        error={error}
+        childErrors={childErrors}
+        onUpdate={onUpdate}
+        onUploadingChange={onUploadingChange}
+      />
+    );
+  }
+
+  if (field.type === "sections") {
+    return (
+      <SectionsField
         field={field}
         value={value}
         error={error}
@@ -930,6 +1049,142 @@ function MediaListField({
           + Add video
         </button>
       </div>
+      <ErrorText message={error} />
+    </fieldset>
+  );
+}
+
+/**
+ * Case-study sections: each is one image (the same uploader, preview,
+ * replace and remove as every other image field) plus an optional
+ * description. Sections reorder by drag or ↑/↓ and save with the form.
+ */
+function SectionsField({
+  field,
+  value,
+  error,
+  childErrors,
+  onUpdate,
+  onUploadingChange,
+}: {
+  field: FieldDef;
+  value: unknown;
+  error?: string;
+  childErrors?: Record<string, string>;
+  onUpdate: (fn: (value: unknown) => unknown) => void;
+  onUploadingChange: (delta: number) => void;
+}) {
+  const list = (value as SectionValue[]) ?? [];
+
+  const updateList = (fn: (items: SectionValue[]) => SectionValue[]) =>
+    onUpdate((current) => fn((current as SectionValue[]) ?? []));
+  const patch = (key: string, next: Partial<SectionValue>) =>
+    updateList((items) => items.map((s) => (s.key === key ? { ...s, ...next } : s)));
+  const move = (key: string, delta: number) =>
+    updateList((items) => {
+      const target = items[items.findIndex((s) => s.key === key) + delta];
+      return target ? moveByKey(items, key, target.key) : items;
+    });
+  const remove = (key: string) => updateList((items) => items.filter((s) => s.key !== key));
+  const add = () =>
+    updateList((items) => [
+      ...items,
+      { key: newSectionId(), image: { ...EMPTY_IMAGE }, description: "" },
+    ]);
+  const drag = useDragReorder((from, to) => updateList((items) => moveByKey(items, from, to)));
+
+  const control =
+    "text-meta text-ink-muted hover:text-blue disabled:opacity-30 disabled:hover:text-ink-muted";
+
+  return (
+    <fieldset className="rounded-sm border border-line p-4">
+      <legend className="label px-1 text-ink-muted">{field.label}</legend>
+      {field.help && <p className="text-meta text-ink-faint">{field.help}</p>}
+
+      {list.length > 0 ? (
+        <ol className="mt-4 space-y-4">
+          {list.map((section, i) => {
+            const number = String(i + 1).padStart(2, "0");
+            const prefix = `${field.key}.${i}`;
+            return (
+              <li
+                key={section.key}
+                {...drag.row(section.key)}
+                className={cn("rounded-sm border border-line bg-canvas p-4", drag.rowCls(section.key))}
+              >
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <span className="flex items-center gap-2">
+                    <button {...drag.handle(section.key, `Drag section ${number} to reorder`)}>⠿</button>
+                    <span className="label text-ink">Section {number}</span>
+                  </span>
+                  <div className="flex items-center gap-3">
+                    <button
+                      type="button"
+                      onClick={() => move(section.key, -1)}
+                      disabled={i === 0}
+                      aria-label={`Move section ${number} up`}
+                      className={control}
+                    >
+                      ↑
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => move(section.key, 1)}
+                      disabled={i === list.length - 1}
+                      aria-label={`Move section ${number} down`}
+                      className={control}
+                    >
+                      ↓
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => remove(section.key)}
+                      className="text-meta text-ink-muted hover:text-danger"
+                    >
+                      Delete section
+                    </button>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <div>
+                    <span className="text-meta text-ink-muted">Image</span>
+                    <div className="mt-1">
+                      <ImageRow
+                        value={section.image}
+                        labelPrefix={`${prefix}.image`}
+                        errors={childErrors}
+                        image={field.image}
+                        onUploadingChange={onUploadingChange}
+                        onChange={(next) => patch(section.key, { image: next })}
+                      />
+                    </div>
+                    <ErrorText message={childErrors?.[`${prefix}.image`]} />
+                  </div>
+                  <label className="block">
+                    <span className="text-meta text-ink-muted">Description (optional)</span>
+                    <textarea
+                      rows={3}
+                      value={section.description}
+                      onChange={(e) => patch(section.key, { description: e.target.value })}
+                      className={cn(inputCls, "mt-1 resize-y")}
+                    />
+                    <span className="mt-1 block text-meta text-ink-faint">
+                      Leave empty to show the image on its own. An empty line starts a new paragraph.
+                    </span>
+                  </label>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+      ) : (
+        <p className="mt-4 text-meta text-ink-faint">No sections yet.</p>
+      )}
+
+      <button type="button" onClick={add} className="mt-3 text-meta text-blue hover:underline">
+        + Add section
+      </button>
       <ErrorText message={error} />
     </fieldset>
   );
