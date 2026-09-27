@@ -3,10 +3,9 @@ import { Reveal } from "@/components/motion/Reveal";
 import { imageReveal } from "@/components/motion/variants";
 import { CaseStudySections } from "@/components/sections/CaseStudySections";
 import { FinalCta } from "@/components/sections/FinalCta";
-import { ProjectVideo } from "@/components/sections/ProjectVideo";
 import { Label } from "@/components/ui/Label";
 import { Section } from "@/components/ui/Section";
-import type { HomepageContent, ImageRef, Project, ProjectMediaItem } from "@/content/types";
+import type { HomepageContent, ImageRef, Project } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { interpolate } from "@/i18n/format";
 import type { Locale } from "@/i18n/locales";
@@ -37,44 +36,14 @@ function isPortrait(image: ImageRef) {
 }
 
 /**
- * Group gallery media into an editorial rhythm: a full-width item,
- * then a two-up row, then full-width again, and so on. Two items pair
- * up directly; a single trailing item in a "pair" slot falls back to
- * full-width, so the layout still reads as intentional at any count.
- */
-function buildRows<T>(images: T[]): T[][] {
-  if (images.length <= 1) return images.length ? [images] : [];
-  if (images.length === 2) return [images];
-
-  const rows: T[][] = [];
-  let cursor = 0;
-  let solo = true;
-
-  while (cursor < images.length) {
-    rows.push(images.slice(cursor, cursor + (solo ? 1 : 2)));
-    cursor += solo ? 1 : 2;
-    solo = !solo;
-  }
-
-  return rows;
-}
-
-/** The project's media in saved order. Projects that predate the
- * media list (`media` unset) show their image gallery, unchanged. */
-function mediaOf(project: Project): ProjectMediaItem[] {
-  return project.media ?? project.gallery.map((image) => ({ type: "image" as const, ...image }));
-}
-
-/**
- * /work/[slug] — a single case study, image-led. The CMS gives one
- * short `description` and an ordered list of images and videos;
- * everything here is driven by that. Sections whose data is empty
- * (media, results) simply don't render, so a project with only a hero
- * image still looks finished.
+ * /work/[slug] — a single case study. Header (category, title, year, ONE
+ * cover image = the hero image), then client/services/year/category and
+ * the description, then the case-study sections — the only other images
+ * on the page. The older "Project media" list is kept in the data but is
+ * not rendered here. Sections whose data is empty (case study, results)
+ * simply don't render.
  */
 export function ProjectDetail({ project, moreProjects, cta, dict, locale }: ProjectDetailProps) {
-  const rows = buildRows(mediaOf(project));
-
   return (
     <article>
       {/* 1 — Hero: minimal information, confident type, main image */}
@@ -118,34 +87,9 @@ export function ProjectDetail({ project, moreProjects, cta, dict, locale }: Proj
         </Reveal>
       </Section>
 
-      {/* 2 — Visuals: flexible editorial media layout, in saved order */}
-      {rows.length > 0 && (
-        <Section ground="canvas" spacing="sm">
-          <div className="flex flex-col gap-4 sm:gap-6 lg:gap-8">
-            {rows.map((row, i) => (
-              <Reveal
-                key={row.map((item) => item.src).join("|")}
-                variants={imageReveal}
-                amount={0.15}
-                delay={0.03 * (i % 4)}
-              >
-                {row.length >= 2 ? (
-                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:gap-8">
-                    {row.map((item) => (
-                      <GalleryItem key={item.src} item={item} title={project.title} />
-                    ))}
-                  </div>
-                ) : (
-                  row[0] && <GalleryItem item={row[0]} title={project.title} full />
-                )}
-              </Reveal>
-            ))}
-          </div>
-        </Section>
-      )}
-
-      {/* 3 + 4 — Information (CMS-only) and the story, one rhythm unit */}
-      <Section ground="canvas" spacing="md">
+      {/* 3 + 4 — Information (CMS-only) and the story, one rhythm unit.
+          No top padding: the details follow the cover image directly. */}
+      <Section ground="canvas" spacing="md" className="pt-0 sm:pt-0">
         <Reveal>
           <dl className="grid grid-cols-2 gap-x-6 gap-y-8 border-t border-line pt-8 sm:grid-cols-4">
             <Fact term={dict.projectDetail.client} detail={project.client} />
@@ -166,15 +110,21 @@ export function ProjectDetail({ project, moreProjects, cta, dict, locale }: Proj
           </dl>
         </Reveal>
 
-        <Reveal delay={0.05}>
-          <p className="mt-16 max-w-2xl text-lead text-ink lg:mt-24 lg:ml-[33%] lg:max-w-xl">
-            {project.description}
-          </p>
-        </Reveal>
+        {project.description.trim() && (
+          <Reveal delay={0.05}>
+            <p className="mt-16 max-w-2xl text-lead text-ink lg:mt-24 lg:ml-[33%] lg:max-w-xl">
+              {project.description}
+            </p>
+          </Reveal>
+        )}
       </Section>
 
-      {/* 4a — Case study: CMS sections (title, text, media), in order */}
-      <CaseStudySections sections={project.sections} title={project.title} />
+      {/* 4a — Case study: CMS sections (image + optional text), in order.
+          A section reusing the cover image is skipped so it never shows twice. */}
+      <CaseStudySections
+        sections={project.sections.filter((section) => section.image.src !== project.heroImage.src)}
+        title={project.title}
+      />
 
       {/* 4b — Outcomes: only when the CMS carries measured results */}
       {project.results.length > 0 && (
@@ -276,53 +226,5 @@ function RelatedProjectCard({
         </p>
       </div>
     </Link>
-  );
-}
-
-function GalleryItem({
-  item,
-  title,
-  full = false,
-}: {
-  item: ProjectMediaItem;
-  title: string;
-  full?: boolean;
-}) {
-  return item.type === "video" ? (
-    <ProjectVideo
-      src={item.src}
-      title={item.alt || title}
-      width={item.width}
-      height={item.height}
-      full={full}
-    />
-  ) : (
-    <GalleryFigure image={item} full={full} />
-  );
-}
-
-function GalleryFigure({
-  image,
-  full = false,
-}: {
-  image: ImageRef;
-  full?: boolean;
-}) {
-  return (
-    <figure
-      className={cn(
-        "group relative overflow-hidden rounded-sm bg-paper",
-        full && isPortrait(image) && "mx-auto max-w-2xl",
-      )}
-      style={{ aspectRatio: ratioOf(image, full ? "16 / 10" : "4 / 5") }}
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven placeholder asset, not a static import */}
-      <img
-        src={image.src}
-        alt={image.alt}
-        loading="lazy"
-        className="h-full w-full object-cover object-center transition-transform duration-[var(--duration-slow)] ease-[var(--ease-out-soft)] group-hover:scale-[1.02]"
-      />
-    </figure>
   );
 }
