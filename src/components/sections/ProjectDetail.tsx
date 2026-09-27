@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Reveal } from "@/components/motion/Reveal";
-import { imageReveal } from "@/components/motion/variants";
 import { CaseStudySections } from "@/components/sections/CaseStudySections";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { Label } from "@/components/ui/Label";
@@ -10,7 +9,6 @@ import type { Dictionary } from "@/i18n/get-dictionary";
 import { interpolate } from "@/i18n/format";
 import type { Locale } from "@/i18n/locales";
 import { withLocale } from "@/i18n/paths";
-import { cn } from "@/lib/utils";
 
 type RelatedProject = Pick<
   Project,
@@ -31,116 +29,83 @@ function ratioOf(image: ImageRef, fallback: string) {
     : fallback;
 }
 
-function isPortrait(image: ImageRef) {
-  return Boolean(image.width && image.height && image.height > image.width);
-}
-
 /**
- * /work/[slug] — a single case study. Header (category, title, year, ONE
- * cover image = the hero image), then client/services/year/category and
- * the description, then the "Project media" images and the case-study
- * sections — the only other images on the page (never video). Sections
- * whose data is empty (media, case study, results) simply don't render.
+ * The project's images in page order: the hero image, then the "Project
+ * media" images (or, for projects that predate that list, the legacy
+ * gallery), then the case-study sections — each with its optional
+ * description. Images only: videos are never shown. An image that appears
+ * more than once in the data is shown once; nothing is removed from the data.
  */
-/**
- * The images from the admin's "Project media" list (or, for projects that
- * predate it, the legacy gallery), in saved order, as image-only
- * sections. Videos are left out — the project page shows no video.
- */
-function projectMediaImages(project: Project): CaseStudySection[] {
+function projectImages(project: Project): CaseStudySection[] {
   const media = project.media ?? project.gallery.map((image) => ({ type: "image" as const, ...image }));
-  return media.flatMap((item, i) =>
+  const mediaImages = media.flatMap((item, i) =>
     item.type === "image"
       ? [{ id: `media-${i}`, image: { src: item.src, alt: item.alt, width: item.width, height: item.height } }]
       : [],
   );
+  const seen = new Set<string>();
+  return [{ id: "hero", image: project.heroImage }, ...mediaImages, ...project.sections].filter((section) => {
+    if (seen.has(section.image.src)) return false;
+    seen.add(section.image.src);
+    return true;
+  });
 }
 
+/** "https://www.example.com/" → "example.com" for the link text. */
+function displayUrl(url: string) {
+  return url.replace(/^https?:\/\//, "").replace(/^www\./, "").replace(/\/$/, "");
+}
+
+/**
+ * /work/[slug] — a single project. The header holds only the project
+ * information in two columns — left: the year, the description and the
+ * optional website/social link; right: "Services:" with one service per
+ * line — and the project images follow directly underneath.
+ */
 export function ProjectDetail({ project, moreProjects, cta, dict, locale }: ProjectDetailProps) {
-  // Everything below the description: Project media images, then the
-  // case-study sections. Anything reusing the cover image is skipped so
-  // the cover never shows twice; nothing is removed from the data.
-  const contentImages = [...projectMediaImages(project), ...project.sections].filter(
-    (section) => section.image.src !== project.heroImage.src,
-  );
+  const website = project.websiteUrl;
+  const external = website ? /^https?:\/\//.test(website) : false;
 
   return (
     <article>
-      {/* 1 — Hero: minimal information, confident type, main image */}
-      <Section ground="canvas" spacing="sm" className="pt-8 pb-0 sm:pt-12 sm:pb-0">
-        <Reveal>
-          <Link
-            href={withLocale("/work", locale)}
-            className="group inline-flex items-center gap-1.5 text-sm font-medium tracking-tight text-ink-muted transition-colors hover:text-blue"
-          >
-            <span
-              aria-hidden="true"
-              className="transition-transform duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] group-hover:-translate-x-0.5"
-            >
-              &larr;
-            </span>
-            {dict.work.backToWork}
-          </Link>
-        </Reveal>
-
-        <Reveal delay={0.05} className="mt-10">
-          <Label tone="blue">{project.category}</Label>
-          <h1 className="text-display-1 mt-4 text-ink">{project.title}</h1>
-          <p className="label mt-6 text-ink-faint">{project.year}</p>
-        </Reveal>
-
-        <Reveal variants={imageReveal} amount={0} className="mt-12 lg:mt-16">
-          <div
-            className={cn(
-              "relative overflow-hidden rounded-sm bg-paper",
-              isPortrait(project.heroImage) && "mx-auto max-w-2xl",
+      {/* 1 — Header: left, the year, the description and the optional
+          website/social link; right, "Services:" and the service items.
+          The client is named in the description itself, so it isn't
+          repeated; the title exists only for screen readers. */}
+      <Section ground="canvas" spacing="sm">
+        <h1 className="sr-only">{project.title}</h1>
+        <Reveal className="grid grid-cols-1 gap-10 md:grid-cols-2 md:gap-16">
+          <div>
+            <p className="label text-ink-muted">{project.year}</p>
+            {project.description.trim() && (
+              <p className="mt-4 max-w-xl text-lead text-ink">{project.description}</p>
             )}
-            style={{ aspectRatio: ratioOf(project.heroImage, "16 / 10") }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven placeholder asset, not a static import */}
-            <img
-              src={project.heroImage.src}
-              alt={project.heroImage.alt}
-              className="h-full w-full object-cover object-center"
-            />
+            {website && (
+              <a
+                href={website}
+                {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                className="mt-8 inline-block text-lead text-blue underline decoration-1 underline-offset-4 transition-colors hover:text-ink"
+              >
+                {displayUrl(website)}
+              </a>
+            )}
           </div>
-        </Reveal>
-      </Section>
 
-      {/* 3 + 4 — Information (CMS-only) and the story, one rhythm unit.
-          No top padding: the details follow the cover image directly. */}
-      <Section ground="canvas" spacing="md" className="pt-0 sm:pt-0">
-        <Reveal className="mt-10 lg:mt-12">
-          <dl className="grid grid-cols-2 gap-x-6 gap-y-8 border-t border-line pt-8 sm:grid-cols-4">
-            <Fact term={dict.projectDetail.client} detail={project.client} />
-            <div>
-              <dt className="label text-ink-faint">{dict.projectDetail.servicesLabel}</dt>
-              <dd className="mt-2 space-y-1 text-meta text-ink">
-                {project.services.length ? (
-                  project.services.map((service) => (
-                    <div key={service}>{service}</div>
-                  ))
-                ) : (
-                  <span>&mdash;</span>
-                )}
-              </dd>
+          {project.services.length > 0 && (
+            <div className="text-lead text-ink md:text-right">
+              <p className="font-semibold">{dict.projectDetail.servicesLabel}:</p>
+              <ul className="mt-4 space-y-3">
+                {project.services.map((service) => (
+                  <li key={service}>{service}</li>
+                ))}
+              </ul>
             </div>
-            <Fact term={dict.projectDetail.year} detail={String(project.year)} />
-            <Fact term={dict.projectDetail.category} detail={project.category} />
-          </dl>
+          )}
         </Reveal>
-
-        {project.description.trim() && (
-          <Reveal delay={0.05}>
-            <p className="mt-10 max-w-2xl text-lead text-ink lg:mt-12 lg:ml-[33%] lg:max-w-xl">
-              {project.description}
-            </p>
-          </Reveal>
-        )}
       </Section>
 
-      {/* 4a — Project media images, then the case study (image + optional text) */}
-      <CaseStudySections sections={contentImages} title={project.title} />
+      {/* 2 — Project images, each with its optional description */}
+      <CaseStudySections sections={projectImages(project)} title={project.title} />
 
       {/* 4b — Outcomes: only when the CMS carries measured results */}
       {project.results.length > 0 && (
@@ -193,15 +158,6 @@ export function ProjectDetail({ project, moreProjects, cta, dict, locale }: Proj
       {/* 6 — CTA: the homepage's own closing block, unchanged */}
       <FinalCta content={cta} locale={locale} />
     </article>
-  );
-}
-
-function Fact({ term, detail }: { term: string; detail: string }) {
-  return (
-    <div>
-      <dt className="label text-ink-faint">{term}</dt>
-      <dd className="mt-2 text-meta text-ink">{detail}</dd>
-    </div>
   );
 }
 

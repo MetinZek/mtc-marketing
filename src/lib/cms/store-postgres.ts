@@ -161,6 +161,24 @@ function prepare(sql: Tx, record: DbRecord): Record<string, Param> {
   return out;
 }
 
+/* ---- optional projects.website_url (migration 0006) ----
+ * Until the column exists it is left out of writes, so saving projects
+ * keeps working; reads already skip absent columns. */
+
+let websiteColumnReady = false;
+
+async function writableColumns(sql: Tx, key: StoreKey, columns: string[]): Promise<string[]> {
+  if (key !== "projects" || websiteColumnReady) return columns;
+  const [row] = await sql`
+    select exists (
+      select 1 from information_schema.columns
+      where table_schema = current_schema()
+        and table_name = 'projects' and column_name = 'website_url'
+    ) as ok`;
+  websiteColumnReady = row?.ok === true;
+  return websiteColumnReady ? columns : columns.filter((c) => c !== "website_url");
+}
+
 export async function mutateRows(
   key: StoreKey,
   transform: (rows: unknown[]) => unknown[],
@@ -201,13 +219,14 @@ export async function mutateRows(
     const changed = changedRows.map(({ row, i }) => prepare(tx, toRecord(key, row, i)));
 
     if (changed.length > 0) {
-      const updates = spec.columns
+      const columns = await writableColumns(tx, key, spec.columns);
+      const updates = columns
         .filter((c) => !spec.key.includes(c))
         .map((c) => `${c} = excluded.${c}`)
         .concat("updated_at = now()")
         .join(", ");
       await tx`
-        insert into ${tx(spec.table)} ${tx(changed, spec.columns)}
+        insert into ${tx(spec.table)} ${tx(changed, columns)}
         on conflict (${tx(spec.key)}) do update set ${tx.unsafe(updates)}
       `;
     }

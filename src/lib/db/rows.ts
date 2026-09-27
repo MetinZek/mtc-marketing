@@ -48,6 +48,7 @@ const PROJECT_FIELDS: FieldMap = [
   ["mobileVideoUrl", "mobile_video_url"],
   ["posterUrl", "poster_url"],
   ["caseStudyUrl", "case_study_url"],
+  ["websiteUrl", "website_url"],
   ["seoTitle", "seo_title"],
   ["metaDescription", "meta_description"],
   ["ogImage", "og_image"],

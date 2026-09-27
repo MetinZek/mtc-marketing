@@ -151,6 +151,12 @@ export const COLLECTION_DEFS: Record<CmsCollection, CollectionDef> = {
       { key: "year", label: "Year", type: "number", required: true },
       { key: "client", label: "Client", type: "text", required: true },
       {
+        key: "websiteUrl",
+        label: "Client website / social link",
+        type: "url",
+        help: "Optional. Shown under the year in the project page header, e.g. https://example.com or an Instagram profile.",
+      },
+      {
         key: "description",
         label: "Short description",
         type: "textarea",

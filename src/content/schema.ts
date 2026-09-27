@@ -119,6 +119,8 @@ export const projectSchema = seoSchema.extend({
   posterUrl: urlField(imageUrlError),
   /** "View case study" target. Falls back to /work/[slug]. */
   caseStudyUrl: urlField(linkUrlError),
+  /** Optional client website / social link, shown in the project header. */
+  websiteUrl: urlField(linkUrlError),
   results: z.array(projectResultSchema).default([]),
   testimonialId: z.string().optional(),
   featured: z.boolean().default(false),
