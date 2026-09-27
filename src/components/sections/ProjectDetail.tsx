@@ -5,7 +5,7 @@ import { CaseStudySections } from "@/components/sections/CaseStudySections";
 import { FinalCta } from "@/components/sections/FinalCta";
 import { Label } from "@/components/ui/Label";
 import { Section } from "@/components/ui/Section";
-import type { HomepageContent, ImageRef, Project } from "@/content/types";
+import type { CaseStudySection, HomepageContent, ImageRef, Project } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { interpolate } from "@/i18n/format";
 import type { Locale } from "@/i18n/locales";
@@ -38,16 +38,36 @@ function isPortrait(image: ImageRef) {
 /**
  * /work/[slug] — a single case study. Header (category, title, year, ONE
  * cover image = the hero image), then client/services/year/category and
- * the description, then the case-study sections — the only other images
- * on the page. The older "Project media" list is kept in the data but is
- * not rendered here. Sections whose data is empty (case study, results)
- * simply don't render.
+ * the description, then the "Project media" images and the case-study
+ * sections — the only other images on the page (never video). Sections
+ * whose data is empty (media, case study, results) simply don't render.
  */
+/**
+ * The images from the admin's "Project media" list (or, for projects that
+ * predate it, the legacy gallery), in saved order, as image-only
+ * sections. Videos are left out — the project page shows no video.
+ */
+function projectMediaImages(project: Project): CaseStudySection[] {
+  const media = project.media ?? project.gallery.map((image) => ({ type: "image" as const, ...image }));
+  return media.flatMap((item, i) =>
+    item.type === "image"
+      ? [{ id: `media-${i}`, image: { src: item.src, alt: item.alt, width: item.width, height: item.height } }]
+      : [],
+  );
+}
+
 export function ProjectDetail({ project, moreProjects, cta, dict, locale }: ProjectDetailProps) {
+  // Everything below the description: Project media images, then the
+  // case-study sections. Anything reusing the cover image is skipped so
+  // the cover never shows twice; nothing is removed from the data.
+  const contentImages = [...projectMediaImages(project), ...project.sections].filter(
+    (section) => section.image.src !== project.heroImage.src,
+  );
+
   return (
     <article>
       {/* 1 — Hero: minimal information, confident type, main image */}
-      <Section ground="canvas" spacing="sm" className="pt-8 sm:pt-12">
+      <Section ground="canvas" spacing="sm" className="pt-8 pb-0 sm:pt-12 sm:pb-0">
         <Reveal>
           <Link
             href={withLocale("/work", locale)}
@@ -90,7 +110,7 @@ export function ProjectDetail({ project, moreProjects, cta, dict, locale }: Proj
       {/* 3 + 4 — Information (CMS-only) and the story, one rhythm unit.
           No top padding: the details follow the cover image directly. */}
       <Section ground="canvas" spacing="md" className="pt-0 sm:pt-0">
-        <Reveal>
+        <Reveal className="mt-10 lg:mt-12">
           <dl className="grid grid-cols-2 gap-x-6 gap-y-8 border-t border-line pt-8 sm:grid-cols-4">
             <Fact term={dict.projectDetail.client} detail={project.client} />
             <div>
@@ -112,19 +132,15 @@ export function ProjectDetail({ project, moreProjects, cta, dict, locale }: Proj
 
         {project.description.trim() && (
           <Reveal delay={0.05}>
-            <p className="mt-16 max-w-2xl text-lead text-ink lg:mt-24 lg:ml-[33%] lg:max-w-xl">
+            <p className="mt-10 max-w-2xl text-lead text-ink lg:mt-12 lg:ml-[33%] lg:max-w-xl">
               {project.description}
             </p>
           </Reveal>
         )}
       </Section>
 
-      {/* 4a — Case study: CMS sections (image + optional text), in order.
-          A section reusing the cover image is skipped so it never shows twice. */}
-      <CaseStudySections
-        sections={project.sections.filter((section) => section.image.src !== project.heroImage.src)}
-        title={project.title}
-      />
+      {/* 4a — Project media images, then the case study (image + optional text) */}
+      <CaseStudySections sections={contentImages} title={project.title} />
 
       {/* 4b — Outcomes: only when the CMS carries measured results */}
       {project.results.length > 0 && (
