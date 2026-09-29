@@ -1,3 +1,4 @@
+import { coverFormats, type CoverFormat } from "@/content/schema";
 import type { CmsCollection } from "@/lib/cms/admin";
 
 /**
@@ -53,6 +54,12 @@ export type FieldDef = {
   required?: boolean;
   help?: string;
   options?: string[];
+  /** Stored with the entry but not shown (set by another field). */
+  hidden?: boolean;
+  /** For `video`: fields that receive the video's pixel width/height. */
+  dimensionKeys?: { width: string; height: string };
+  /** For `select`: display text per option value (defaults to the value). */
+  optionLabels?: Record<string, string>;
   /** Populate a select from CMS service titles at render time. */
   optionsFrom?: "services";
   /** For `slug`: the field to derive from. */
@@ -113,6 +120,17 @@ const PROJECT_THUMBNAIL_IMAGE: ImageFieldConfig = {
  * browser to Supabase Storage (never through a Vercel function, so the
  * 4.5MB body cap doesn't apply). 50MB is Supabase's default per-file
  * limit. */
+/** Admin labels for the Selected Work card proportions, with example
+ * file sizes so the right one is easy to match to a video. */
+const COVER_FORMAT_LABELS: Record<CoverFormat, string> = {
+  original: "Original — match the video exactly, nothing cropped (recommended)",
+  standard: "Standard 4:3 — e.g. 1440×1080 (original card shape)",
+  landscape: "Landscape 16:10 — e.g. 1280×800, 1920×1200",
+  widescreen: "Widescreen 16:9 — e.g. 1920×1080",
+  square: "Square 1:1 — e.g. 1080×1080",
+  portrait: "Portrait 4:5 — e.g. 1080×1350",
+};
+
 export const PROJECT_VIDEO: VideoFieldConfig = {
   maxSizeMB: 50,
   accept: ["video/mp4", "video/webm"],
@@ -198,15 +216,26 @@ export const COLLECTION_DEFS: Record<CmsCollection, CollectionDef> = {
         label: "Project Cover Image",
         type: "image",
         image: PROJECT_THUMBNAIL_IMAGE,
-        help: "Homepage Selected Work card (4:3 crop). Empty → the hero image is used.",
+        help: "Homepage Selected Work card, cropped to the Cover format below. Empty → the hero image is used.",
+      },
+      {
+        key: "coverFormat",
+        label: "Cover format",
+        type: "select",
+        options: [...coverFormats],
+        optionLabels: COVER_FORMAT_LABELS,
+        help: "Shape of the homepage Selected Work card, for both the cover video and the cover image. Original uses the video's own size, so nothing is cut; wide videos also get a bigger card. The fixed shapes crop anything that doesn't match.",
       },
       {
         key: "desktopVideoUrl",
         label: "Project Cover Video",
         type: "video",
         video: PROJECT_VIDEO,
-        help: "Optional. Replaces the cover image on the homepage card — plays muted and looped, no controls. The cover image shows until it plays and if it can't. Landscape works best.",
+        dimensionKeys: { width: "coverVideoWidth", height: "coverVideoHeight" },
+        help: "Optional. Replaces the cover image on the homepage card — plays muted and looped, no controls, never compressed. The cover image shows until it plays and if it can't. For a sharp result, export at least 1920 px wide (H.264 MP4, ~8–12 Mbps).",
       },
+      { key: "coverVideoWidth", label: "Cover video width", type: "number", hidden: true },
+      { key: "coverVideoHeight", label: "Cover video height", type: "number", hidden: true },
       {
         key: "mobileVideoUrl",
         label: "Mobile cover video URL",

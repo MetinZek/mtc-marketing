@@ -367,7 +367,7 @@ export function EntryForm({
         )}
         <input type="hidden" name="payload" value={payload} />
 
-        {def.fields.map((field) => (
+        {def.fields.filter((field) => !field.hidden).map((field) => (
           <Field
             key={field.key}
             field={field}
@@ -377,6 +377,7 @@ export function EntryForm({
             onChange={(v) => set(field.key, v)}
             onUpdate={(fn) => update(field.key, fn)}
             onUploadingChange={registerUploading}
+            onSetField={set}
             onSlugFromTitle={
               field.type === "slug" && field.slugFrom
                 ? () =>
@@ -431,6 +432,7 @@ function Field({
   onChange,
   onUpdate,
   onUploadingChange,
+  onSetField,
   onSlugFromTitle,
 }: {
   field: FieldDef;
@@ -440,6 +442,7 @@ function Field({
   onChange: (value: unknown) => void;
   onUpdate: (fn: (value: unknown) => unknown) => void;
   onUploadingChange: (delta: number) => void;
+  onSetField: (key: string, value: unknown) => void;
   onSlugFromTitle?: () => void;
 }) {
   if (field.type === "boolean") {
@@ -468,7 +471,7 @@ function Field({
         >
           {(field.options ?? []).map((opt) => (
             <option key={opt} value={opt}>
-              {opt}
+              {field.optionLabels?.[opt] ?? opt}
             </option>
           ))}
         </select>
@@ -492,6 +495,7 @@ function Field({
         value={String(value ?? "")}
         error={error}
         onChange={onChange}
+        onSetField={onSetField}
         onUploadingChange={onUploadingChange}
       />
     );
@@ -746,12 +750,15 @@ function VideoUploader({
   config,
   onUploaded,
   onRemove,
+  onMeasured,
   onUploadingChange,
 }: {
   src: string;
   config: VideoFieldConfig;
   onUploaded: (url: string, dims: { width: number; height: number } | null) => void;
   onRemove: () => void;
+  /** Called with the preview's dimensions once its metadata loads. */
+  onMeasured?: (dims: { width: number; height: number }) => void;
   onUploadingChange: (delta: number) => void;
 }) {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -821,6 +828,10 @@ function VideoUploader({
             preload="metadata"
             onError={() => setLoadFailed(true)}
             onLoadedData={() => setLoadFailed(false)}
+            onLoadedMetadata={(e) => {
+              const { videoWidth: width, videoHeight: height } = e.currentTarget;
+              if (width > 0 && height > 0) onMeasured?.({ width, height });
+            }}
             className="aspect-video w-full max-w-md rounded-sm border border-line bg-paper object-contain"
           />
           {loadFailed && (
@@ -876,13 +887,16 @@ function VideoUploader({
   );
 }
 
-/** Single uploaded video stored as its URL (e.g. the cover video). */
+/** Single uploaded video stored as its URL (e.g. the cover video). With
+ * `field.dimensionKeys`, its pixel size is also written to those fields —
+ * on upload, and from the preview for videos uploaded before that. */
 function VideoField({
   field,
   config,
   value,
   error,
   onChange,
+  onSetField,
   onUploadingChange,
 }: {
   field: FieldDef;
@@ -890,8 +904,15 @@ function VideoField({
   value: string;
   error?: string;
   onChange: (value: unknown) => void;
+  onSetField: (key: string, value: unknown) => void;
   onUploadingChange: (delta: number) => void;
 }) {
+  const setDimensions = (dims: { width: number; height: number } | null) => {
+    if (!field.dimensionKeys) return;
+    onSetField(field.dimensionKeys.width, dims ? String(dims.width) : "");
+    onSetField(field.dimensionKeys.height, dims ? String(dims.height) : "");
+  };
+
   return (
     <fieldset className="rounded-sm border border-line p-4">
       <legend className="label px-1 text-ink-muted">
@@ -901,8 +922,15 @@ function VideoField({
       <VideoUploader
         src={value}
         config={config}
-        onUploaded={(url) => onChange(url)}
-        onRemove={() => onChange("")}
+        onUploaded={(url, dims) => {
+          onChange(url);
+          setDimensions(dims);
+        }}
+        onRemove={() => {
+          onChange("");
+          setDimensions(null);
+        }}
+        onMeasured={setDimensions}
         onUploadingChange={onUploadingChange}
       />
       {field.help && <p className="mt-3 text-meta text-ink-faint">{field.help}</p>}

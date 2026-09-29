@@ -86,6 +86,20 @@ export const projectResultSchema = z.object({
   value: z.string().min(1), // e.g. "+240%"
 });
 
+/** Selected Work card proportions, chosen per project in the admin.
+ * "original" follows the cover video's own size (coverVideoWidth/Height)
+ * so nothing is cropped, falling back to "standard" (4:3, the original
+ * fixed card shape) when there is no measured video. */
+export const coverFormats = [
+  "original",
+  "standard",
+  "landscape",
+  "widescreen",
+  "square",
+  "portrait",
+] as const;
+export type CoverFormat = (typeof coverFormats)[number];
+
 export const projectSchema = seoSchema.extend({
   id: z.string().min(1),
   title: z.string().min(1),
@@ -115,6 +129,11 @@ export const projectSchema = seoSchema.extend({
    * and vice versa; neither → the cover image alone. */
   desktopVideoUrl: urlField(videoUrlError),
   mobileVideoUrl: urlField(videoUrlError),
+  /** Selected Work card proportion, applied to the cover video and image. */
+  coverFormat: z.enum(coverFormats).default("original"),
+  /** Cover video pixel size, measured by the admin on upload. */
+  coverVideoWidth: z.number().int().positive().optional(),
+  coverVideoHeight: z.number().int().positive().optional(),
   /** Cover image URL alternative, used when no `thumbnail` is set. */
   posterUrl: urlField(imageUrlError),
   /** "View case study" target. Falls back to /work/[slug]. */

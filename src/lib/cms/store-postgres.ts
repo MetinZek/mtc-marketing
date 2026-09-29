@@ -161,22 +161,30 @@ function prepare(sql: Tx, record: DbRecord): Record<string, Param> {
   return out;
 }
 
-/* ---- optional projects.website_url (migration 0006) ----
- * Until the column exists it is left out of writes, so saving projects
+/* ---- optional projects columns (migrations 0006–0008) ----
+ * Until a column exists it is left out of writes, so saving projects
  * keeps working; reads already skip absent columns. */
 
-let websiteColumnReady = false;
+const OPTIONAL_PROJECT_COLUMNS = [
+  "website_url",
+  "cover_format",
+  "cover_video_width",
+  "cover_video_height",
+];
+let missingProjectColumns: Set<string> | null = null;
 
 async function writableColumns(sql: Tx, key: StoreKey, columns: string[]): Promise<string[]> {
-  if (key !== "projects" || websiteColumnReady) return columns;
-  const [row] = await sql`
-    select exists (
-      select 1 from information_schema.columns
+  if (key !== "projects") return columns;
+  if (!missingProjectColumns || missingProjectColumns.size > 0) {
+    const present = await sql`
+      select column_name from information_schema.columns
       where table_schema = current_schema()
-        and table_name = 'projects' and column_name = 'website_url'
-    ) as ok`;
-  websiteColumnReady = row?.ok === true;
-  return websiteColumnReady ? columns : columns.filter((c) => c !== "website_url");
+        and table_name = 'projects' and column_name in ${sql(OPTIONAL_PROJECT_COLUMNS)}`;
+    const found = new Set(present.map((r) => String(r.column_name)));
+    missingProjectColumns = new Set(OPTIONAL_PROJECT_COLUMNS.filter((c) => !found.has(c)));
+  }
+  const missing = missingProjectColumns;
+  return missing.size === 0 ? columns : columns.filter((c) => !missing.has(c));
 }
 
 export async function mutateRows(
