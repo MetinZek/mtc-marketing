@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { EntryForm } from "@/components/admin/EntryForm";
 import { getCollectionDef } from "@/lib/admin/collections";
+import { withDynamicOptions } from "@/lib/admin/options";
 import { getEntry } from "@/lib/cms/admin";
 
 export default async function EditEntryPage({
@@ -17,7 +18,7 @@ export default async function EditEntryPage({
 
   return (
     <EntryForm
-      def={def}
+      def={await withDynamicOptions(def)}
       entry={entry as Record<string, unknown>}
       mode="edit"
     />

@@ -469,6 +469,13 @@ function Field({
           onChange={(e) => onChange(e.target.value)}
           className={cn(inputCls, "mt-2 appearance-none")}
         >
+          {/* No stored value yet → an explicit prompt instead of silently
+              showing (but not selecting) the first option. */}
+          {!(field.options ?? []).includes(String(value ?? "")) && (
+            <option value="" disabled>
+              Choose…
+            </option>
+          )}
           {(field.options ?? []).map((opt) => (
             <option key={opt} value={opt}>
               {field.optionLabels?.[opt] ?? opt}

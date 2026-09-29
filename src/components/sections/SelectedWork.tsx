@@ -5,31 +5,14 @@ import { Grid } from "@/components/ui/Grid";
 import { Label } from "@/components/ui/Label";
 import { Section } from "@/components/ui/Section";
 import { ViewportVideo } from "@/components/ui/ViewportVideo";
-import type { CoverFormat } from "@/content/schema";
 import type { Project } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { interpolate } from "@/i18n/format";
 import type { Locale } from "@/i18n/locales";
 import { withLocale } from "@/i18n/paths";
 import { isExternalUrl } from "@/lib/media-url";
+import { coverImage, coverRatio, hasCoverVideo } from "@/lib/project-cover";
 import { cn } from "@/lib/utils";
-
-/** Card proportion (width / height) per fixed admin "Cover format". */
-const COVER_RATIO: Record<Exclude<CoverFormat, "original">, [number, number]> = {
-  standard: [4, 3],
-  landscape: [16, 10],
-  widescreen: [16, 9],
-  square: [1, 1],
-  portrait: [4, 5],
-};
-
-/** "original" → the cover video's measured size, so it plays uncropped;
- * without one (no video, or not measured yet) → the standard 4:3. */
-function coverRatio(project: Project): [number, number] {
-  const { coverFormat, coverVideoWidth: w, coverVideoHeight: h } = project;
-  if (coverFormat !== "original") return COVER_RATIO[coverFormat];
-  return w && h && (project.desktopVideoUrl || project.mobileVideoUrl) ? [w, h] : COVER_RATIO.standard;
-}
 
 /** Thumbnail/meta column split by card shape, so wide videos get a
  * larger thumbnail and tall ones a narrower one (literal classes so
@@ -133,11 +116,8 @@ function ProjectRow({
     : withLocale(`/work/${project.slug}`, locale);
   const externalProps = external ? { target: "_blank", rel: "noopener noreferrer" } : {};
 
-  const hasVideo = Boolean(project.desktopVideoUrl || project.mobileVideoUrl);
-  const cover = project.thumbnail ?? {
-    src: project.posterUrl || project.heroImage.src,
-    alt: project.heroImage.alt,
-  };
+  const hasVideo = hasCoverVideo(project);
+  const cover = coverImage(project);
   const [ratioW, ratioH] = coverRatio(project);
   const layout = layoutFor([ratioW, ratioH]);
   const mediaMotion = cn(

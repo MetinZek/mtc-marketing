@@ -8,12 +8,14 @@ import { cn } from "@/lib/utils";
 const NAV = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/projects", label: "Projects" },
+  { href: "/admin/gallery", label: "Work Gallery" },
   { href: "/admin/services", label: "Services" },
   { href: "/admin/team", label: "Team" },
   { href: "/admin/posts", label: "Journal" },
   { href: "/admin/testimonials", label: "Testimonials" },
   { href: "/admin/clients", label: "Trusted Clients" },
   { href: "/admin/contact", label: "Contact" },
+  { href: "/admin/archive", label: "Archive" },
 ];
 
 export function Sidebar() {

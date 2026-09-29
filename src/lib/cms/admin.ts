@@ -5,6 +5,7 @@ import type { ZodType } from "zod";
 import {
   clientSchema,
   contactInputSchema,
+  galleryItemSchema,
   postSchema,
   projectSchema,
   serviceSchema,
@@ -17,6 +18,7 @@ import {
 } from "@/content/schema";
 import type {
   Client,
+  GalleryItem,
   Post,
   Project,
   Service,
@@ -42,6 +44,7 @@ export type EntryOf = {
   clients: Client;
   team: TeamMember;
   posts: Post;
+  gallery: GalleryItem;
 };
 
 const SCHEMAS: { [K in CmsCollection]: ZodType<EntryOf[K]> } = {
@@ -51,6 +54,7 @@ const SCHEMAS: { [K in CmsCollection]: ZodType<EntryOf[K]> } = {
   clients: clientSchema,
   team: teamMemberSchema,
   posts: postSchema,
+  gallery: galleryItemSchema,
 };
 
 export const CMS_COLLECTIONS = [
@@ -60,6 +64,7 @@ export const CMS_COLLECTIONS = [
   "posts",
   "testimonials",
   "clients",
+  "gallery",
 ] as const satisfies readonly CmsCollection[];
 
 function idOf(row: unknown): string {
@@ -175,13 +180,122 @@ export async function rawEntry(
   return (found as Record<string, unknown> | undefined) ?? null;
 }
 
-export async function deleteEntry(
+/* ---- archive: "Delete" moves entries here; restorable for 30 days ---- */
+
+/** How long an archived entry can be restored before it is purged. */
+export const ARCHIVE_RETENTION_DAYS = 30;
+const RETENTION_MS = ARCHIVE_RETENTION_DAYS * 24 * 60 * 60 * 1000;
+
+export type ArchivedEntry = {
+  /** Archive row id (not the entry's own id). */
+  id: string;
+  collection: CmsCollection;
+  entryId: string;
+  /** Display name at the time it was archived. */
+  title: string;
+  archivedAt: string;
+  /** The complete entry exactly as it was stored. */
+  data: Record<string, unknown>;
+};
+
+function titleOf(row: Record<string, unknown>): string {
+  const name = row.title ?? row.name ?? row.person ?? row.id;
+  return typeof name === "string" && name ? name : "Untitled";
+}
+
+function isExpired(entry: ArchivedEntry, now = Date.now()): boolean {
+  return now - Date.parse(entry.archivedAt) >= RETENTION_MS;
+}
+
+/** Permanently removes archived entries older than the retention period. */
+async function purgeExpiredArchive(): Promise<void> {
+  const rows = (await readRows("archive")) as ArchivedEntry[];
+  if (!rows.some((r) => isExpired(r))) return;
+  await mutateRows("archive", (current) =>
+    (current as ArchivedEntry[]).filter((r) => !isExpired(r)),
+  );
+}
+
+/**
+ * "Delete" in the admin: copies the entry into the archive first, then
+ * removes it from its collection (so a failure in between can only
+ * leave a duplicate, never lose the entry). It disappears from the
+ * public site immediately.
+ */
+export async function archiveEntry(
   collection: CmsCollection,
   id: string,
 ): Promise<void> {
+  const row = await rawEntry(collection, id);
+  if (!row) return;
+
+  const archived: ArchivedEntry = {
+    id: crypto.randomUUID(),
+    collection,
+    entryId: id,
+    title: titleOf(row),
+    archivedAt: new Date().toISOString(),
+    data: row,
+  };
+  await mutateRows("archive", (rows) => [...rows, archived]);
   await mutateRows(collection, (rows) => rows.filter((r) => idOf(r) !== id));
+  await purgeExpiredArchive();
+
   revalidateSite();
   revalidatePath(`/admin/${collection}`);
+  revalidatePath("/admin/archive");
+}
+
+/** Archived entries still within the retention period, newest first. */
+export async function listArchive(): Promise<ArchivedEntry[]> {
+  await purgeExpiredArchive();
+  const rows = (await readRows("archive")) as ArchivedEntry[];
+  return rows
+    .filter((r) => !isExpired(r))
+    .sort((a, b) => Date.parse(b.archivedAt) - Date.parse(a.archivedAt));
+}
+
+export type RestoreResult = { ok: true; entry: ArchivedEntry } | { ok: false; error: string };
+
+/**
+ * Puts an archived entry back into its collection, unchanged (it keeps
+ * its published state and order). Refused if something with the same id
+ * or slug was created in the meantime.
+ */
+export async function restoreArchivedEntry(archiveId: string): Promise<RestoreResult> {
+  const entry = (await listArchive()).find((r) => r.id === archiveId);
+  if (!entry) return { ok: false, error: "This item is no longer in the archive." };
+
+  const parsed = SCHEMAS[entry.collection].safeParse(entry.data);
+  if (!parsed.success) {
+    return { ok: false, error: `“${entry.title}” can't be restored: its saved data is no longer valid.` };
+  }
+
+  const existing = (await readRows(entry.collection)) as Record<string, unknown>[];
+  if (existing.some((r) => idOf(r) === entry.entryId)) {
+    return { ok: false, error: `“${entry.title}” already exists — it was restored before.` };
+  }
+  const slug = (parsed.data as { slug?: string }).slug;
+  if (slug && existing.some((r) => r.slug === slug)) {
+    return {
+      ok: false,
+      error: `Another entry already uses the slug “${slug}”. Change that entry's slug first, then restore.`,
+    };
+  }
+
+  await mutateRows(entry.collection, (rows) => [...rows, parsed.data]);
+  await mutateRows("archive", (rows) => rows.filter((r) => idOf(r) !== archiveId));
+
+  revalidateSite();
+  revalidatePath(`/admin/${entry.collection}`);
+  revalidatePath("/admin/archive");
+  return { ok: true, entry };
+}
+
+/** Deletes one archived entry for good, before its 30 days are up. */
+export async function deleteArchivedEntry(archiveId: string): Promise<void> {
+  await mutateRows("archive", (rows) => rows.filter((r) => idOf(r) !== archiveId));
+  revalidatePath("/admin/archive");
 }
 
 export async function setPublished(

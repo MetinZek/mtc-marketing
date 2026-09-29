@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { EntryForm } from "@/components/admin/EntryForm";
 import { getCollectionDef } from "@/lib/admin/collections";
+import { withDynamicOptions } from "@/lib/admin/options";
 
 export default async function NewEntryPage({
   params,
@@ -20,5 +21,5 @@ export default async function NewEntryPage({
     publishedAt: new Date().toISOString().slice(0, 10),
   };
 
-  return <EntryForm def={def} entry={defaults} mode="create" />;
+  return <EntryForm def={await withDynamicOptions(def)} entry={defaults} mode="create" />;
 }

@@ -2,7 +2,12 @@ import Link from "next/link";
 import { deleteEntryAction, moveEntryAction } from "@/app/admin/_actions";
 import { Button } from "@/components/ui/Button";
 import type { CollectionDef } from "@/lib/admin/collections";
-import { isPublished, listEntries, type CmsCollection } from "@/lib/cms/admin";
+import {
+  ARCHIVE_RETENTION_DAYS,
+  isPublished,
+  listEntries,
+  type CmsCollection,
+} from "@/lib/cms/admin";
 import { ConfirmSubmit } from "./ConfirmSubmit";
 import { PublishToggle } from "./PublishToggle";
 
@@ -12,7 +17,14 @@ function cell(value: unknown): string {
   return String(value);
 }
 
-export async function CollectionTable({ def }: { def: CollectionDef }) {
+export async function CollectionTable({
+  def,
+  archived = false,
+}: {
+  def: CollectionDef;
+  /** Show the "moved to the archive" notice after a delete. */
+  archived?: boolean;
+}) {
   const entries = (await listEntries(def.key)) as ReadonlyArray<
     Record<string, unknown>
   >;
@@ -30,6 +42,19 @@ export async function CollectionTable({ def }: { def: CollectionDef }) {
           </Button>
         )}
       </header>
+
+      {archived && (
+        <p
+          role="status"
+          className="mt-6 rounded-sm border border-line bg-paper px-3 py-2 text-meta text-ink-muted"
+        >
+          Moved to the{" "}
+          <Link href="/admin/archive" className="text-blue hover:underline">
+            Archive
+          </Link>
+          . You can restore it there for {ARCHIVE_RETENTION_DAYS} days.
+        </p>
+      )}
 
       <div className="mt-8 overflow-x-auto rounded-md border border-line">
         <table className="w-full min-w-[36rem] text-left text-sm">
@@ -107,7 +132,7 @@ export async function CollectionTable({ def }: { def: CollectionDef }) {
                           />
                           <input type="hidden" name="id" value={id} />
                           <ConfirmSubmit
-                            message={`Delete this ${def.singular.toLowerCase()} permanently?`}
+                            message={`Delete this ${def.singular.toLowerCase()}? It moves to the Archive, where it can be restored for ${ARCHIVE_RETENTION_DAYS} days before it is deleted permanently.`}
                             className="text-meta text-ink-muted hover:text-danger"
                           >
                             Delete

@@ -1,6 +1,7 @@
 import type { CollectionName } from "./schema";
 
 import { clients } from "./data/clients";
+import { gallery } from "./data/gallery";
 import { posts } from "./data/posts";
 import { projects } from "./data/projects";
 import { services } from "./data/services";
@@ -20,9 +21,11 @@ export const collectionSeeds: Record<CollectionName, readonly unknown[]> = {
   clients,
   team,
   posts,
+  gallery,
 };
 
-/** Seed rows for a store key (contact submissions start empty). */
-export function seedRowsFor(key: CollectionName | "submissions"): unknown[] {
-  return key === "submissions" ? [] : [...collectionSeeds[key]];
+/** Seed rows for a store key (contact submissions and the admin
+ * archive start empty). */
+export function seedRowsFor(key: CollectionName | "submissions" | "archive"): unknown[] {
+  return key === "submissions" || key === "archive" ? [] : [...collectionSeeds[key]];
 }

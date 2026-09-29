@@ -1,5 +1,6 @@
 import type {
   Client,
+  GalleryItem,
   HomepageContent,
   Post,
   Project,
@@ -32,6 +33,9 @@ export interface ContentProvider {
   getProjects(): Promise<Project[]>;
   getFeaturedProjects(): Promise<Project[]>;
   getProjectBySlug(slug: string): Promise<Project | null>;
+
+  /* Work gallery (standalone pieces, grouped by service on /work) */
+  getGallery(): Promise<GalleryItem[]>;
 
   /* Services */
   getServices(): Promise<Service[]>;

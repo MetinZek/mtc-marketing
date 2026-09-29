@@ -16,9 +16,11 @@ import { saveMedia } from "@/lib/cms/media";
 import { createVideoUpload, isVideoStorageConfigured } from "@/lib/cms/video-storage";
 import { isDatabaseConfigured } from "@/lib/db/client";
 import {
-  deleteEntry,
+  archiveEntry,
+  deleteArchivedEntry,
   moveEntry,
   rawEntry,
+  restoreArchivedEntry,
   saveEntry,
   setPublished,
   setSubmissionStatus,
@@ -282,8 +284,29 @@ export async function deleteEntryAction(formData: FormData): Promise<void> {
   const def = getCollectionDef(String(formData.get("collection") ?? ""));
   const id = String(formData.get("id") ?? "");
   if (!def || !def.canDelete || !id) return;
-  await deleteEntry(def.key, id);
-  redirect(`/admin/${def.key}`);
+  await archiveEntry(def.key, id);
+  redirect(`/admin/${def.key}?archived=1`);
+}
+
+/* ---------------- archive ---------------- */
+
+export async function restoreArchivedAction(formData: FormData): Promise<void> {
+  await requireSession();
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  const result = await restoreArchivedEntry(id);
+  const query = result.ok
+    ? `restored=${encodeURIComponent(result.entry.title)}`
+    : `error=${encodeURIComponent(result.error)}`;
+  redirect(`/admin/archive?${query}`);
+}
+
+export async function deleteArchivedAction(formData: FormData): Promise<void> {
+  await requireSession();
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  await deleteArchivedEntry(id);
+  redirect("/admin/archive");
 }
 
 export async function updateSubmissionStatusAction(

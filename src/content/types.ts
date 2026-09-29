@@ -3,6 +3,7 @@ import type {
   caseStudySectionSchema,
   clientSchema,
   contactInputSchema,
+  galleryItemSchema,
   homepageSchema,
   imageSchema,
   postSchema,
@@ -29,6 +30,7 @@ export type Testimonial = z.infer<typeof testimonialSchema>;
 export type Client = z.infer<typeof clientSchema>;
 export type TeamMember = z.infer<typeof teamMemberSchema>;
 export type Post = z.infer<typeof postSchema>;
+export type GalleryItem = z.infer<typeof galleryItemSchema>;
 export type Stat = z.infer<typeof statSchema>;
 export type HomepageContent = z.infer<typeof homepageSchema>;
 export type StudioContent = z.infer<typeof studioSchema>;

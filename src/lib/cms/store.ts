@@ -19,7 +19,7 @@ import * as postgresStore from "./store-postgres";
  *   ephemeral filesystem.
  */
 
-export type StoreKey = CollectionName | "submissions";
+export type StoreKey = CollectionName | "submissions" | "archive";
 
 function databaseEnabled(): boolean {
   if (isDatabaseConfigured()) return true;

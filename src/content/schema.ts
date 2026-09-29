@@ -106,6 +106,9 @@ export const projectSchema = seoSchema.extend({
   slug,
   client: z.string().min(1),
   category: z.string().min(1), // e.g. "Branding", "Web & App"
+  /** The service (by id) this project belongs to — /work filters and
+   * which gallery pieces sit next to it. */
+  serviceId: z.string().optional(),
   year: z.number().int().gte(2000).lte(2100),
   description: z.string().min(1), // short summary
   /** Long-form case-study copy (markdown). Optional. */
@@ -163,6 +166,28 @@ export const serviceSchema = seoSchema.extend({
   image: imageSchema.optional(), // icon / visual
   ctaLabel: z.string().default("Explore service"),
   /** Only published services appear on the public site. */
+  published: z.boolean().default(true),
+  order: z.number().int().default(0),
+});
+
+/* ---------------- Work gallery ---------------------------- */
+
+/** A standalone piece of work (a logo, poster, post, screen…) shown in
+ * its service's section on /work — lighter than a full project. */
+export const galleryItemSchema = z.object({
+  id: z.string().min(1),
+  title: z.string().min(1),
+  /** The service (by id) whose /work section this piece appears in. */
+  serviceId: z.string().min(1),
+  client: z.string().trim().optional(),
+  image: imageSchema,
+  /** Optional video shown instead of the image (which stays as its poster). */
+  videoUrl: urlField(videoUrlError),
+  /** Video pixel size, measured by the admin on upload. */
+  videoWidth: z.number().int().positive().optional(),
+  videoHeight: z.number().int().positive().optional(),
+  /** Optional "View project" target, e.g. /work/balkanbee or https://…. */
+  link: urlField(linkUrlError),
   published: z.boolean().default(true),
   order: z.number().int().default(0),
 });
@@ -375,5 +400,6 @@ export const collections = [
   "clients",
   "team",
   "posts",
+  "gallery",
 ] as const;
 export type CollectionName = (typeof collections)[number];

@@ -161,7 +161,7 @@ function prepare(sql: Tx, record: DbRecord): Record<string, Param> {
   return out;
 }
 
-/* ---- optional projects columns (migrations 0006–0008) ----
+/* ---- optional projects columns (migrations 0006–0009) ----
  * Until a column exists it is left out of writes, so saving projects
  * keeps working; reads already skip absent columns. */
 
@@ -170,6 +170,7 @@ const OPTIONAL_PROJECT_COLUMNS = [
   "cover_format",
   "cover_video_width",
   "cover_video_height",
+  "service_id",
 ];
 let missingProjectColumns: Set<string> | null = null;
 

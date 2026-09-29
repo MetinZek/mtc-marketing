@@ -5,6 +5,7 @@ import { siteSettings as rawSettings } from "@/content/data/site-settings";
 import { studio as rawStudio } from "@/content/data/studio";
 import {
   clientSchema,
+  galleryItemSchema,
   homepageSchema,
   postSchema,
   projectSchema,
@@ -105,6 +106,12 @@ export const localProvider: ContentProvider = {
   async getClients() {
     return parseAll(clientSchema, await readRows("clients"), "client")
       .filter((c) => c.published)
+      .sort(byOrder);
+  },
+
+  async getGallery() {
+    return parseAll(galleryItemSchema, await readRows("gallery"), "gallery item")
+      .filter((g) => g.published)
       .sort(byOrder);
   },
 

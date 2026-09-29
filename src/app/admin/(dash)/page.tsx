@@ -3,6 +3,7 @@ import { counts } from "@/lib/cms/admin";
 
 const TILES = [
   { key: "projects", label: "Projects", href: "/admin/projects" },
+  { key: "gallery", label: "Work gallery pieces", href: "/admin/gallery" },
   { key: "services", label: "Services", href: "/admin/services" },
   { key: "team", label: "Team members", href: "/admin/team" },
   { key: "posts", label: "Journal articles", href: "/admin/posts" },

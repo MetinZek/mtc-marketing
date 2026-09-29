@@ -90,6 +90,11 @@ export async function getTestimonialById(id: string) {
   return localizeEntry<Testimonial>(row, overlay?.testimonials, "id");
 }
 
+/** Work gallery pieces carry titles/client names only — not translated. */
+export async function getGallery() {
+  return cms.getGallery();
+}
+
 /** Clients are placeholder logos/names only — not part of the translation overlay. */
 export async function getClients() {
   return cms.getClients();

@@ -7,7 +7,8 @@
  * Tables (see db/migrations):
  *   projects             — one real column per Project field
  *   contact_submissions  — one real column per Submission field
- *   cms_entries          — every other collection, as JSONB documents
+ *   cms_entries          — every other collection (and the admin
+ *                          archive), as JSONB documents
  */
 
 export type StoreKey =
@@ -17,7 +18,9 @@ export type StoreKey =
   | "clients"
   | "team"
   | "posts"
-  | "submissions";
+  | "gallery"
+  | "submissions"
+  | "archive";
 
 export type Row = Record<string, unknown>;
 export type DbRecord = Record<string, unknown>;
@@ -31,6 +34,7 @@ const PROJECT_FIELDS: FieldMap = [
   ["title", "title"],
   ["client", "client"],
   ["category", "category"],
+  ["serviceId", "service_id"],
   ["year", "year"],
   ["description", "description"],
   ["content", "content", ""],
