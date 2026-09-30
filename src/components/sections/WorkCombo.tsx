@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { Reveal } from "@/components/motion/Reveal";
 import { ViewportVideo } from "@/components/ui/ViewportVideo";
+import { FALLBACK_IMAGE, VIDEO_BOX } from "@/lib/video-fallback";
 import type { GalleryItem, Project } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { interpolate } from "@/i18n/format";
@@ -91,12 +92,22 @@ export function WorkCombo({
   );
 }
 
-/** Media box: natural proportions on phones, fills its grid cell on md+. */
-function MediaFrame({ ratio, children }: { ratio: [number, number]; children: React.ReactNode }) {
+/** Media box: natural proportions on phones, fills its grid cell on md+.
+ * With a video, the cover image is only its slow/failed fallback. */
+function MediaFrame({
+  ratio,
+  video = false,
+  children,
+}: {
+  ratio: [number, number];
+  video?: boolean;
+  children: React.ReactNode;
+}) {
   return (
     <div
       className="relative aspect-(--ratio) overflow-hidden rounded-sm bg-paper md:aspect-auto md:h-full"
       style={{ "--ratio": `${ratio[0]} / ${ratio[1]}` } as React.CSSProperties}
+      {...(video ? VIDEO_BOX : {})}
     >
       {children}
     </div>
@@ -118,16 +129,22 @@ function ProjectTile({
   locale: Locale;
 }) {
   const cover = coverImage(project);
+  const video = hasCoverVideo(project);
   return (
     <Link
       href={withLocale(`/work/${project.slug}`, locale)}
       aria-label={interpolate(dict.work.viewCaseStudyAriaLabel, { title: project.title })}
       className="block h-full rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
     >
-      <MediaFrame ratio={naturalCoverRatio(project)}>
+      <MediaFrame ratio={naturalCoverRatio(project)} video={video}>
         {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven asset, not a static import */}
-        <img src={cover.src} alt={cover.alt} loading="lazy" className={cn("h-full w-full object-cover", zoom)} />
-        {hasCoverVideo(project) && (
+        <img
+          src={cover.src}
+          alt={cover.alt}
+          loading="lazy"
+          className={cn("h-full w-full object-cover", zoom, video && ["transition-[transform,opacity]", FALLBACK_IMAGE])}
+        />
+        {video && (
           <ViewportVideo
             desktopSrc={project.desktopVideoUrl}
             mobileSrc={project.mobileVideoUrl}
@@ -175,9 +192,18 @@ function PieceTile({
 }) {
   return (
     <div className="relative h-full">
-      <MediaFrame ratio={pieceRatio(item)}>
+      <MediaFrame ratio={pieceRatio(item)} video={!!item.videoUrl}>
         {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven asset, not a static import */}
-        <img src={item.image.src} alt={item.image.alt} loading="lazy" className={cn("h-full w-full object-cover", zoom)} />
+        <img
+          src={item.image.src}
+          alt={item.image.alt}
+          loading="lazy"
+          className={cn(
+            "h-full w-full object-cover",
+            zoom,
+            item.videoUrl && ["transition-[transform,opacity]", FALLBACK_IMAGE],
+          )}
+        />
         {item.videoUrl && (
           <ViewportVideo
             desktopSrc={item.videoUrl}

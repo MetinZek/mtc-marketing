@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { SLOW_VIDEO_MS } from "@/lib/video-fallback";
 
 /**
  * Muted, looping background video whose loading and playback are
@@ -15,12 +16,54 @@ import { useEffect, useRef } from "react";
  *   all instances — no scroll listeners, no React state/re-renders.
  * - Picks the mobile or desktop URL via matchMedia *before* assigning
  *   `src`, so a phone never requests the desktop file (and vice versa).
- * - The element stays transparent until it is actually `playing`
- *   (`data-ready`), so the poster image underneath shows while loading
- *   and is what remains if autoplay is refused (iOS Low Power Mode,
- *   data saver, a broken URL) — failure never breaks the layout.
- * - Honors prefers-reduced-motion: the poster is shown, nothing loads.
+ * - The element stays transparent until its first frame is available
+ *   (`data-ready`). The cover image underneath is only a *fallback*:
+ *   the media box carries `data-video` (see VIDEO_BOX / FALLBACK_IMAGE)
+ *   and the image stays hidden while the video loads normally, fading in
+ *   only if the video is slow (SLOW_VIDEO_MS), fails, or never loads
+ *   (reduced motion) — so on a good connection the video appears
+ *   directly, without the image flashing first.
+ * - Honors prefers-reduced-motion: the cover image is shown, nothing loads.
  */
+
+/**
+ * Tracks a video's loading on its parent media box (`data-video`):
+ * "loading" → "ready" at the first frame, "slow" if that takes longer
+ * than SLOW_VIDEO_MS, "failed" on error. Returns a cleanup function.
+ * Used by ViewportVideo and by plain <video> elements (e.g. the /work
+ * hover preview).
+ */
+export function trackVideo(video: HTMLVideoElement): () => void {
+  const box = video.parentElement;
+  if (!box) return () => {};
+  const set = (state: string) => {
+    box.dataset.video = state;
+  };
+  // HAVE_CURRENT_DATA — the first frame can be painted.
+  if (video.readyState >= 2) {
+    set("ready");
+    return () => {};
+  }
+  set("loading");
+  const timer = window.setTimeout(() => {
+    if (video.readyState < 2) set("slow");
+  }, SLOW_VIDEO_MS);
+  const onReady = () => {
+    window.clearTimeout(timer);
+    set("ready");
+  };
+  const onError = () => {
+    window.clearTimeout(timer);
+    set("failed");
+  };
+  video.addEventListener("loadeddata", onReady);
+  video.addEventListener("error", onError);
+  return () => {
+    window.clearTimeout(timer);
+    video.removeEventListener("loadeddata", onReady);
+    video.removeEventListener("error", onError);
+  };
+}
 
 /** Matches the site's `md` breakpoint (mobile nav) — below it is "mobile". */
 const MOBILE_QUERY = "(max-width: 767px)";
@@ -35,7 +78,13 @@ type Entry = {
   mobile?: string;
   near: boolean;
   ratio: number;
+  /** Stops the current load tracking (see trackVideo). */
+  untrack?: () => void;
 };
+
+function setBoxState(video: HTMLVideoElement, state: string) {
+  if (video.parentElement) video.parentElement.dataset.video = state;
+}
 
 const entries = new Map<HTMLVideoElement, Entry>();
 let nearObserver: IntersectionObserver | null = null;
@@ -59,11 +108,17 @@ function attach(video: HTMLVideoElement, entry: Entry) {
   video.playsInline = true;
   video.preload = "auto";
   delete video.dataset.ready;
+  entry.untrack?.();
   video.src = src;
+  entry.untrack = trackVideo(video);
 }
 
 function detach(video: HTMLVideoElement) {
   if (!video.hasAttribute("src")) return;
+  const entry = entries.get(video);
+  entry?.untrack?.();
+  if (entry) entry.untrack = undefined;
+  setBoxState(video, "pending");
   video.pause();
   video.removeAttribute("src");
   delete video.dataset.ready;
@@ -148,6 +203,8 @@ function stop() {
 function register(video: HTMLVideoElement, desktop?: string, mobile?: string) {
   if (!nearObserver) start();
   entries.set(video, { desktop, mobile, near: false, ratio: 0 });
+  // Reduced motion: no video will load, so the cover image is shown.
+  if (reducedMq?.matches) setBoxState(video, "off");
   nearObserver?.observe(video);
   visibleObserver?.observe(video);
 }
@@ -155,8 +212,8 @@ function register(video: HTMLVideoElement, desktop?: string, mobile?: string) {
 function unregister(video: HTMLVideoElement) {
   nearObserver?.unobserve(video);
   visibleObserver?.unobserve(video);
-  entries.delete(video);
   detach(video);
+  entries.delete(video);
   if (entries.size === 0) stop();
 }
 
@@ -177,7 +234,11 @@ export function ViewportVideo({
 
   useEffect(() => {
     const video = ref.current;
-    if (!video || typeof IntersectionObserver === "undefined") return;
+    if (!video) return;
+    if (typeof IntersectionObserver === "undefined") {
+      setBoxState(video, "off");
+      return;
+    }
     register(video, desktopSrc, mobileSrc);
     return () => unregister(video);
   }, [desktopSrc, mobileSrc]);
@@ -193,6 +254,7 @@ export function ViewportVideo({
       disableRemotePlayback
       aria-hidden="true"
       tabIndex={-1}
+      onLoadedData={markReady}
       onPlaying={markReady}
       className={className}
     />

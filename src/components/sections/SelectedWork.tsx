@@ -5,6 +5,7 @@ import { Grid } from "@/components/ui/Grid";
 import { Label } from "@/components/ui/Label";
 import { Section } from "@/components/ui/Section";
 import { ViewportVideo } from "@/components/ui/ViewportVideo";
+import { FALLBACK_IMAGE, VIDEO_BOX } from "@/lib/video-fallback";
 import type { Project } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { interpolate } from "@/i18n/format";
@@ -146,14 +147,15 @@ function ProjectRow({
             <div
               className="relative overflow-hidden rounded-sm bg-paper"
               style={{ aspectRatio: `${ratioW} / ${ratioH}` }}
+              {...(hasVideo ? VIDEO_BOX : {})}
             >
               {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven placeholder asset, not a static import */}
               <img
                 src={cover.src}
                 alt={cover.alt}
                 className={cn(
-                  "object-cover transition-transform",
-                  hasVideo ? "object-center" : "object-left-top",
+                  "object-cover",
+                  hasVideo ? ["object-center transition-[transform,opacity]", FALLBACK_IMAGE] : "object-left-top transition-transform",
                   mediaMotion,
                 )}
               />

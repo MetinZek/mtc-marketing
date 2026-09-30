@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Reveal } from "@/components/motion/Reveal";
-import { ViewportVideo } from "@/components/ui/ViewportVideo";
+import { ViewportVideo, trackVideo } from "@/components/ui/ViewportVideo";
+import { FALLBACK_IMAGE, VIDEO_BOX } from "@/lib/video-fallback";
 import type { Project } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { interpolate } from "@/i18n/format";
@@ -169,13 +170,17 @@ export function WorkList({
                   <span
                     className="relative block overflow-hidden rounded-sm bg-paper"
                     style={{ aspectRatio: `${w} / ${h}` }}
+                    {...(hasCoverVideo(project) ? VIDEO_BOX : {})}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven asset, not a static import */}
                     <img
                       src={cover.src}
                       alt=""
                       loading="lazy"
-                      className="h-full w-full object-cover object-center"
+                      className={cn(
+                        "h-full w-full object-cover object-center",
+                        hasCoverVideo(project) && ["transition-opacity", FALLBACK_IMAGE],
+                      )}
                     />
                     {hasCoverVideo(project) && (
                       <ViewportVideo
@@ -213,21 +218,28 @@ export function WorkList({
                   isActive ? "scale-100 opacity-100" : "scale-75 opacity-0",
                 )}
                 style={{ aspectRatio: `${w} / ${h}` }}
+                {...(videoSrc ? VIDEO_BOX : {})}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven asset, not a static import */}
                 <img
                   src={cover.src}
                   alt=""
                   className={cn(
-                    "h-full w-full object-cover object-center transition-[scale] duration-[var(--duration-slow)] ease-[var(--ease-out-soft)]",
+                    "h-full w-full object-cover object-center transition-[scale,opacity] duration-[var(--duration-slow)] ease-[var(--ease-out-soft)]",
                     isActive ? "scale-100" : "scale-110",
+                    videoSrc && FALLBACK_IMAGE,
                   )}
                 />
                 {videoSrc && touched.has(project.id) && (
                   <video
                     ref={(video) => {
-                      if (video) videos.current.set(project.id, video);
-                      else videos.current.delete(project.id);
+                      if (!video) return;
+                      videos.current.set(project.id, video);
+                      const untrack = trackVideo(video);
+                      return () => {
+                        untrack();
+                        videos.current.delete(project.id);
+                      };
                     }}
                     src={videoSrc}
                     muted
@@ -235,7 +247,7 @@ export function WorkList({
                     playsInline
                     autoPlay={isActive}
                     preload="auto"
-                    onPlaying={(e) => {
+                    onLoadedData={(e) => {
                       e.currentTarget.dataset.ready = "";
                     }}
                     className="absolute inset-0 h-full w-full object-cover object-center opacity-0 transition-opacity data-[ready]:opacity-100"

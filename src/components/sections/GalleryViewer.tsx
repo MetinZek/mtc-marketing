@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import { SLOW_VIDEO_MS } from "@/lib/video-fallback";
 import type { GalleryItem } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import type { Locale } from "@/i18n/locales";
@@ -16,7 +17,9 @@ const pad = (n: number) => String(n).padStart(2, "0");
  * trap and Esc for free) showing the piece uncropped, with previous /
  * next through `items`, arrow keys, a counter, the title and client, and
  * an optional "View project" link. Closes on Esc, the Close button or a
- * click on the background. Page scroll is locked while it is open.
+ * click on the background. Page scroll is locked while it is open. A
+ * video's image is only a fallback: shown as its poster if the video is
+ * slow to start, or instead of it if it fails.
  *
  * The site's custom cursor hides the native one and can't draw above
  * the dialog's top layer, so the viewer brings the system cursor back.
@@ -41,6 +44,17 @@ export function GalleryViewer({
   const dialogRef = useRef<HTMLDialogElement>(null);
   const current = index !== null ? items[index] : undefined;
   const count = items.length;
+  const [slowId, setSlowId] = useState<string | null>(null);
+  const [failedId, setFailedId] = useState<string | null>(null);
+
+  // Only a video that hasn't shown a frame within SLOW_VIDEO_MS gets
+  // its image as a poster (a poster disappears at the first frame).
+  const currentId = current?.videoUrl ? current.id : null;
+  useEffect(() => {
+    if (!currentId) return;
+    const timer = window.setTimeout(() => setSlowId(currentId), SLOW_VIDEO_MS);
+    return () => window.clearTimeout(timer);
+  }, [currentId]);
 
   const step = (delta: number) => {
     if (index === null || count === 0) return;
@@ -100,11 +114,12 @@ export function GalleryViewer({
             className="relative flex min-h-0 flex-1 items-center justify-center py-6"
             onClick={onBackground}
           >
-            {current.videoUrl ? (
+            {current.videoUrl && failedId !== current.id ? (
               <video
                 key={current.id}
                 src={current.videoUrl}
-                poster={current.image.src}
+                poster={slowId === current.id ? current.image.src : undefined}
+                onError={() => setFailedId(current.id)}
                 autoPlay
                 muted
                 loop

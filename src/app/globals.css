@@ -240,6 +240,51 @@ html.custom-cursor-active button {
 }
 
 /* ============================================================
+   Video cover fallback — the cover image under a video (class
+   `video-fallback`, inside a `data-video` box; see ViewportVideo).
+   The image starts hidden and fades in on its own after 1.5s — pure
+   CSS, so it also works on a connection too slow to have loaded the
+   page's JS yet. JS then reports the video's state: "ready" hides the
+   image for good (the video's first frame is showing); "slow",
+   "failed" and "off" (reduced motion) show it now. "loading" restarts
+   the delay (a second keyframes name restarts the animation) when a
+   video starts loading later, e.g. on scrolling near it.
+   Keep 1.5s in sync with SLOW_VIDEO_MS.
+   ============================================================ */
+@keyframes video-fallback-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes video-fallback-in-again {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+[data-video] .video-fallback {
+  opacity: 0;
+  animation: video-fallback-in var(--duration-base) ease-out 1.5s forwards;
+}
+[data-video="loading"] .video-fallback {
+  animation-name: video-fallback-in-again;
+}
+[data-video="ready"] .video-fallback {
+  animation: none;
+  opacity: 0;
+}
+[data-video="slow"] .video-fallback,
+[data-video="failed"] .video-fallback,
+[data-video="off"] .video-fallback {
+  animation: none;
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  /* No video plays, so the image is the content — show it at once. */
+  [data-video] .video-fallback {
+    animation: none;
+    opacity: 1;
+  }
+}
+
+/* ============================================================
    Reduced motion — honour the OS setting globally
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
