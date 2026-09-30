@@ -72,6 +72,37 @@ const UPLOAD_EXTENSIONS: Record<string, string> = {
 
 export type UploadState = { ok: boolean; url?: string; error?: string };
 
+/** Longest side an uploaded image is scaled down to (never enlarged). */
+const MAX_IMAGE_SIDE = 2400;
+
+/**
+ * Converts an uploaded JPG/PNG/WebP to a compressed WebP (EXIF rotation
+ * applied, longest side ≤ MAX_IMAGE_SIDE, quality 80), keeping it only
+ * when it is actually smaller. SVGs, and anything sharp can't read,
+ * are stored as uploaded. Proportions never change, so the width/height
+ * the admin measured still give the right aspect ratio.
+ */
+async function toWebp(
+  input: Buffer,
+  type: string,
+): Promise<{ bytes: Buffer; extension?: string; contentType?: string }> {
+  if (!["image/jpeg", "image/png", "image/webp"].includes(type)) return { bytes: input };
+  try {
+    const { default: sharp } = await import("sharp");
+    const webp = await sharp(input)
+      .rotate()
+      .resize({ width: MAX_IMAGE_SIDE, height: MAX_IMAGE_SIDE, fit: "inside", withoutEnlargement: true })
+      .webp({ quality: 80, effort: 5 })
+      .toBuffer();
+    return webp.length < input.length
+      ? { bytes: webp, extension: "webp", contentType: "image/webp" }
+      : { bytes: input };
+  } catch (error) {
+    console.error("[upload] WebP conversion failed, storing the original:", error);
+    return { bytes: input };
+  }
+}
+
 export async function uploadImageAction(formData: FormData): Promise<UploadState> {
   if (!(await hasValidSession())) {
     return { ok: false, error: "Your session has expired. Please sign in again." };
@@ -104,11 +135,13 @@ export async function uploadImageAction(formData: FormData): Promise<UploadState
     };
   }
 
-  const filename = `${Date.now()}-${crypto.randomUUID()}.${extension}`;
-  const bytes = Buffer.from(await file.arrayBuffer());
+  const optimized = await toWebp(Buffer.from(await file.arrayBuffer()), file.type);
+  const filename = `${Date.now()}-${crypto.randomUUID()}.${optimized.extension ?? extension}`;
+  const bytes = optimized.bytes;
+  const contentType = optimized.contentType ?? file.type;
 
   if (isDatabaseConfigured()) {
-    return { ok: true, url: await saveMedia(filename, file.type, bytes) };
+    return { ok: true, url: await saveMedia(filename, contentType, bytes) };
   }
   if (process.env.VERCEL) {
     return { ok: false, error: "Uploads need a database — DATABASE_URL is not set." };

@@ -1303,6 +1303,10 @@ function ImageRow({
       ? `recommended ${config.recommendedWidth}×${config.recommendedHeight}px`
       : null,
     formatAccept(config.accept),
+    // Server-side: JPG/PNG are stored as compressed WebP (see uploadImageAction).
+    config.accept.some((t) => t === "image/jpeg" || t === "image/png")
+      ? "auto-converted to WebP"
+      : null,
   ]
     .filter(Boolean)
     .join(" · ");

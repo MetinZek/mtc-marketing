@@ -8,6 +8,7 @@ import { contactDefaults, navCta, primaryNav } from "@/config/site";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import type { Locale } from "@/i18n/locales";
 import { withLocale } from "@/i18n/paths";
+import { pauseSmoothScroll } from "@/lib/smooth-scroll";
 import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
@@ -36,8 +37,10 @@ export function MobileMenu({
     if (!open) return;
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
+    const resume = pauseSmoothScroll();
     return () => {
       document.body.style.overflow = prev;
+      resume();
     };
   }, [open]);
 

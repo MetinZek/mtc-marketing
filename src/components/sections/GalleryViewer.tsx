@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { pauseSmoothScroll } from "@/lib/smooth-scroll";
 import { SLOW_VIDEO_MS } from "@/lib/video-fallback";
 import type { GalleryItem } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
@@ -69,8 +70,10 @@ export function GalleryViewer({
     if (open && !dialog.open) dialog.showModal();
     if (!open && dialog.open) dialog.close();
     document.documentElement.style.overflow = open ? "hidden" : "";
+    const resume = open ? pauseSmoothScroll() : undefined;
     return () => {
       document.documentElement.style.overflow = "";
+      resume?.();
     };
   }, [index]);
 

@@ -11,9 +11,11 @@ import { SLOW_VIDEO_MS } from "@/lib/video-fallback";
  *   the screen (the element renders with no `src`, `preload="none"`),
  *   and the source is released again once it scrolls that far away, so
  *   a long list never holds every video in memory.
- * - Only the single most-visible video plays; every other one is
- *   paused. Coordinated by one shared pair of IntersectionObservers for
- *   all instances — no scroll listeners, no React state/re-renders.
+ * - Every video at least MIN_VISIBLE_RATIO on screen plays (at most
+ *   MAX_PLAYING, largest visible area first, so a big tile always
+ *   plays); the rest are paused. Coordinated by one shared pair of
+ *   IntersectionObservers for all instances — no scroll listeners, no
+ *   React state/re-renders.
  * - Picks the mobile or desktop URL via matchMedia *before* assigning
  *   `src`, so a phone never requests the desktop file (and vice versa).
  * - The element stays transparent until its first frame is available
@@ -72,12 +74,16 @@ const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 const NEAR_MARGIN = "100% 0px 100% 0px";
 /** How much of a video must be on screen before it's allowed to play. */
 const MIN_VISIBLE_RATIO = 0.25;
+/** Most videos allowed to play at once (e.g. a /work grid row). */
+const MAX_PLAYING = 4;
 
 type Entry = {
   desktop?: string;
   mobile?: string;
   near: boolean;
   ratio: number;
+  /** Visible area in px² — ranks videos when too many are on screen. */
+  area: number;
   /** Stops the current load tracking (see trackVideo). */
   untrack?: () => void;
 };
@@ -125,21 +131,20 @@ function detach(video: HTMLVideoElement) {
   video.load(); // releases the network request + decoded buffers
 }
 
-/** Play the single most-visible video, pause every other one. */
+/** Play the videos that are well on screen (largest first, up to
+ * MAX_PLAYING); pause every other one. */
 function reconcile() {
-  let best: HTMLVideoElement | null = null;
+  const playing = new Set<HTMLVideoElement>();
   if (!document.hidden && !reducedMq?.matches) {
-    let bestRatio = MIN_VISIBLE_RATIO;
-    for (const [video, entry] of entries) {
-      if (entry.ratio >= bestRatio && sourceFor(entry)) {
-        best = video;
-        bestRatio = entry.ratio;
-      }
-    }
+    [...entries]
+      .filter(([, entry]) => entry.ratio >= MIN_VISIBLE_RATIO && sourceFor(entry))
+      .sort(([, a], [, b]) => b.area - a.area)
+      .slice(0, MAX_PLAYING)
+      .forEach(([video]) => playing.add(video));
   }
 
   for (const [video, entry] of entries) {
-    if (video === best) {
+    if (playing.has(video)) {
       attach(video, entry);
       if (video.paused) {
         // Rejected when autoplay is blocked or a pause interrupts it —
@@ -166,7 +171,10 @@ function onNear(records: IntersectionObserverEntry[]) {
 function onVisible(records: IntersectionObserverEntry[]) {
   for (const record of records) {
     const entry = entries.get(record.target as HTMLVideoElement);
-    if (entry) entry.ratio = record.isIntersecting ? record.intersectionRatio : 0;
+    if (!entry) continue;
+    entry.ratio = record.isIntersecting ? record.intersectionRatio : 0;
+    const { width, height } = record.intersectionRect;
+    entry.area = record.isIntersecting ? width * height : 0;
   }
   reconcile();
 }
@@ -202,7 +210,7 @@ function stop() {
 
 function register(video: HTMLVideoElement, desktop?: string, mobile?: string) {
   if (!nearObserver) start();
-  entries.set(video, { desktop, mobile, near: false, ratio: 0 });
+  entries.set(video, { desktop, mobile, near: false, ratio: 0, area: 0 });
   // Reduced motion: no video will load, so the cover image is shown.
   if (reducedMq?.matches) setBoxState(video, "off");
   nearObserver?.observe(video);

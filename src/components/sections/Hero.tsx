@@ -90,15 +90,21 @@ function HeroBackground() {
         className="absolute top-1/2 left-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 sm:h-[520px] sm:w-[520px] lg:h-[620px] lg:w-[620px]"
       >
         <circle cx="320" cy="320" r="300" fill="none" strokeWidth="1" className="stroke-ink/[0.05]" />
-        <g
-          style={{
-            transformOrigin: "320px 320px",
-            animation: "hero-rotate-slow 150s linear infinite",
-          }}
+      </svg>
+      {/* The rotating line is its own HTML layer: a CSS transform on an
+          element (not inside the SVG) runs on the compositor, so it
+          costs nothing per frame instead of repainting the ring. */}
+      <div
+        className="absolute top-1/2 left-1/2 h-[420px] w-[420px] -translate-x-1/2 -translate-y-1/2 sm:h-[520px] sm:w-[520px] lg:h-[620px] lg:w-[620px]"
+      >
+        <svg
+          viewBox="0 0 640 640"
+          className="h-full w-full"
+          style={{ animation: "hero-rotate-slow 150s linear infinite" }}
         >
           <line x1="320" y1="320" x2="320" y2="20" strokeWidth="1" className="stroke-ink/[0.08]" />
-        </g>
-      </svg>
+        </svg>
+      </div>
 
       {/* two quiet nodes */}
       <span

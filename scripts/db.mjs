@@ -17,7 +17,7 @@ import postgres from "postgres";
 import { JSON_COLUMNS, tableFor, toRecord } from "../src/lib/db/rows.ts";
 
 const ROOT = process.cwd();
-const COLLECTIONS = ["projects", "services", "testimonials", "clients", "team", "posts", "submissions"];
+const COLLECTIONS = ["projects", "services", "testimonials", "clients", "team", "posts", "gallery", "submissions"];
 const UPLOAD_EXT = { jpg: "image/jpeg", png: "image/png", webp: "image/webp", svg: "image/svg+xml" };
 
 const url = process.env.DATABASE_URL;

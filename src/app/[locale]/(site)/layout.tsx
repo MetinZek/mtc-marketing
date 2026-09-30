@@ -1,6 +1,7 @@
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { PageTransition } from "@/components/motion/PageTransition";
+import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { CustomCursor } from "@/components/ui/CustomCursor";
 import { getDictionary } from "@/i18n/get-dictionary";
 
@@ -30,6 +31,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       </main>
       <Footer />
       <CustomCursor />
+      <SmoothScroll />
     </>
   );
 }
