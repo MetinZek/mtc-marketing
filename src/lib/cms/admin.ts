@@ -13,6 +13,7 @@ import {
   submissionStatuses,
   teamMemberSchema,
   testimonialSchema,
+  workPageSchema,
   type CollectionName,
   type SubmissionStatus,
 } from "@/content/schema";
@@ -180,6 +181,22 @@ export async function rawEntry(
   return (found as Record<string, unknown> | undefined) ?? null;
 }
 
+/* ---- Work page settings (admin → Work Page) ---- */
+
+/** Validates and stores the Work page settings, then refreshes /work. */
+export async function saveWorkPage(input: unknown): Promise<SaveResult> {
+  const result = workPageSchema.safeParse({ ...(input as object), id: "work-page" });
+  if (!result.success) return { ok: false, errors: collectIssues(result.error) };
+  const settings = result.data;
+  await mutateRows("settings", (rows) => [
+    ...rows.filter((r) => idOf(r) !== settings.id),
+    settings,
+  ]);
+  revalidateSite();
+  revalidatePath("/admin/work-page");
+  return { ok: true, id: settings.id };
+}
+
 /* ---- archive: "Delete" moves entries here; restorable for 30 days ---- */
 
 /** How long an archived entry can be restored before it is purged. */
@@ -244,6 +261,7 @@ export async function archiveEntry(
   revalidateSite();
   revalidatePath(`/admin/${collection}`);
   revalidatePath("/admin/archive");
+  revalidatePath("/admin/work-page");
 }
 
 /** Archived entries still within the retention period, newest first. */

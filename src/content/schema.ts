@@ -192,6 +192,30 @@ export const galleryItemSchema = z.object({
   order: z.number().int().default(0),
 });
 
+/* ---------------- Work page settings ---------------------- */
+
+/** One tile of the /work grid: a project or a Work gallery piece. */
+export const workLayoutEntrySchema = z.object({
+  kind: z.enum(["project", "piece"]),
+  id: z.string().min(1),
+  size: z.enum(["big", "small"]),
+  /** Hidden from the Work page (still published elsewhere). */
+  hidden: z.boolean().default(false),
+});
+
+/** Admin → Work Page: heading overrides, default view and the grid
+ * arrangement. Empty text fields fall back to the translated defaults. */
+export const workPageSchema = z.object({
+  id: z.literal("work-page"),
+  eyebrow: z.string().trim().max(60).optional(),
+  title: z.string().trim().max(60).optional(),
+  intro: z.string().trim().max(400).optional(),
+  defaultView: z.enum(["grid", "index"]).default("grid"),
+  /** Saved arrangement. Empty → automatic; items missing from it
+   * (added later) are appended automatically. */
+  layout: z.array(workLayoutEntrySchema).default([]),
+});
+
 /* ---------------- Testimonials ---------------------------- */
 
 export const testimonialSchema = z.object({

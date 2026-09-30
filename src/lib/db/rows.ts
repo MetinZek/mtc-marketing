@@ -20,7 +20,8 @@ export type StoreKey =
   | "posts"
   | "gallery"
   | "submissions"
-  | "archive";
+  | "archive"
+  | "settings";
 
 export type Row = Record<string, unknown>;
 export type DbRecord = Record<string, unknown>;

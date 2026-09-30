@@ -3,7 +3,9 @@ import { WorkIndex } from "@/components/sections/WorkIndex";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 import { getGallery, getProjects, getServices } from "@/lib/cms/localized";
+import { getWorkPage } from "@/lib/cms/work-page";
 import { buildMetadata } from "@/lib/seo";
+import { resolveLayout } from "@/lib/work-layout";
 
 export async function generateMetadata(): Promise<Metadata> {
   const [dict, locale] = await Promise.all([getDictionary(), getLocale()]);
@@ -23,10 +25,11 @@ export async function generateMetadata(): Promise<Metadata> {
  * layout.
  */
 export default async function WorkPage() {
-  const [projects, services, gallery, dict, locale] = await Promise.all([
+  const [projects, services, gallery, settings, dict, locale] = await Promise.all([
     getProjects(),
     getServices(),
     getGallery(),
+    getWorkPage(),
     getDictionary(),
     getLocale(),
   ]);
@@ -34,6 +37,8 @@ export default async function WorkPage() {
     <WorkIndex
       projects={projects}
       pieces={gallery}
+      settings={settings}
+      layout={resolveLayout(settings.layout, projects, gallery)}
       services={services.map(({ id, number, title }) => ({ id, number, title }))}
       dict={dict}
       locale={locale}

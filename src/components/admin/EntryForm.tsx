@@ -447,16 +447,19 @@ function Field({
 }) {
   if (field.type === "boolean") {
     return (
-      <label className="flex items-center gap-3">
-        <input
-          type="checkbox"
-          checked={value === true}
-          onChange={(e) => onChange(e.target.checked)}
-          className="h-4 w-4 accent-[var(--color-blue)]"
-        />
-        <span className="text-sm text-ink">{field.label}</span>
+      <div>
+        <label className="flex items-center gap-3">
+          <input
+            type="checkbox"
+            checked={value === true}
+            onChange={(e) => onChange(e.target.checked)}
+            className="h-4 w-4 accent-[var(--color-blue)]"
+          />
+          <span className="text-sm text-ink">{field.label}</span>
+        </label>
+        {field.help && <p className="mt-1.5 pl-7 text-meta text-ink-faint">{field.help}</p>}
         <ErrorText message={error} />
-      </label>
+      </div>
     );
   }
 

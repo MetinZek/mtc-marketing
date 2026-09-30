@@ -22,6 +22,7 @@ import {
   rawEntry,
   restoreArchivedEntry,
   saveEntry,
+  saveWorkPage,
   setPublished,
   setSubmissionStatus,
 } from "@/lib/cms/admin";
@@ -286,6 +287,41 @@ export async function deleteEntryAction(formData: FormData): Promise<void> {
   if (!def || !def.canDelete || !id) return;
   await archiveEntry(def.key, id);
   redirect(`/admin/${def.key}?archived=1`);
+}
+
+/* ---------------- Work page ---------------- */
+
+export type WorkPageSaveState = { ok?: boolean; error?: string };
+
+export async function saveWorkPageAction(
+  _prev: WorkPageSaveState,
+  formData: FormData,
+): Promise<WorkPageSaveState> {
+  await requireSession();
+  let input: unknown;
+  try {
+    input = JSON.parse(String(formData.get("payload") ?? "{}"));
+  } catch {
+    return { error: "The form data could not be read. Reload the page and try again." };
+  }
+  const result = await saveWorkPage(input);
+  if (!result.ok) {
+    const [field, message] = Object.entries(result.errors)[0] ?? ["", "Invalid data."];
+    return { error: field ? `${field}: ${message}` : message };
+  }
+  return { ok: true };
+}
+
+/** "Remove" on the Work Page screen: moves the project or gallery piece
+ * to the Archive (restorable for 30 days), without leaving the page. */
+export async function archiveWorkItemAction(
+  kind: "project" | "piece",
+  id: string,
+): Promise<{ ok: boolean }> {
+  await requireSession();
+  if (!id) return { ok: false };
+  await archiveEntry(kind === "project" ? "projects" : "gallery", id);
+  return { ok: true };
 }
 
 /* ---------------- archive ---------------- */

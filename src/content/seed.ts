@@ -24,8 +24,12 @@ export const collectionSeeds: Record<CollectionName, readonly unknown[]> = {
   gallery,
 };
 
-/** Seed rows for a store key (contact submissions and the admin
- * archive start empty). */
-export function seedRowsFor(key: CollectionName | "submissions" | "archive"): unknown[] {
-  return key === "submissions" || key === "archive" ? [] : [...collectionSeeds[key]];
+/** Seed rows for a store key (contact submissions, the admin archive
+ * and page settings start empty). */
+export function seedRowsFor(
+  key: CollectionName | "submissions" | "archive" | "settings",
+): unknown[] {
+  return key === "submissions" || key === "archive" || key === "settings"
+    ? []
+    : [...collectionSeeds[key]];
 }

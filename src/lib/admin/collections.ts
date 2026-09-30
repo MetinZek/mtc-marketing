@@ -160,6 +160,7 @@ export const COLLECTION_DEFS: Record<CmsCollection, CollectionDef> = {
       { key: "title", label: "Title" },
       { key: "category", label: "Category" },
       { key: "year", label: "Year" },
+      { key: "featured", label: "On homepage" },
       { key: "order", label: "Order" },
     ],
     fields: [
@@ -263,8 +264,9 @@ export const COLLECTION_DEFS: Record<CmsCollection, CollectionDef> = {
       },
       {
         key: "featured",
-        label: "Show in Selected Work (homepage)",
+        label: "Also show on the homepage (Selected Work)",
         type: "boolean",
+        help: "Off by default — a published project always appears on the Work page; tick this only for the ones the homepage should feature too.",
       },
       { key: "published", label: "Published", type: "boolean" },
       {

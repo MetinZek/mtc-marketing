@@ -17,6 +17,8 @@ import type {
   submissionSchema,
   teamMemberSchema,
   testimonialSchema,
+  workLayoutEntrySchema,
+  workPageSchema,
 } from "./schema";
 
 export type Seo = z.infer<typeof seoSchema>;
@@ -31,6 +33,8 @@ export type Client = z.infer<typeof clientSchema>;
 export type TeamMember = z.infer<typeof teamMemberSchema>;
 export type Post = z.infer<typeof postSchema>;
 export type GalleryItem = z.infer<typeof galleryItemSchema>;
+export type WorkPage = z.infer<typeof workPageSchema>;
+export type WorkLayoutEntry = z.infer<typeof workLayoutEntrySchema>;
 export type Stat = z.infer<typeof statSchema>;
 export type HomepageContent = z.infer<typeof homepageSchema>;
 export type StudioContent = z.infer<typeof studioSchema>;

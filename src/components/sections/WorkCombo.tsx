@@ -11,23 +11,15 @@ import type { Locale } from "@/i18n/locales";
 import { withLocale } from "@/i18n/paths";
 import { coverImage, hasCoverVideo, naturalCoverRatio } from "@/lib/project-cover";
 import { cn } from "@/lib/utils";
+import { placeTiles, type LayoutSize } from "@/lib/work-layout";
 import { GalleryViewer } from "./GalleryViewer";
 
-type NumberedProject = { project: Project; number: number };
+export type ComboWork =
+  | { kind: "project"; project: Project; number: number }
+  | { kind: "piece"; item: GalleryItem };
 
-type Tile =
-  | { kind: "project"; project: Project; number: number; span: string }
-  | { kind: "piece"; item: GalleryItem; span: string };
-
-/*
- * Layout unit (md+): the grid is 12 columns; rows are half-units sized
- * from the container width so every tile is 3:2 —
- *   big      8 cols × 4 rows
- *   small    4 cols × 2 rows   (two stacked beside a big one)
- *   pair     6 cols × 3 rows   (two works left over at the end)
- *   solo     12 cols × 5 rows  (one work left over at the end)
- * Every block is a whole rectangle, so the mosaic never leaves holes.
- */
+/** Row unit (md+): half-rows sized from the container width so every
+ * standard tile is 3:2 — see placeTiles in src/lib/work-layout.ts. */
 const ROWS =
   "md:auto-rows-[calc(((100cqw-3rem)/3/1.5-1.5rem)/2)] lg:auto-rows-[calc(((100cqw-4rem)/3/1.5-2rem)/2)]";
 
@@ -39,106 +31,48 @@ function pieceRatio(item: GalleryItem): [number, number] {
   return width && height ? [width, height] : [4, 3];
 }
 
-type Work =
-  | { kind: "project"; project: Project; number: number }
-  | { kind: "piece"; item: GalleryItem };
-
-/** A piece belongs to a project when it links to it or names its client. */
-function belongsTo(item: GalleryItem, project: Project): boolean {
-  return (
-    item.link?.endsWith(`/work/${project.slug}`) === true ||
-    (!!item.client && item.client.toLowerCase() === project.client.toLowerCase())
-  );
-}
-
 /**
- * Builds the mosaic from repeating blocks of one big and two small
- * tiles, alternating sides, every tile a different work. Big tiles go
- * to projects first (then pieces once projects run out); each small
- * slot takes a gallery piece that isn't from the big tile's project,
- * else the next project, else any piece — so a project never sits
- * beside its own pieces. Two or one works left at the end become a
- * pair or a solo.
- */
-function arrange(projects: NumberedProject[], pieces: GalleryItem[]): Tile[] {
-  const projectQueue: Work[] = projects.map((p) => ({ kind: "project", ...p }));
-  const pieceQueue: Work[] = pieces.map((item) => ({ kind: "piece", item }));
-  const remaining = () => projectQueue.length + pieceQueue.length;
-
-  const takeSmall = (big: Work): Work | undefined => {
-    const bigProject = big.kind === "project" ? big.project : null;
-    const unrelated = pieceQueue.findIndex(
-      (w) => w.kind === "piece" && !(bigProject && belongsTo(w.item, bigProject)),
-    );
-    if (unrelated !== -1) return pieceQueue.splice(unrelated, 1)[0];
-    return projectQueue.shift() ?? pieceQueue.shift();
-  };
-
-  const tile = (work: Work, span: string): Tile =>
-    work.kind === "project" ? { ...work, span } : { kind: "piece", item: work.item, span };
-
-  const tiles: Tile[] = [];
-  let side = 0;
-  while (remaining() >= 3) {
-    const big = (projectQueue.shift() ?? pieceQueue.shift())!;
-    const first = takeSmall(big)!;
-    const second = takeSmall(big)!;
-    const left = side % 2 === 0;
-    side += 1;
-    tiles.push(tile(big, cn("md:col-span-8 md:row-span-4", left ? "md:col-start-1" : "md:col-start-5")));
-    const smallCol = left ? "md:col-start-9" : "md:col-start-1";
-    tiles.push(tile(first, cn("md:col-span-4 md:row-span-2", smallCol)));
-    tiles.push(tile(second, cn("md:col-span-4 md:row-span-2", smallCol)));
-  }
-
-  const rest = [...projectQueue, ...pieceQueue];
-  const restSpan = rest.length === 1 ? "md:col-span-12 md:row-span-5" : "md:col-span-6 md:row-span-3";
-  rest.forEach((work) => tiles.push(tile(work, restSpan)));
-  return tiles;
-}
-
-/**
- * /work grid view: projects and Work gallery pieces in one mosaic of
- * big + small blocks, each tile a different work. Project tiles (cover
+ * /work grid view: projects and Work gallery pieces in one mosaic, in
+ * the order and big/small sizes from admin → Work Page (or the automatic
+ * arrangement). Project tiles (cover
  * video/image, number, title, "Case study" tag) open their page; piece
  * tiles open in the full-screen GalleryViewer. On phones every
  * tile stacks at its media's own proportions.
  */
 export function WorkCombo({
-  projects,
-  pieces,
+  works,
   serviceTitle,
   dict,
   locale,
 }: {
-  projects: NumberedProject[];
-  pieces: GalleryItem[];
+  /** Visible works in grid order, each with its tile size. */
+  works: { size: LayoutSize; work: ComboWork }[];
   serviceTitle: (serviceId: string) => string;
   dict: Dictionary;
   locale: Locale;
 }) {
   const [open, setOpen] = useState<number | null>(null);
-  const tiles = arrange(projects, pieces);
+  const tiles = placeTiles(works.map(({ size, work }) => ({ size, value: work })));
   // Viewer order follows the mosaic's order.
-  const viewerItems = tiles.flatMap((tile) => (tile.kind === "piece" ? [tile.item] : []));
+  const viewerItems = tiles.flatMap(({ value }) => (value.kind === "piece" ? [value.item] : []));
 
   return (
     <div className="@container">
       <div className={cn("grid grid-flow-dense grid-cols-1 gap-6 md:grid-cols-12 lg:gap-8", ROWS)}>
-        {tiles.map((tile, i) => (
+        {tiles.map(({ value, span }, i) => (
           <Reveal
-            key={tile.kind === "project" ? tile.project.id : tile.item.id}
+            key={value.kind === "project" ? `p:${value.project.id}` : `g:${value.item.id}`}
             delay={(i % 3) * 0.05}
             amount={0.15}
-            className={cn("group relative", tile.span)}
+            className={cn("group relative", span)}
           >
-            {tile.kind === "project" ? (
-              <ProjectTile project={tile.project} number={tile.number} dict={dict} locale={locale} />
+            {value.kind === "project" ? (
+              <ProjectTile project={value.project} number={value.number} dict={dict} locale={locale} />
             ) : (
               <PieceTile
-                item={tile.item}
+                item={value.item}
                 dict={dict}
-                onOpen={() => setOpen(viewerItems.indexOf(tile.item))}
+                onOpen={() => setOpen(viewerItems.indexOf(value.item))}
               />
             )}
           </Reveal>
