@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { Icon } from "./Icon";
 
 /**
- * Editorial text link with a trailing arrow — for "View all work",
- * "Explore service", and similar tertiary navigation. The arrow nudges
- * on hover; the underline is the affordance.
+ * Text link with a trailing arrow, for tertiary navigation ("See all
+ * work", "Read the journal"). The underline is the affordance; the arrow
+ * nudges on hover. `external` opens in a new tab with the diagonal arrow.
  */
 export function ArrowLink({
   href,
@@ -18,27 +19,24 @@ export function ArrowLink({
   className?: string;
   external?: boolean;
 }) {
-  const externalProps = external
-    ? { target: "_blank", rel: "noopener noreferrer" }
-    : {};
+  const externalProps = external ? { target: "_blank", rel: "noopener noreferrer" } : {};
 
   return (
     <Link
       href={href}
       className={cn(
-        "group inline-flex items-center gap-1.5 text-sm font-medium tracking-tight text-ink",
-        "border-b border-ink/25 pb-0.5 transition-colors hover:border-blue hover:text-blue",
+        "group/arrow inline-flex items-center gap-1.5 rounded-xs text-[0.9375rem] font-semibold tracking-[-0.01em] text-ink",
+        "underline decoration-ink/25 decoration-1 underline-offset-[0.35em] transition-colors duration-[var(--duration-fast)]",
+        "hover:text-blue hover:decoration-blue",
         className,
       )}
       {...externalProps}
     >
       {children}
-      <span
-        aria-hidden="true"
-        className="transition-transform duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] group-hover:translate-x-0.5"
-      >
-        &rarr;
-      </span>
+      <Icon
+        name={external ? "arrow-up-right" : "arrow-right"}
+        className="transition-transform duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover/arrow:translate-x-0.5"
+      />
     </Link>
   );
 }

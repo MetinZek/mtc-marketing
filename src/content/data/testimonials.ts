@@ -15,6 +15,7 @@ export const testimonials: Testimonial[] = [
     company: "Placeholder Company",
     featured: true,
     order: 1,
+    published: false, // placeholder copy: never publish
   },
   {
     id: "t-arc",
@@ -25,6 +26,7 @@ export const testimonials: Testimonial[] = [
     company: "Placeholder Studio",
     featured: false,
     order: 2,
+    published: false, // placeholder copy: never publish
   },
   {
     id: "t-field",
@@ -35,5 +37,6 @@ export const testimonials: Testimonial[] = [
     company: "Placeholder Group",
     featured: false,
     order: 3,
+    published: false, // placeholder copy: never publish
   },
 ];

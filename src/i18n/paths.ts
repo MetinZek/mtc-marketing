@@ -14,9 +14,14 @@ export function splitLocaleFromPathname(pathname: string): {
   path: string;
 } {
   const [, maybeLocale, ...rest] = pathname.split("/");
-  if (maybeLocale && hasLocale(maybeLocale) && maybeLocale !== defaultLocale) {
-    const path = `/${rest.join("/")}`;
-    return { locale: maybeLocale, path: path === "/" ? "/" : path.replace(/\/$/, "") || "/" };
+  // The default locale is unprefixed in the browser, but a pre-rendered
+  // page can report its internal "/en/..." route (the proxy's rewrite
+  // target) before hydration settles. Treat that prefix as English too, so
+  // links built from it never become "/de/en" (a 404 on the live site).
+  if (maybeLocale && hasLocale(maybeLocale)) {
+    const raw = `/${rest.join("/")}`;
+    const path = raw === "/" ? "/" : raw.replace(/\/$/, "") || "/";
+    return { locale: maybeLocale, path };
   }
   return { locale: defaultLocale, path: pathname === "" ? "/" : pathname };
 }

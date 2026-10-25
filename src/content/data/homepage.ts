@@ -1,29 +1,31 @@
 import type { HomepageContent } from "../types";
 
 /**
- * Homepage singleton content. Seeded now so sections built in later
- * stages read from here (and, eventually, from the same shape in
- * Supabase) rather than hard-coding copy.
+ * Homepage singleton content (English; German and Swedish come from the
+ * overlays in src/content/i18n). Not admin-managed: this file ships with the
+ * site. Copy rewritten for the redesign; every claim here is either a
+ * description of MTC's own services and process or taken from the live site.
  */
 export const homepageContent: HomepageContent = {
   hero: {
     label: "Creative digital agency",
-    headline: ["We build brands.", "We create digital.", "We make ideas move."],
+    headline: ["We make brands", "impossible to ignore."],
     supporting:
-      "MTC combines strategy, creative direction, technology and marketing to build brands and digital experiences that get noticed.",
+      "Branding, websites, social media and content from one creative team, from the first idea to launch day.",
     primaryCta: { label: "Start a project", href: "/contact" },
-    secondaryCta: { label: "View our work", href: "/work" },
+    secondaryCta: { label: "See our work", href: "/work" },
   },
   intro: {
-    label: "What we do",
+    label: "Why one team",
     statement:
-      "We build brands, digital experiences and campaigns that make businesses impossible to ignore.",
-    body: "MTC brings branding, digital experiences, social media, marketing, content and advertising together under one roof — working as a single system instead of six separate vendors.",
+      "One team for the whole job: the brand, the website, the content and the campaigns that carry it.",
+    body: "Fewer handoffs, one standard, and work that fits together because the same people made it.",
   },
   services: {
-    label: "Our services",
-    headline: "Everything your brand needs to move forward.",
-    supporting: "Four disciplines. One accountable team.",
+    label: "What we do",
+    headline: "One team. Four disciplines.",
+    supporting:
+      "Most projects draw on more than one, so your brand, website and campaigns look and sound like they belong together.",
   },
   approach: {
     label: "The MTC approach",
@@ -33,7 +35,7 @@ export const homepageContent: HomepageContent = {
     {
       id: "think",
       title: "Think",
-      body: "Strategy, research and positioning — settled before a single execution decision gets made.",
+      body: "Strategy, research and positioning, settled before a single design decision.",
     },
     {
       id: "make",
@@ -43,80 +45,55 @@ export const homepageContent: HomepageContent = {
     {
       id: "move",
       title: "Move",
-      body: "Launch, distribute, advertise, measure — and keep improving.",
+      body: "Launch, distribute, advertise and measure, then keep improving.",
     },
   ],
   howWeWork: {
     label: "How we work",
-    headline: "From first idea to real-world impact.",
-    supporting: "Four stages. One continuous system.",
+    headline: "A clear process, from first call to launch.",
+    supporting: "Four stages, and one team with you the whole way through.",
   },
   process: [
     {
       id: "discover",
       number: "01",
       title: "Discover",
-      body: "Understand the business, audience, goals and opportunity.",
+      body: "We learn your business, your audience and what success should look like.",
     },
     {
       id: "define",
       number: "02",
       title: "Define",
-      body: "Build the strategy, positioning, creative direction and plan.",
+      body: "We set the strategy, positioning and creative direction, and agree on a plan.",
     },
     {
       id: "create",
       number: "03",
       title: "Create",
-      body: "Design, develop and produce the brand, digital experience and content.",
+      body: "We design, build and produce the brand, the website and the content.",
     },
     {
       id: "launch",
       number: "04",
       title: "Launch",
-      body: "Launch the work, distribute it, advertise it and learn from the results.",
+      body: "We launch, promote and measure the work, then keep improving what performs.",
     },
   ],
-  stats: [
-    {
-      id: "campaigns",
-      value: "+120",
-      label: "Campaigns launched",
-      note: "Placeholder — replace with a verified figure before publishing.",
-    },
-    {
-      id: "projects",
-      value: "+80",
-      label: "Brands & digital projects",
-      note: "Placeholder — replace with a verified figure before publishing.",
-    },
-    {
-      id: "impressions",
-      value: "+45M",
-      label: "Impressions generated",
-      note: "Placeholder — replace with a verified figure before publishing.",
-    },
-    {
-      id: "roas",
-      value: "3.8x",
-      label: "Average campaign ROAS",
-      note: "Placeholder — replace with a verified figure before publishing.",
-    },
-  ],
+  // No verified figures exist, so no statistics are published anywhere.
+  stats: [],
   testimonialsIntro: {
-    label: "What clients say",
-    headline: "Good work is remembered.",
-    supporting: "A few words from people we've worked with.",
+    label: "Client words",
+    headline: "What our clients say.",
   },
   finalCta: {
     headline: "Have a project in mind?",
-    supporting: "Let's build something worth noticing.",
+    supporting: "Pick what you need and we'll take it from there.",
     primaryCta: { label: "Start a project", href: "/contact" },
   },
   seo: {
-    seoTitle: "MTC — Creative digital agency",
+    seoTitle: "MTC | Creative digital agency in Mitrovica, Kosovo",
     metaDescription:
-      "Branding, web & app development, social media, and content — strategy first, creative always, technology where it matters.",
+      "MTC is a creative digital agency for branding, websites, social media and content. One team, from the first idea to launch day.",
     noindex: false,
   },
 };

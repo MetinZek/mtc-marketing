@@ -7,16 +7,19 @@ import { splitLocaleFromPathname, withLocale } from "@/i18n/paths";
 import { cn } from "@/lib/utils";
 
 /**
- * Minimal EN / DE / SV switcher — three small text links, active locale
- * highlighted. Swaps only the locale segment of the current path, so it
- * round-trips from any page (e.g. /work/noma ↔ /de/work/noma).
+ * EN / DE / SV switcher. Swaps only the locale segment of the current
+ * path, so it round-trips from any page (/work/pixel-print ↔
+ * /de/work/pixel-print). `compact` renders it as a small segmented
+ * control for the navigation pill; the default is a plain row of links.
  */
 export function LanguageSwitcher({
   className,
   ariaLabel,
+  compact = false,
 }: {
   className?: string;
   ariaLabel: string;
+  compact?: boolean;
 }) {
   const pathname = usePathname();
   const { locale: activeLocale, path } = splitLocaleFromPathname(pathname);
@@ -25,23 +28,33 @@ export function LanguageSwitcher({
     <div
       role="group"
       aria-label={ariaLabel}
-      className={cn("flex items-center gap-2.5 text-sm tracking-tight", className)}
+      className={cn(
+        "flex items-center text-[0.8125rem] font-semibold tracking-[0.02em]",
+        compact ? "gap-0.5 rounded-pill border border-ink/[0.08] bg-ink/[0.03] p-0.5" : "gap-1",
+        className,
+      )}
     >
-      {locales.map((locale, i) => (
-        <span key={locale} className="flex items-center gap-2.5">
-          {i > 0 && <span aria-hidden="true" className="text-ink-faint">/</span>}
+      {locales.map((locale) => {
+        const active = locale === activeLocale;
+        return (
           <Link
+            key={locale}
             href={withLocale(path, locale)}
-            aria-current={locale === activeLocale ? "page" : undefined}
+            hrefLang={locale}
+            aria-current={active ? "page" : undefined}
             className={cn(
-              "transition-colors hover:text-blue",
-              locale === activeLocale ? "text-blue" : "text-ink-muted",
+              "inline-flex h-8 min-w-9 items-center justify-center rounded-pill px-2 transition-colors duration-[var(--duration-fast)]",
+              active
+                ? compact
+                  ? "bg-canvas text-ink shadow-[0_1px_2px_rgba(11,18,34,0.08)]"
+                  : "text-blue"
+                : "text-ink-muted hover:text-ink",
             )}
           >
             {localeLabel[locale]}
           </Link>
-        </span>
-      ))}
+        );
+      })}
     </div>
   );
 }

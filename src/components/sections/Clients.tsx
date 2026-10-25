@@ -1,7 +1,6 @@
 import { Reveal } from "@/components/motion/Reveal";
 import type { Client } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
-import { cn } from "@/lib/utils";
 
 type ClientsProps = {
   clients: Client[];
@@ -9,60 +8,60 @@ type ClientsProps = {
 };
 
 /**
- * Trusted Clients — a short, quiet horizontal logo strip, not a
- * section in its own right. Desktop/tablet: a slow, continuous CSS
- * marquee (content duplicated once for a seamless loop, paused on
- * hover). Mobile: a native horizontally-scrollable row instead of
- * auto-motion, since swipe is the expected mobile interaction — both
- * are clipped to the viewport so neither can cause page-level
- * horizontal overflow. No cards, no heading, no extra copy.
+ * Client logos: a calm, static row of real marks (no marquee), all set as
+ * one-colour silhouettes so every logo reads on white, including marks
+ * delivered in white (Summit Balkans), and none outshouts the others.
+ * Logos link to the client's site when the CMS has a URL. Wraps and
+ * centres on small screens, so there is never an empty trailing cell.
  */
 export function Clients({ clients, dict }: ClientsProps) {
   if (clients.length === 0) return null;
 
   return (
-    <section
-      id="clients"
-      aria-label={dict.home.trustedClientsAriaLabel}
-      className="bg-canvas py-10 sm:py-12"
-    >
-      <Reveal className="container-mtc">
-        <p className="label text-ink-faint">{dict.home.trustedByLabel}</p>
-
-        {/* Desktop / tablet — continuous marquee */}
-        <div className="mt-6 hidden overflow-hidden sm:block sm:mt-8">
-          <div className="flex w-max animate-[clients-marquee_46s_linear_infinite] items-center gap-16 hover:[animation-play-state:paused]">
-            {[...clients, ...clients].map((client, i) => (
-              <LogoMark key={`${client.id}-${i}`} client={client} />
-            ))}
-          </div>
-        </div>
-
-        {/* Mobile — native horizontal scroll, no auto-motion. Stays
-            within the container's own gutter (no negative-margin bleed)
-            so it can never push the page wider than the viewport. */}
-        <div
-          className={cn(
-            "mt-6 flex items-center gap-10 overflow-x-auto pb-1 sm:hidden",
-            "[-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-          )}
+    <section aria-label={dict.home.trustedClientsAriaLabel} className="bg-canvas pb-20 pt-6 sm:pb-28">
+      <div className="container-mtc">
+        <Reveal className="flex items-center gap-4">
+          <p className="label text-ink-muted">{dict.home.trustedByLabel}</p>
+          <span aria-hidden="true" className="h-px flex-1 bg-line" />
+        </Reveal>
+        <Reveal
+          as="ul"
+          stagger={45}
+          className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-6 sm:mt-10 sm:gap-x-10 lg:justify-between lg:gap-x-6"
         >
           {clients.map((client) => (
-            <LogoMark key={client.id} client={client} />
+            <li key={client.id}>
+              <LogoMark client={client} />
+            </li>
           ))}
-        </div>
-      </Reveal>
+        </Reveal>
+      </div>
     </section>
   );
 }
 
 function LogoMark({ client }: { client: Client }) {
-  return (
-    // eslint-disable-next-line @next/next/no-img-element -- CMS-driven placeholder asset
+  const image = (
+    // eslint-disable-next-line @next/next/no-img-element -- CMS-driven logo
     <img
       src={client.logo.src}
       alt={client.logo.alt}
-      className="h-6 w-auto shrink-0 opacity-50 grayscale transition-opacity duration-200 hover:opacity-90 sm:h-7"
+      width={client.logo.width}
+      height={client.logo.height}
+      loading="lazy"
+      className="h-12 w-28 object-contain opacity-50 [filter:brightness(0)] transition-opacity duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover/logo:opacity-90 sm:h-14 sm:w-32"
     />
+  );
+  return client.url ? (
+    <a
+      href={client.url}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="group/logo block rounded-sm p-1 focus-visible:outline-2 focus-visible:outline-offset-2"
+    >
+      {image}
+    </a>
+  ) : (
+    <span className="group/logo block p-1">{image}</span>
   );
 }

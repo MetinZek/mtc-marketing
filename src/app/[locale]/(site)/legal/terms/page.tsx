@@ -16,7 +16,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   return buildMetadata({
     path: "/legal/terms",
-    title: `Terms of Use — ${LEGAL_ENTITY_NAME}`,
+    title: `Terms of Use | ${LEGAL_ENTITY_NAME}`,
     description: `The terms governing your use of the ${LEGAL_ENTITY_NAME} website.`,
     locale,
   });

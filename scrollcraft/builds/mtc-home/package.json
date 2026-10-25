@@ -1,0 +1,8 @@
+{
+  "name": "mtc-home-verify",
+  "private": true,
+  "description": "Scroll Craft verification harness dependencies (kept out of the site package).",
+  "dependencies": {
+    "playwright-core": "^1.64.1"
+  }
+}

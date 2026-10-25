@@ -8,9 +8,10 @@ export const siteConfig = {
   name: "MTC",
   legalName: "MTC Digital Agency",
   /** One-line positioning used for metadata fallbacks + footer. */
-  tagline: "A creative digital agency — brand, product, and marketing under one roof.",
+  tagline:
+    "A creative digital agency in Mitrovica, Kosovo: branding, websites, social media and content under one roof.",
   description:
-    "MTC is a creative digital agency combining branding, web & app development, social media, and content — strategy first, creative always, technology where it matters.",
+    "MTC is a creative digital agency for branding, websites, social media and content. One team, from the first idea to launch day.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   locale: "en",
   /** OG / Twitter defaults. */
@@ -50,7 +51,9 @@ export const footerNav: { titleKey: string; items: NavItem[] }[] = [
     titleKey: "exploreHeading",
     items: [
       { key: "work", href: "/work" },
-      { key: "services", href: "/services" },
+      // No standalone services page: point at the homepage section
+      // (the live site linked to /services, which is a 404).
+      { key: "services", href: "/#services" },
       { key: "studio", href: "/studio" },
       { key: "journal", href: "/journal" },
       { key: "contact", href: "/contact" },
@@ -76,7 +79,8 @@ export const contactDefaults = {
   location: "Mitrovica, Kosovo",
   social: [
     { label: "Instagram", href: "https://www.instagram.com/mtc.marketing/" },
-    // Left unchanged — no new LinkedIn URL is available yet.
-    { label: "LinkedIn", href: "https://linkedin.com/" },
+    // The live site's LinkedIn link pointed at linkedin.com itself (no
+    // company page), so it is left out. Add the company URL here when
+    // there is one.
   ],
 } as const;

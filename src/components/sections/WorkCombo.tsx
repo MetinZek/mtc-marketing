@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Reveal } from "@/components/motion/Reveal";
+import { Icon } from "@/components/ui/Icon";
 import { ViewportVideo } from "@/components/ui/ViewportVideo";
 import { FALLBACK_IMAGE, VIDEO_BOX } from "@/lib/video-fallback";
 import type { GalleryItem, Project } from "@/content/types";
@@ -22,7 +23,7 @@ export type ComboWork =
 /** Row unit (md+): half-rows sized from the container width so every
  * standard tile is 3:2 — see placeTiles in src/lib/work-layout.ts. */
 const ROWS =
-  "md:auto-rows-[calc(((100cqw-3rem)/3/1.5-1.5rem)/2)] lg:auto-rows-[calc(((100cqw-4rem)/3/1.5-2rem)/2)]";
+  "md:auto-rows-[calc(((100cqw-2.5rem)/3/1.5-1.25rem)/2)] lg:auto-rows-[calc(((100cqw-3rem)/3/1.5-1.5rem)/2)]";
 
 const pad = (n: number) => String(n).padStart(2, "0");
 
@@ -59,12 +60,11 @@ export function WorkCombo({
 
   return (
     <div className="@container">
-      <div className={cn("grid grid-flow-dense grid-cols-1 gap-6 md:grid-cols-12 lg:gap-8", ROWS)}>
+      <div className={cn("grid grid-flow-dense grid-cols-1 gap-5 md:grid-cols-12 lg:gap-6", ROWS)}>
         {tiles.map(({ value, span }, i) => (
           <Reveal
             key={value.kind === "project" ? `p:${value.project.id}` : `g:${value.item.id}`}
             delay={(i % 3) * 0.05}
-            amount={0.15}
             className={cn("group relative", span)}
           >
             {value.kind === "project" ? (
@@ -105,7 +105,7 @@ function MediaFrame({
 }) {
   return (
     <div
-      className="relative aspect-(--ratio) overflow-hidden rounded-sm bg-paper md:aspect-auto md:h-full"
+      className="ice-glint frost-edge relative aspect-(--ratio) overflow-hidden rounded-lg bg-frost md:aspect-auto md:h-full"
       style={{ "--ratio": `${ratio[0]} / ${ratio[1]}` } as React.CSSProperties}
       {...(video ? VIDEO_BOX : {})}
     >
@@ -134,7 +134,7 @@ function ProjectTile({
     <Link
       href={withLocale(`/work/${project.slug}`, locale)}
       aria-label={interpolate(dict.work.viewCaseStudyAriaLabel, { title: project.title })}
-      className="block h-full rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
+      className="glint-group block h-full rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
     >
       <MediaFrame ratio={naturalCoverRatio(project)} video={video}>
         {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven asset, not a static import */}
@@ -156,24 +156,21 @@ function ProjectTile({
         )}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-ink/75 via-ink/25 to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-ink/80 via-ink/30 to-transparent"
         />
-        <span className="label absolute left-4 top-4 rounded-pill bg-canvas/90 px-2.5 py-1.5 text-ink lg:left-6 lg:top-6">
-          {dict.work.caseStudy}
-        </span>
         <div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-4 lg:inset-x-6 lg:bottom-6">
           <div>
-            <span className="label text-canvas/70">{pad(number)}</span>
+            <span className="text-meta font-semibold text-canvas/75 tabular">{pad(number)}</span>
             <h2 className="text-display-3 mt-1 text-canvas">{project.title}</h2>
-            <p className="label mt-2 text-canvas/75">
-              {project.category} &middot; {project.year}
+            <p className="mt-2 text-meta text-canvas/85">
+              {project.category} · {project.year}
             </p>
           </div>
           <span
             aria-hidden="true"
-            className="flex h-10 w-10 shrink-0 -translate-x-1 items-center justify-center rounded-full bg-canvas text-base text-ink opacity-0 transition-all duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover:translate-x-0 group-hover:opacity-100"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-canvas text-base text-ink transition-[background-color,color] duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover:bg-blue group-hover:text-white"
           >
-            &rarr;
+            <Icon name="arrow-right" className="text-lg" />
           </span>
         </div>
       </MediaFrame>

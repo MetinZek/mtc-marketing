@@ -1,39 +1,33 @@
 "use client";
 
-import { useId, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import { submitContactAction } from "@/app/[locale]/(site)/contact/_action";
-import { Reveal } from "@/components/motion/Reveal";
 import { Button } from "@/components/ui/Button";
+import { Icon } from "@/components/ui/Icon";
 import { Label } from "@/components/ui/Label";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { splitLocaleFromPathname } from "@/i18n/paths";
+import { toneFor } from "@/lib/disciplines";
 import { cn } from "@/lib/utils";
 
-type FieldKey = "name" | "email" | "company" | "phone" | "service" | "message";
+type FieldKey = "name" | "email" | "company" | "phone" | "message";
 
 const EMPTY: Record<FieldKey, string> = {
   name: "",
   email: "",
   company: "",
   phone: "",
-  service: "",
   message: "",
 };
 
-const FIELD_ORDER: FieldKey[] = [
-  "name",
-  "email",
-  "company",
-  "phone",
-  "service",
-  "message",
-];
+const FIELD_ORDER: FieldKey[] = ["name", "email", "company", "phone", "message"];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^[+(]?\d[\d\s()+-]{5,}$/;
-// Keep in sync with contactInputSchema's `message` min length in src/content/schema.ts.
+// Keep in sync with contactInputSchema in src/content/schema.ts.
 const MESSAGE_MIN_LENGTH = 20;
+const SERVICE_MAX_LENGTH = 120;
 
 type Errors = Partial<Record<FieldKey, string>>;
 
@@ -49,26 +43,26 @@ function validate(values: Record<FieldKey, string>, cf: Dictionary["contactForm"
 
 const fieldClass = (invalid: boolean) =>
   cn(
-    "mt-2 w-full border-b bg-transparent py-2.5 text-body text-ink",
-    "transition-colors duration-[var(--duration-base)] ease-[var(--ease-out-soft)]",
-    "placeholder:text-ink-faint focus:border-blue",
-    invalid ? "border-danger" : "border-line-strong",
+    "mt-2 w-full rounded-sm border bg-canvas px-4 py-3 text-body text-ink",
+    "transition-[border-color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]",
+    "placeholder:text-ink-faint focus:border-blue focus:shadow-[0_0_0_4px_rgba(11,69,255,0.12)] focus:outline-none",
+    invalid ? "border-danger" : "border-line-strong hover:border-ink/30",
   );
 
 /**
- * Contact form built from the MTC tokens — underline fields, no boxes,
- * the shared <Button> to submit. Validates on submit (and re-checks a
- * field on blur once submitted), then swaps to a minimal confirmation.
- * Submits via the submitContactAction Server Action (stores the
- * submission + emails the studio inbox); `locale` is derived from the
- * current URL and sent along since Server Actions can't read
- * next/root-params themselves.
+ * Contact form, built from the site's own tokens. "What do you need?" is a
+ * row of discipline chips (each in its colour); the homepage's inquiry
+ * desk pre-selects them through `?services=…`, so the brief is already
+ * begun. Validates on submit (and re-checks a field on blur afterwards),
+ * then swaps to a confirmation. Submits through the existing
+ * submitContactAction Server Action, unchanged: the chosen disciplines
+ * are sent as one readable `service` line.
  */
 export function ContactForm({
-  serviceOptions,
+  services,
   dict,
 }: {
-  serviceOptions: string[];
+  services: { id: string; title: string }[];
   dict: Dictionary;
 }) {
   const cf = dict.contactForm;
@@ -77,19 +71,26 @@ export function ContactForm({
   const uid = useId();
   const formRef = useRef<HTMLFormElement>(null);
   const [values, setValues] = useState<Record<FieldKey, string>>(EMPTY);
+  const [selected, setSelected] = useState<string[]>([]);
   const [errors, setErrors] = useState<Errors>({});
   const [attempted, setAttempted] = useState(false);
-  const [status, setStatus] = useState<"idle" | "submitting" | "success">(
-    "idle",
-  );
+  const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
+
+  // Carry the inquiry desk's selection over (?services=branding,web-app).
+  useEffect(() => {
+    const wanted = new URLSearchParams(window.location.search).get("services");
+    if (!wanted) return;
+    const ids = wanted.split(",").filter((id) => services.some((s) => s.id === id));
+    // Reading the URL is only possible after mount; this runs once.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (ids.length) setSelected(ids);
+  }, [services]);
 
   const idFor = (key: FieldKey) => `${uid}-${key}`;
 
   const setField = (key: FieldKey, value: string) => {
     setValues((v) => ({ ...v, [key]: value }));
-    if (attempted && errors[key]) {
-      setErrors((e) => ({ ...e, [key]: undefined }));
-    }
+    if (attempted && errors[key]) setErrors((e) => ({ ...e, [key]: undefined }));
   };
 
   const handleBlur = (key: FieldKey) => {
@@ -98,12 +99,18 @@ export function ContactForm({
     setErrors((e) => ({ ...e, [key]: next[key] }));
   };
 
+  const toggle = (id: string) =>
+    setSelected((current) => (current.includes(id) ? current.filter((s) => s !== id) : [...current, id]));
+
+  /** The chosen disciplines as one line; ids if the titles run too long. */
+  const serviceLine = () => {
+    const chosen = services.filter((s) => selected.includes(s.id));
+    const titles = chosen.map((s) => s.title).join(", ");
+    return titles.length <= SERVICE_MAX_LENGTH ? titles : chosen.map((s) => s.id).join(", ");
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    // Belt-and-suspenders against a double submit: the button is already
-    // disabled while submitting, but that `disabled` prop only lands on
-    // the next render, so a fast double-click/double-Enter could still
-    // reach here before it does.
     if (status === "submitting") return;
 
     const next = validate(values, cf);
@@ -112,11 +119,7 @@ export function ContactForm({
     if (Object.keys(next).length > 0) {
       setErrors(next);
       const firstInvalid = FIELD_ORDER.find((key) => next[key]);
-      if (firstInvalid) {
-        formRef.current
-          ?.querySelector<HTMLElement>(`[name="${firstInvalid}"]`)
-          ?.focus();
-      }
+      if (firstInvalid) formRef.current?.querySelector<HTMLElement>(`[name="${firstInvalid}"]`)?.focus();
       return;
     }
 
@@ -128,7 +131,7 @@ export function ContactForm({
       email: values.email,
       company: values.company,
       phone: values.phone,
-      service: values.service,
+      service: serviceLine(),
       message: values.message,
       locale,
     });
@@ -144,18 +147,56 @@ export function ContactForm({
 
   if (status === "success") {
     return (
-      <Reveal>
-        <div className="border-t border-line pt-8">
-          <Label tone="blue">{cf.successLabel}</Label>
-          <p className="text-display-3 mt-4 max-w-md text-ink">{cf.successMessage}</p>
-        </div>
-      </Reveal>
+      <div role="status" className="rounded-lg bg-canvas p-8 sm:p-10">
+        <span className="flex size-12 items-center justify-center rounded-full bg-mint-tint text-mint-ink">
+          <Icon name="check" className="text-2xl" strokeWidth={2.4} />
+        </span>
+        <Label tone="ink" className="mt-6">
+          {cf.successLabel}
+        </Label>
+        <p className="text-display-3 mt-3 max-w-md text-ink">{cf.successMessage}</p>
+      </div>
     );
   }
 
   return (
     <form ref={formRef} noValidate onSubmit={handleSubmit}>
-      <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
+      <fieldset>
+        <legend className="text-body font-semibold text-ink">{cf.servicesLabel}</legend>
+        <p className="mt-1 text-meta text-ink-muted">{cf.servicesHint}</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {services.map((service, i) => {
+            const tone = toneFor(service.id, i);
+            const on = selected.includes(service.id);
+            return (
+              <button
+                key={service.id}
+                type="button"
+                aria-pressed={on}
+                onClick={() => toggle(service.id)}
+                className={cn(
+                  "inline-flex min-h-11 items-center gap-2 rounded-pill border bg-canvas px-4 py-2 text-meta font-semibold text-ink",
+                  "transition-[background-color,border-color,color] duration-[var(--duration-fast)] active:scale-[0.97]",
+                  on ? tone.chipOn : "border-line-strong hover:border-ink/30",
+                )}
+              >
+                <span
+                  aria-hidden="true"
+                  className={cn(
+                    "flex size-4.5 items-center justify-center rounded-full",
+                    on ? cn(tone.dot, "text-white") : "border border-line-strong",
+                  )}
+                >
+                  {on && <Icon name="check" className="text-[0.7rem]" strokeWidth={2.8} />}
+                </span>
+                {service.title}
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
+
+      <div className="mt-10 grid grid-cols-1 gap-x-5 gap-y-6 sm:grid-cols-2">
         <TextField
           id={idFor("name")}
           name="name"
@@ -206,83 +247,31 @@ export function ContactForm({
         />
 
         <div className="sm:col-span-2">
-          <label
-            htmlFor={idFor("service")}
-            className="label block text-ink-muted"
-          >
-            {cf.serviceLabel}
-            <span className="ml-1.5 text-[0.72rem] font-normal normal-case tracking-normal text-ink-faint">
-              {cf.optionalSuffix}
-            </span>
-          </label>
-          <div className="relative">
-            <select
-              id={idFor("service")}
-              name="service"
-              value={values.service}
-              onChange={(e) => setField("service", e.target.value)}
-              className={cn(
-                fieldClass(false),
-                "appearance-none pr-8",
-                values.service ? "text-ink" : "text-ink-faint",
-              )}
-            >
-              <option value="">{cf.selectServicePlaceholder}</option>
-              {serviceOptions.map((option) => (
-                <option key={option} value={option}>
-                  {option}
-                </option>
-              ))}
-            </select>
-            <span
-              aria-hidden="true"
-              className="pointer-events-none absolute right-1 top-[1.35rem] text-ink-faint"
-            >
-              &#9662;
-            </span>
-          </div>
-        </div>
-
-        <div className="sm:col-span-2">
-          <label
-            htmlFor={idFor("message")}
-            className="label block text-ink-muted"
-          >
+          <label htmlFor={idFor("message")} className="block text-meta font-semibold text-ink">
             {cf.messageLabel}
           </label>
           <textarea
             id={idFor("message")}
             name="message"
-            rows={5}
+            rows={6}
             required
             value={values.message}
             aria-invalid={errors.message ? true : undefined}
-            aria-describedby={
-              errors.message ? `${idFor("message")}-error` : undefined
-            }
+            aria-describedby={errors.message ? `${idFor("message")}-error` : undefined}
             onChange={(e) => setField("message", e.target.value)}
             onBlur={() => handleBlur("message")}
             placeholder={cf.messagePlaceholder}
-            className={cn(fieldClass(Boolean(errors.message)), "min-h-[200px] resize-y")}
+            className={cn(fieldClass(Boolean(errors.message)), "min-h-[180px] resize-y")}
           />
           {errors.message && (
-            <p
-              id={`${idFor("message")}-error`}
-              role="alert"
-              className="mt-1.5 text-meta text-danger"
-            >
+            <p id={`${idFor("message")}-error`} role="alert" className="mt-1.5 text-meta text-danger">
               {errors.message}
             </p>
           )}
         </div>
       </div>
 
-      <Button
-        type="submit"
-        size="lg"
-        className="mt-10"
-        disabled={status === "submitting"}
-      >
+      <Button type="submit" size="lg" arrow className="mt-8" disabled={status === "submitting"}>
         {status === "submitting" ? cf.sending : cf.send}
       </Button>
     </form>
@@ -316,13 +305,9 @@ function TextField({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="label block text-ink-muted">
+      <label htmlFor={id} className="block text-meta font-semibold text-ink">
         {label}
-        {!required && (
-          <span className="ml-1.5 text-[0.72rem] font-normal normal-case tracking-normal text-ink-faint">
-            {optionalSuffix}
-          </span>
-        )}
+        {!required && <span className="ml-1.5 font-normal text-ink-muted">{optionalSuffix}</span>}
       </label>
       <input
         id={id}

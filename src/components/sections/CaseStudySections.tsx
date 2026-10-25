@@ -1,6 +1,4 @@
 import { Reveal } from "@/components/motion/Reveal";
-import { imageReveal } from "@/components/motion/variants";
-import { Section } from "@/components/ui/Section";
 import type { CaseStudySection } from "@/content/types";
 import { cn } from "@/lib/utils";
 
@@ -17,65 +15,79 @@ function paragraphs(text: string): string[][] {
     .filter((lines) => lines.some(Boolean));
 }
 
+type Row = { kind: "full"; items: [CaseStudySection] } | { kind: "pair"; items: [CaseStudySection, CaseStudySection] };
+
 /**
- * The project's case study, below the project details: one large image
- * per section, each at its own proportions (never cropped or stretched),
- * with an optional description underneath, aligned to the project
- * description's column. Landscape images span the container; square and
- * portrait ones are centred at a narrower width so they stay in scale.
- * A section without text renders the image alone — no empty caption.
+ * Groups the gallery into a rhythm: one image across the full width, then
+ * two side by side, and so on. An image with a description, or a portrait
+ * one, always gets a row of its own so nothing is cramped. Every image is
+ * shown at its own proportions on a phone (one per row).
  */
-export function CaseStudySections({
-  sections,
-  title,
-}: {
-  sections: CaseStudySection[];
-  title: string;
-}) {
+function rhythm(sections: CaseStudySection[]): Row[] {
+  const rows: Row[] = [];
+  let i = 0;
+  let full = true;
+  while (i < sections.length) {
+    const a = sections[i]!;
+    const b = sections[i + 1];
+    const standsAlone = (s: CaseStudySection) => Boolean(s.description) || (ratioOf(s.image) ?? 1.5) < 0.95;
+    if (full || !b || standsAlone(a) || standsAlone(b)) {
+      rows.push({ kind: "full", items: [a] });
+      i += 1;
+    } else {
+      rows.push({ kind: "pair", items: [a, b] });
+      i += 2;
+    }
+    full = !full;
+  }
+  return rows;
+}
+
+/**
+ * The project's images below the case-study header, each at its own
+ * proportions (never cropped or stretched), on frost frames with rounded
+ * corners. Optional descriptions sit under their image. Images settle in
+ * as they reach the screen.
+ */
+export function CaseStudySections({ sections, title }: { sections: CaseStudySection[]; title: string }) {
   if (sections.length === 0) return null;
 
   return (
-    <Section ground="canvas" spacing="md" className="pt-4 sm:pt-8">
-      <div className="flex flex-col gap-20 sm:gap-28 lg:gap-36">
-        {sections.map((section) => (
-          <CaseStudyItem key={section.id} section={section} projectTitle={title} />
-        ))}
+    <section aria-label={title} className="bg-canvas pb-20 sm:pb-28">
+      <div className="container-mtc flex flex-col gap-4 sm:gap-6">
+        {rhythm(sections).map((row) =>
+          row.kind === "full" ? (
+            <CaseStudyItem key={row.items[0].id} section={row.items[0]} projectTitle={title} />
+          ) : (
+            <div key={row.items[0].id} className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+              {row.items.map((section) => (
+                <CaseStudyItem key={section.id} section={section} projectTitle={title} />
+              ))}
+            </div>
+          ),
+        )}
       </div>
-    </Section>
+    </section>
   );
 }
 
-function CaseStudyItem({
-  section,
-  projectTitle,
-}: {
-  section: CaseStudySection;
-  projectTitle: string;
-}) {
+function CaseStudyItem({ section, projectTitle }: { section: CaseStudySection; projectTitle: string }) {
   const { image } = section;
   const ratio = ratioOf(image);
   const text = section.description ? paragraphs(section.description) : [];
 
   return (
-    <figure>
-      <Reveal variants={imageReveal} amount={0.1}>
-        <div
-          className={cn(
-            "overflow-hidden rounded-sm bg-paper",
-            ratio !== undefined && ratio < 0.9 && "mx-auto max-w-md sm:max-w-xl lg:max-w-2xl",
-            ratio !== undefined && ratio >= 0.9 && ratio <= 1.1 && "mx-auto max-w-4xl",
-          )}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- CMS-uploaded image, not a static import */}
-          <img
-            src={image.src}
-            alt={image.alt || projectTitle}
-            width={image.width}
-            height={image.height}
-            loading="lazy"
-            className="block h-auto w-full"
-          />
-        </div>
+    <figure className={cn(ratio !== undefined && ratio < 0.95 && "mx-auto w-full max-w-2xl")}>
+      <Reveal variant="image" className="frost-edge overflow-hidden rounded-lg bg-frost">
+        {/* eslint-disable-next-line @next/next/no-img-element -- CMS-uploaded image, not a static import */}
+        <img
+          src={image.src}
+          alt={image.alt || projectTitle}
+          width={image.width}
+          height={image.height}
+          loading="lazy"
+          className="block h-auto w-full"
+        />
       </Reveal>
 
       {text.length > 0 && (

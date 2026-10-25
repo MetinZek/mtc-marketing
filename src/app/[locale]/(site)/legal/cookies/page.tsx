@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   return buildMetadata({
     path: "/legal/cookies",
-    title: `Cookies Policy — ${LEGAL_ENTITY_NAME}`,
+    title: `Cookies Policy | ${LEGAL_ENTITY_NAME}`,
     description: `What cookies this website uses and why.`,
     locale,
   });

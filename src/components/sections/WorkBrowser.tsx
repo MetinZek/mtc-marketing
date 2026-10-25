@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { GalleryItem, Project, WorkLayoutEntry } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import type { Locale } from "@/i18n/locales";
+import { toneFor } from "@/lib/disciplines";
 import { cn } from "@/lib/utils";
 import { WorkCombo, type ComboWork } from "./WorkCombo";
 import { WorkList } from "./WorkList";
@@ -13,18 +14,18 @@ type View = "grid" | "index";
 export type ServiceRef = { id: string; number: string; title: string };
 
 /**
- * /work toolbar + work: service filter pills and a Grid / Index switch.
+ * /work toolbar + work: discipline filter pills and a Grid / Index switch.
  *
  * - Grid (default): the combo mosaic of projects and Work gallery pieces.
  * - Index: the typographic project list with the cursor preview.
  *
  * Order, big/small sizes, hidden items and the default view come from
  * admin → Work Page (`layout`, already merged with the current content).
- * Pills are the services that have something to show, in service
- * order, and filter projects and pieces together. A project belongs to
- * its admin "Service", else the service whose title equals its
- * category. Numbers always refer to the full project list. Changing
- * filter or view re-keys the content so it reveals again.
+ * Pills are the disciplines that have something to show, in service
+ * order, each in its own colour, and filter projects and pieces together.
+ * A project belongs to its admin "Service", else the service whose title
+ * equals its category. Numbers always refer to the full project list.
+ * Changing filter or view re-keys the content so it reveals again.
  */
 export function WorkBrowser({
   projects,
@@ -79,13 +80,12 @@ export function WorkBrowser({
     work.kind === "project" ? [{ project: work.project, number: work.number }] : [],
   );
 
-  const pill = (active: boolean) =>
+  const pill = (active: boolean, activeClass = "border-ink bg-ink text-canvas") =>
     cn(
-      "rounded-pill border px-3.5 py-1.5 text-meta transition-colors duration-[var(--duration-fast)]",
+      "inline-flex min-h-10 items-center gap-2 rounded-pill border px-4 py-1.5 text-meta font-semibold",
+      "transition-[background-color,border-color,color] duration-[var(--duration-fast)] active:scale-[0.97]",
       "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
-      active
-        ? "border-blue bg-blue-tint text-blue"
-        : "border-line text-ink-muted hover:border-ink/30 hover:text-ink",
+      active ? activeClass : "border-line-strong text-ink-muted hover:border-ink/30 hover:text-ink",
     );
 
   const views: { value: View; label: string }[] = [
@@ -105,20 +105,24 @@ export function WorkBrowser({
               className={pill(filter === null)}
             >
               {dict.work.filterAll}
-              <span className="ml-1.5 tabular-nums opacity-60">{all.length}</span>
+              <span className="tabular-nums opacity-60">{all.length}</span>
             </button>
-            {pills.map((service) => (
-              <button
-                key={service.id}
-                type="button"
-                aria-pressed={filter === service.id}
-                onClick={() => setFilter(service.id)}
-                className={pill(filter === service.id)}
-              >
-                {service.title}
-                <span className="ml-1.5 tabular-nums opacity-60">{countFor(service.id)}</span>
-              </button>
-            ))}
+            {pills.map((service) => {
+              const tone = toneFor(service.id, services.indexOf(service));
+              return (
+                <button
+                  key={service.id}
+                  type="button"
+                  aria-pressed={filter === service.id}
+                  onClick={() => setFilter(service.id)}
+                  className={pill(filter === service.id, tone.chipOn)}
+                >
+                  <span aria-hidden="true" className={cn("size-2 rounded-full", tone.dot)} />
+                  {service.title}
+                  <span className="tabular-nums opacity-60">{countFor(service.id)}</span>
+                </button>
+              );
+            })}
           </div>
         ) : (
           <span />
@@ -127,7 +131,7 @@ export function WorkBrowser({
         <div
           role="group"
           aria-label={dict.work.viewLabel}
-          className="flex rounded-pill border border-line p-0.5"
+          className="flex gap-0.5 rounded-pill border border-ink/[0.08] bg-ink/[0.03] p-0.5"
         >
           {views.map(({ value, label }) => (
             <button
@@ -136,9 +140,11 @@ export function WorkBrowser({
               aria-pressed={view === value}
               onClick={() => setView(value)}
               className={cn(
-                "rounded-pill px-3.5 py-1 text-meta transition-colors duration-[var(--duration-fast)]",
+                "inline-flex h-9 items-center rounded-pill px-4 text-meta font-semibold transition-colors duration-[var(--duration-fast)]",
                 "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
-                view === value ? "bg-ink text-canvas" : "text-ink-muted hover:text-ink",
+                view === value
+                  ? "bg-canvas text-ink shadow-[0_1px_2px_rgba(11,18,34,0.08)]"
+                  : "text-ink-muted hover:text-ink",
               )}
             >
               {label}
@@ -147,14 +153,9 @@ export function WorkBrowser({
         </div>
       </div>
 
-      <div key={`${view}:${filter ?? "all"}`} className="mt-10 lg:mt-14">
+      <div key={`${view}:${filter ?? "all"}`} className="mt-10 lg:mt-12">
         {view === "grid" ? (
-          <WorkCombo
-            works={visible}
-            serviceTitle={serviceTitle}
-            dict={dict}
-            locale={locale}
-          />
+          <WorkCombo works={visible} serviceTitle={serviceTitle} dict={dict} locale={locale} />
         ) : (
           <WorkList items={numbered} dict={dict} locale={locale} />
         )}

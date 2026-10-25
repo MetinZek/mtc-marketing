@@ -57,7 +57,7 @@ export function LegalDocument({
       <Reveal className="max-w-3xl">
         <Label tone="blue">Legal</Label>
         <h1 className="text-display-2 mt-4 text-ink">{title}</h1>
-        <p className="label mt-5 text-ink-faint">Last updated — {lastUpdated}</p>
+        <p className="mt-5 text-meta text-ink-muted">Last updated: {lastUpdated}</p>
         {intro && <p className="mt-6 text-lead text-ink-muted">{intro}</p>}
       </Reveal>
 

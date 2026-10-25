@@ -4,6 +4,12 @@ import type { serviceSchema } from "../schema";
 /** Seed only — see src/content/seed.ts. Typed at the schema's input level. */
 type Service = z.input<typeof serviceSchema>;
 
+/**
+ * The four disciplines. Titles and capabilities are the ones published on
+ * mtcmarketing.co; summaries were rewritten for the redesign. In production
+ * these records live in the CMS database, so the new summaries only reach the
+ * live site once they are entered in /admin → Services.
+ */
 export const services: Service[] = [
   {
     id: "branding",
@@ -11,7 +17,7 @@ export const services: Service[] = [
     title: "Branding & Visual Identity",
     slug: "branding-visual-identity",
     summary:
-      "Positioning, naming, identity systems, and guidelines that give a brand a clear point of view and a consistent voice.",
+      "We find what makes you different and give it a look, a voice and a system that holds together everywhere it appears.",
     capabilities: [
       "Brand strategy & positioning",
       "Naming & messaging",
@@ -19,12 +25,6 @@ export const services: Service[] = [
       "Art direction & guidelines",
       "Design systems for brand",
     ],
-    image: {
-      src: "/services/branding.svg",
-      alt: "Placeholder type specimen composition representing Branding & Visual Identity work.",
-      width: 480,
-      height: 360,
-    },
     ctaLabel: "Explore branding",
     order: 1,
     noindex: false,
@@ -35,7 +35,7 @@ export const services: Service[] = [
     title: "Web & App Development",
     slug: "web-app-development",
     summary:
-      "Marketing sites, web apps, and mobile products designed and built on a modern, measurable stack.",
+      "Websites and web apps designed and built in-house on a modern stack: fast, clear and easy for your team to keep up to date.",
     capabilities: [
       "UX & UI design",
       "Next.js / React builds",
@@ -43,12 +43,6 @@ export const services: Service[] = [
       "Design systems & components",
       "Performance & Core Web Vitals",
     ],
-    image: {
-      src: "/services/web.svg",
-      alt: "Placeholder web interface fragment representing Web & App Development work.",
-      width: 480,
-      height: 360,
-    },
     ctaLabel: "Explore development",
     order: 2,
     noindex: false,
@@ -59,7 +53,7 @@ export const services: Service[] = [
     title: "Social Media & Digital Marketing",
     slug: "social-media-digital-marketing",
     summary:
-      "Always-on social and paid media, planned and produced against a strategy with clear targets.",
+      "Social and paid campaigns planned around clear goals, so every post and every ad has a job to do and a number to answer to.",
     capabilities: [
       "Channel & content strategy",
       "Paid social & search",
@@ -67,12 +61,6 @@ export const services: Service[] = [
       "Analytics & reporting",
       "Campaign optimisation",
     ],
-    image: {
-      src: "/services/social.svg",
-      alt: "Placeholder social campaign post composition representing Social Media & Digital Marketing work.",
-      width: 480,
-      height: 360,
-    },
     ctaLabel: "Explore marketing",
     order: 3,
     noindex: false,
@@ -83,7 +71,7 @@ export const services: Service[] = [
     title: "Content Creation & Advertising",
     slug: "content-creation-advertising",
     summary:
-      "Photography, film, motion, and copy — a content engine that keeps brand and campaigns supplied.",
+      "Photography, film, motion and copy that keep your brand and your campaigns supplied with work worth stopping for.",
     capabilities: [
       "Creative concepts",
       "Photography & film",
@@ -91,12 +79,6 @@ export const services: Service[] = [
       "Copywriting",
       "Production management",
     ],
-    image: {
-      src: "/services/content.svg",
-      alt: "Placeholder campaign artwork composition representing Content Creation & Advertising work.",
-      width: 480,
-      height: 360,
-    },
     ctaLabel: "Explore content",
     order: 4,
     noindex: false,

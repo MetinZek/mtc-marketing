@@ -1,23 +1,21 @@
 import type { StudioContent } from "../types";
 
 /**
- * Studio (/studio) singleton content. Seeded here now so the page reads
- * from the CMS layer like every other route; the Supabase provider will
- * return an editable version of this same shape. Keep it short — the
- * page is deliberately low on copy.
+ * Studio (/studio) singleton content (English; translations live in the
+ * overlays in src/content/i18n). Not admin-managed: this file ships with the
+ * site. Kept short on purpose, and limited to what the live site states.
  */
 export const studio: StudioContent = {
   intro: {
     label: "Studio",
-    headline: ["We are a", "creative and", "digital studio."],
-    supporting:
-      "We build brands, digital products, and the content that carries them.",
+    headline: ["A creative and", "digital studio."],
+    supporting: "We build brands, digital products and the content that carries them.",
   },
   about: {
     label: "The studio",
     body: [
-      "MTC brings branding, digital and content together under one roof — one team accountable for the whole, not a chain of separate vendors.",
-      "Strategy shapes the brand, the brand shapes the product, and the product gives content somewhere to live. Each discipline sharpens the next.",
+      "MTC brings branding, web, social media and content together under one roof. One team is accountable for the whole result, not a chain of separate vendors.",
+      "Strategy shapes the brand, the brand shapes the website, and the website gives your content somewhere to live. Each discipline makes the next one stronger.",
     ],
   },
   capabilities: {
@@ -30,17 +28,17 @@ export const studio: StudioContent = {
       {
         id: "clarity",
         title: "Clarity",
-        body: "Say less, mean more — every choice has a reason behind it.",
+        body: "Say less, mean more. Every choice has a reason behind it.",
       },
       {
         id: "strategy",
         title: "Strategy first",
-        body: "Positioning is settled before the first execution decision.",
+        body: "We settle the positioning before the first design decision.",
       },
       {
         id: "creativity",
         title: "Creative always",
-        body: "Work that earns attention rather than filling space.",
+        body: "Work that earns attention instead of filling space.",
       },
       {
         id: "execution",
@@ -50,9 +48,9 @@ export const studio: StudioContent = {
     ],
   },
   seo: {
-    seoTitle: "Studio — MTC",
+    seoTitle: "Studio | MTC",
     metaDescription:
-      "MTC is a creative and digital studio — branding, web & app development, social, and content, built as one system.",
+      "MTC is a creative and digital studio in Mitrovica, Kosovo: branding, web and app development, social media and content, built as one system.",
     noindex: false,
   },
 };

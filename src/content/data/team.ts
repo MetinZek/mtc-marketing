@@ -20,7 +20,7 @@ export const team: TeamMember[] = [
       height: 800,
     },
     order: 1,
-    published: true,
+    published: false, // placeholder person: never publish
   },
   {
     id: "tm-2",
@@ -34,7 +34,7 @@ export const team: TeamMember[] = [
       height: 800,
     },
     order: 2,
-    published: true,
+    published: false, // placeholder person: never publish
   },
   {
     id: "tm-3",
@@ -48,6 +48,6 @@ export const team: TeamMember[] = [
       height: 800,
     },
     order: 3,
-    published: true,
+    published: false, // placeholder person: never publish
   },
 ];

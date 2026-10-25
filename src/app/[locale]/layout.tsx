@@ -3,11 +3,20 @@ import { notFound } from "next/navigation";
 import { locale as rootLocale } from "next/root-params";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { hasLocale, locales, ogLocale, type Locale } from "@/i18n/locales";
-import { inter } from "@/i18n/font";
+import { archivo } from "@/i18n/font";
 import { withLocale } from "@/i18n/paths";
 import { siteConfig } from "@/config/site";
 import { organizationJsonLd } from "@/lib/seo";
 import "../globals.css";
+import "./scrollcraft.css";
+
+/**
+ * Runs during HTML parsing, before first paint: marks the document as
+ * script-capable so Scroll Craft's reveal states may start hidden (see
+ * ./scrollcraft.css). If the engine has not mounted after a few seconds
+ * (a failed chunk load), the mark is dropped so nothing stays invisible.
+ */
+const SCROLLCRAFT_BOOT = `(function(){var d=document.documentElement;d.classList.add("sc-booting");setTimeout(function(){if(!d.classList.contains("sc-ready"))d.classList.remove("sc-booting")},5000)})();`;
 
 /**
  * Root layout for the public marketing site, branched from src/app/admin
@@ -30,11 +39,11 @@ async function resolveLocale(): Promise<Locale> {
 export async function generateMetadata(): Promise<Metadata> {
   const [locale, dict] = await Promise.all([resolveLocale(), getDictionary()]);
   const canonical = withLocale("/", locale);
-  const title = `${siteConfig.name} — ${dict.meta.titleSuffix}`;
+  const title = `${siteConfig.name} | ${dict.meta.titleSuffix}`;
 
   return {
     metadataBase: new URL(siteConfig.url),
-    title: { default: title, template: `%s — ${siteConfig.name}` },
+    title: { default: title, template: `%s | ${siteConfig.name}` },
     description: dict.meta.description,
     applicationName: siteConfig.name,
     authors: [{ name: siteConfig.legalName }],
@@ -70,8 +79,18 @@ export const viewport: Viewport = {
 export default async function LocaleRootLayout({ children }: { children: React.ReactNode }) {
   const locale = await resolveLocale();
   return (
-    <html lang={locale} className={inter.variable}>
+    // data-scroll-behavior: keep CSS smooth scrolling for in-page anchors
+    // while route changes jump straight to the top (Next 16 no longer does
+    // this by default). suppressHydrationWarning: the boot script below
+    // adds a class to <html> before React hydrates.
+    <html
+      lang={locale}
+      className={archivo.variable}
+      data-scroll-behavior="smooth"
+      suppressHydrationWarning
+    >
       <body>
+        <script dangerouslySetInnerHTML={{ __html: SCROLLCRAFT_BOOT }} />
         {children}
         <script
           type="application/ld+json"

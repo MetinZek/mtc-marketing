@@ -1,57 +1,52 @@
-"use client";
+import { type CSSProperties, type ElementType, type ReactNode } from "react";
 
-import { m, LazyMotion, domAnimation, useReducedMotion, type Variants } from "framer-motion";
-import { type ElementType, type ReactNode } from "react";
-import { fadeUp } from "./variants";
+export type RevealVariant = "up" | "fade" | "image";
 
 /**
- * Scroll-into-view reveal. Wraps content in a motion element that
- * animates once when it enters the viewport.
- *
- * Respects prefers-reduced-motion: when set, children render immediately
- * with no transform. Uses LazyMotion + `m` so only the animation
- * features we use are bundled.
+ * Scroll-into-view reveal, driven by the Scroll Craft engine's flow device
+ * (`data-sc-in`): fires once when the element enters the viewport, a 14px
+ * rise and fade over 620ms on the engine's ease-out. `variant` adjusts the
+ * entrance (see the `[data-reveal]` rules in globals.css); `stagger` reveals
+ * direct children one after another, in milliseconds. Renders on the server
+ * with no client JavaScript of its own: the engine (mounted by
+ * ScrollCraftRoot) adds the `sc-in` class. Reduced motion keeps the fade and
+ * drops the movement.
  */
 export function Reveal({
   children,
-  as = "div",
-  variants = fadeUp,
+  as: Tag = "div",
+  variant = "up",
   className,
-  once = true,
-  amount = 0.3,
   delay = 0,
+  stagger,
+  id,
+  style,
 }: {
   children: ReactNode;
   as?: ElementType;
-  variants?: Variants;
+  variant?: RevealVariant;
   className?: string;
-  once?: boolean;
-  amount?: number;
+  /** Seconds before this element's own entrance starts. */
   delay?: number;
+  /** Milliseconds between direct children's entrances. */
+  stagger?: number;
+  id?: string;
+  style?: CSSProperties;
+  /** @deprecated framer-motion era props, accepted and ignored until every call site moves to `variant`. */
+  variants?: unknown;
+  amount?: number;
+  once?: boolean;
 }) {
-  const reduce = useReducedMotion();
-  const MotionTag = m[as as keyof typeof m] as typeof m.div;
-
-  // Same element and prop shape either way — only the trigger changes.
-  // Swapping to a plain, non-motion tag once `reduce` resolves (instead
-  // of always rendering the motion element) forces a remount that can
-  // land after `whileInView`'s IntersectionObserver has already given
-  // up on a hidden state; keeping one stable element and switching
-  // `whileInView` for an unconditional `animate` avoids that.
-  const trigger = reduce ? { animate: "visible" as const } : { whileInView: "visible" as const };
-
   return (
-    <LazyMotion features={domAnimation} strict>
-      <MotionTag
-        className={className}
-        variants={variants}
-        initial={reduce ? false : "hidden"}
-        viewport={{ once, amount }}
-        transition={{ delay: reduce ? 0 : delay }}
-        {...trigger}
-      >
-        {children}
-      </MotionTag>
-    </LazyMotion>
+    <Tag
+      id={id}
+      className={className}
+      data-sc-in=""
+      data-reveal={variant === "up" ? undefined : variant}
+      data-sc-stagger={stagger}
+      style={delay ? { transitionDelay: `${delay}s`, ...style } : style}
+    >
+      {children}
+    </Tag>
   );
 }

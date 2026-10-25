@@ -1,98 +1,157 @@
+/* Layer order is declared before anything else so the vendored Scroll Craft
+   engine (imported into the "scrollcraft" layer by the public site layout)
+   sits above Tailwind's base styles and below its components and
+   utilities: the engine's resets apply, and any utility still wins. */
+@layer theme, base, scrollcraft, components, utilities;
 @import "tailwindcss";
 
 /* ============================================================
-   MTC — Design System
-   Light mode only. Blue is a strategic accent, never a wash.
+   MTC design system: "Clear ice"
+   Light mode. White and frost grounds, ink type, the logo's blue
+   as the one interface accent, and four discipline hues that each
+   own a region (never confetti).
    ============================================================ */
 
 @theme {
-  /* ---- Color -------------------------------------------------
-     canvas / paper / ink drive 95% of the site.
-     blue is reserved for buttons, links, labels, active + selected
-     states, and thin graphic details. Never large fills, never
-     gradients, never the logo. */
+  /* ---- Grounds ---------------------------------------------- */
   --color-canvas: #ffffff;
-  --color-paper: #f6f4f0; /* warm off-white section ground */
-  --color-paper-deep: #efece4; /* rare, slightly deeper neutral */
+  --color-frost: #f4f7fd; /* cool off-white section ground */
+  --color-frost-deep: #e9effa; /* rare, slightly deeper ground */
+  /* Legacy names kept for the admin panel; they now resolve to frost. */
+  --color-paper: #f4f7fd;
+  --color-paper-deep: #e9effa;
 
-  --color-ink: #17191e; /* primary text */
-  --color-ink-muted: #5c606b; /* metadata, captions, secondary copy */
-  --color-ink-faint: #8b8f99; /* disabled, hint text */
+  /* ---- Ink (cool, derived from the brand blue) -------------- */
+  --color-ink: #0b1222;
+  --color-ink-muted: #4a5468;
+  --color-ink-faint: #8790a3;
 
-  --color-line: #e6e2da; /* hairline borders on light ground */
-  --color-line-strong: #d6d1c6; /* hairline on paper ground */
+  --color-line: #e3e8f2;
+  --color-line-strong: #cfd7e6;
 
-  --color-blue: #1d4bff; /* MTC accent — provisional until logo lands */
-  --color-blue-strong: #1637c9; /* hover / pressed */
-  --color-blue-tint: #e9edff; /* selection bg, subtle chips */
-  --color-blue-contrast: #ffffff; /* text on a blue fill */
+  /* ---- Brand: the logo gradient's two ends ------------------ */
+  --color-blue: #0b45ff;
+  --color-blue-strong: #0034d1;
+  --color-blue-tint: #e8eeff;
+  --color-blue-contrast: #ffffff;
+  --color-sky: #22a0ff;
 
-  --color-focus: #1d4bff;
+  /* ---- Discipline hues: one per service, used as regions ---- */
+  --color-amber: #ffb020;
+  --color-amber-ink: #8a5300;
+  --color-amber-tint: #fff5e0;
+  --color-azure: #2563ff;
+  --color-azure-ink: #1d3fbf;
+  --color-azure-tint: #eaf0ff;
+  --color-coral: #ff5a5f;
+  --color-coral-ink: #b3262b;
+  --color-coral-tint: #ffeced;
+  --color-mint: #14b87c;
+  --color-mint-ink: #0b7a52;
+  --color-mint-tint: #e5f8f0;
 
-  /* Inline form-validation only — deliberately outside the editorial
-     palette, used for invalid field underlines and error messages. */
+  --color-focus: #0b45ff;
   --color-danger: #c4362b;
 
-  /* ---- Typography -----------------------------------------
-     One variable family (Inter), loaded in app/layout.tsx via
-     next/font as --font-inter. Sizes, weights, tracking and line
-     heights are unchanged; Inter has no width axis, so the display
-     role's font-stretch rules below are currently inert. */
+  /* ---- Typography ------------------------------------------
+     One variable family: Archivo (width 62-125, weight 100-900),
+     self-hosted by next/font as --font-archivo. Display type uses
+     the width axis (expanded); body stays at normal width. The
+     admin panel loads Inter instead, so the fallback chain keeps
+     it unchanged. */
   --font-sans:
-    var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    var(--font-archivo, var(--font-inter)), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-display: var(--font-sans);
 
-  /* Fluid, editorial scale. Hierarchy = size + weight + tracking. */
-  --text-display-1: clamp(3rem, 1.6rem + 6.8vw, 7.25rem);
-  --text-display-1--line-height: 1.02;
-  --text-display-1--letter-spacing: -0.035em;
+  --text-display-hero: clamp(2.4rem, 1rem + 3.55vw, 4.6rem);
+  --text-display-hero--line-height: 1;
+  --text-display-hero--letter-spacing: -0.038em;
 
-  --text-display-2: clamp(2.4rem, 1.5rem + 4.2vw, 4.75rem);
-  --text-display-2--line-height: 1.04;
-  --text-display-2--letter-spacing: -0.03em;
+  --text-display-1: clamp(2.5rem, 1.35rem + 4.4vw, 5.5rem);
+  --text-display-1--line-height: 1;
+  --text-display-1--letter-spacing: -0.038em;
 
-  --text-display-3: clamp(1.9rem, 1.4rem + 2.4vw, 3rem);
+  --text-display-2: clamp(2.05rem, 1.3rem + 3vw, 4.1rem);
+  --text-display-2--line-height: 1.03;
+  --text-display-2--letter-spacing: -0.032em;
+
+  --text-display-3: clamp(1.6rem, 1.2rem + 1.6vw, 2.55rem);
   --text-display-3--line-height: 1.08;
   --text-display-3--letter-spacing: -0.025em;
 
-  --text-title: clamp(1.35rem, 1.15rem + 0.9vw, 1.85rem);
-  --text-title--line-height: 1.18;
+  --text-title: clamp(1.25rem, 1.1rem + 0.65vw, 1.65rem);
+  --text-title--line-height: 1.2;
   --text-title--letter-spacing: -0.015em;
 
-  --text-lead: clamp(1.1rem, 1rem + 0.5vw, 1.375rem);
+  --text-lead: clamp(1.075rem, 1rem + 0.38vw, 1.3rem);
   --text-lead--line-height: 1.5;
-  --text-lead--letter-spacing: -0.005em;
+  --text-lead--letter-spacing: -0.008em;
 
   --text-body: 1rem;
   --text-body--line-height: 1.62;
 
-  --text-meta: 0.8125rem;
+  --text-meta: 0.875rem;
   --text-meta--line-height: 1.5;
 
-  --text-label: 0.72rem;
+  --text-label: 0.75rem;
   --text-label--line-height: 1.2;
-  --text-label--letter-spacing: 0.14em;
+  --text-label--letter-spacing: 0.12em;
 
-  /* ---- Radius (restrained) -------------------------------- */
-  --radius-xs: 2px;
-  --radius-sm: 4px;
-  --radius-md: 8px;
+  /* ---- Radius: one rounded scale held across the site -------- */
+  --radius-xs: 6px;
+  --radius-sm: 12px;
+  --radius-md: 20px;
+  --radius-lg: 28px;
   --radius-pill: 999px;
 
-  /* ---- Shadow (used sparingly) --------------------------- */
-  --shadow-subtle: 0 1px 2px rgba(23, 25, 30, 0.04), 0 8px 24px rgba(23, 25, 30, 0.06);
-  --shadow-lift: 0 2px 6px rgba(23, 25, 30, 0.06), 0 20px 50px rgba(23, 25, 30, 0.1);
+  /* ---- Shadow: offset + blur, tinted to the ink hue ---------- */
+  --shadow-subtle: 0 1px 2px rgba(11, 18, 34, 0.05), 0 8px 24px -6px rgba(11, 18, 34, 0.08);
+  --shadow-lift: 0 2px 6px rgba(11, 18, 34, 0.06), 0 22px 48px -14px rgba(11, 18, 34, 0.16);
+  --shadow-float: 0 4px 10px rgba(11, 18, 34, 0.05), 0 34px 80px -24px rgba(11, 30, 90, 0.22);
 
-  /* ---- Layout ------------------------------------------- */
+  /* ---- Layout ------------------------------------------------ */
   --container-max: 1440px;
-  --gutter: clamp(1.25rem, 5vw, 5rem);
+  --gutter: clamp(1rem, 4.6vw, 5rem);
 
-  /* ---- Motion ------------------------------------------- */
-  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
-  --duration-fast: 180ms;
-  --duration-base: 320ms;
+  /* ---- Motion -------------------------------------------------- */
+  --ease-out-soft: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out-soft: cubic-bezier(0.77, 0, 0.175, 1);
+  --duration-fast: 160ms;
+  --duration-base: 280ms;
   --duration-slow: 620ms;
+}
+
+/* ============================================================
+   Scroll Craft tokens. Unlayered on purpose so they win over the
+   engine's own :root defaults (which live in the scrollcraft
+   layer). Six colour roles, two fonts, light-ground elevation.
+   ============================================================ */
+:root {
+  --sc-canvas: #ffffff;
+  --sc-surface: #f4f7fd;
+  --sc-ink: #0b1222;
+  --sc-ink-soft: #4a5468;
+  --sc-accent: #0b45ff;
+  --sc-accent-ink: #ffffff;
+
+  --sc-font-display: var(--font-display);
+  --sc-font-text: var(--font-sans);
+  --sc-font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+
+  --sc-t-base: 1rem;
+  --sc-gutter: var(--gutter);
+  --sc-maxw: var(--container-max);
+
+  /* A light canvas: halve the elevation alphas and tint toward the ink. */
+  --sc-shadow-color: 222 52% 9%;
+  --sc-e1: 0 1px 2px hsl(var(--sc-shadow-color) / 0.06), 0 2px 6px -1px hsl(var(--sc-shadow-color) / 0.06);
+  --sc-e2: 0 2px 4px hsl(var(--sc-shadow-color) / 0.05), 0 10px 22px -6px hsl(var(--sc-shadow-color) / 0.1);
+  --sc-e3: 0 4px 8px hsl(var(--sc-shadow-color) / 0.05), 0 22px 46px -12px hsl(var(--sc-shadow-color) / 0.14),
+    0 52px 90px -30px hsl(var(--sc-shadow-color) / 0.12);
+  --sc-edge: inset 0 1px 0 rgba(255, 255, 255, 0.75);
+
+  --sc-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 /* ============================================================
@@ -112,21 +171,30 @@
     font-family: var(--font-sans);
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
-    font-stretch: 100%;
   }
 
-  /* Display role. font-stretch is kept unchanged; Inter has no width
-     axis so it currently has no effect. */
-  h1, h2, h3, .font-display {
+  /* Display role: Archivo pushed toward expanded on its width axis.
+     font-variation-settings only names "wdth", so font-weight still
+     drives the weight axis. */
+  h1,
+  h2,
+  h3,
+  .font-display {
     font-family: var(--font-display);
-    font-stretch: 118%;
-    font-weight: 700;
+    font-variation-settings: "wdth" 114;
+    font-weight: 650;
     text-wrap: balance;
   }
 
-  h4, h5, h6 {
+  h4,
+  h5,
+  h6 {
     font-weight: 600;
     letter-spacing: -0.01em;
+  }
+
+  p {
+    text-wrap: pretty;
   }
 
   a {
@@ -135,13 +203,13 @@
   }
 
   ::selection {
-    background: var(--color-blue-tint);
-    color: var(--color-blue-strong);
+    background: var(--color-blue);
+    color: #ffffff;
   }
 
   :focus-visible {
     outline: 2px solid var(--color-focus);
-    outline-offset: 2px;
+    outline-offset: 3px;
     border-radius: var(--radius-xs);
   }
 
@@ -162,7 +230,6 @@
    Utilities
    ============================================================ */
 @layer utilities {
-  /* Page-consistent horizontal padding + max width. */
   .container-mtc {
     width: 100%;
     max-width: var(--container-max);
@@ -170,94 +237,223 @@
     padding-inline: var(--gutter);
   }
 
-  /* Small tracked eyebrow labels. */
+  /* Small tracked labels. Width axis pulled slightly wide so caps
+     read evenly at small sizes. */
   .label {
     font-size: var(--text-label);
     line-height: var(--text-label--line-height);
     letter-spacing: var(--text-label--letter-spacing);
     text-transform: uppercase;
     font-weight: 600;
-    font-stretch: 100%;
+    font-variation-settings: "wdth" 106;
   }
 
   .text-expanded {
-    font-stretch: 118%;
+    font-variation-settings: "wdth" 120;
+  }
+
+  .text-condensed {
+    font-variation-settings: "wdth" 88;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
   }
 }
 
 /* ============================================================
-   Hero background motion — extremely slow, decorative only.
-   Pure CSS so the reduced-motion block below neutralises it for
-   free via animation-duration/-iteration-count, no JS required.
+   Ice glint: the site's one hover signature. A narrow specular
+   streak crosses a surface once on hover, the way light runs
+   across a cut ice face. Only transform and opacity animate; the
+   element needs `relative overflow-hidden` (or rounded clipping).
+   Hover-capable fine pointers only; inert under reduced motion.
    ============================================================ */
-@keyframes hero-rotate-slow {
-  from {
-    transform: rotate(0deg);
+@layer components {
+  .ice-glint {
+    isolation: isolate;
   }
-  to {
-    transform: rotate(360deg);
+  .ice-glint::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    z-index: 3;
+    pointer-events: none;
+    background: linear-gradient(
+      105deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.05) 42%,
+      rgba(255, 255, 255, 0.55) 48%,
+      rgba(214, 233, 255, 0.35) 51%,
+      rgba(255, 255, 255, 0.05) 56%,
+      transparent 60%
+    );
+    transform: translate3d(-110%, 0, 0);
+    opacity: 0;
+  }
+  /* `.glint-group` lets a whole card trigger the glint on its media. */
+  @media (hover: hover) and (pointer: fine) {
+    .ice-glint:hover::after,
+    .glint-group:hover .ice-glint::after,
+    .glint-group:focus-visible .ice-glint::after {
+      opacity: 1;
+      transform: translate3d(110%, 0, 0);
+      transition:
+        transform 900ms var(--ease-out-soft),
+        opacity 200ms linear;
+    }
+  }
+
+  /* Reveal variants for the engine's flow device (see Reveal.tsx).
+     This layer sits above the engine's, so the settled state is
+     restated here too. */
+  [data-sc-in][data-reveal="fade"] {
+    transform: none;
+  }
+  [data-sc-in][data-reveal="image"] {
+    transform: scale(1.03);
+    transform-origin: 50% 65%;
+    transition:
+      opacity 700ms var(--ease-out-soft),
+      transform 1100ms var(--ease-out-soft);
+  }
+  [data-sc-in][data-reveal="image"].sc-in {
+    transform: none;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    [data-sc-in][data-reveal="image"] {
+      transform: none;
+    }
+  }
+
+  /* Reduced motion: the work reel stops being a scroll-driven pan and
+     becomes an ordinary horizontal scroller in normal flow, so every
+     project stays reachable without movement or a tall empty act. */
+  @media (prefers-reduced-motion: reduce) {
+    .work-reel {
+      height: auto !important;
+    }
+    .work-reel > [data-sc-stage] {
+      position: relative;
+      height: auto;
+      overflow-x: auto;
+      padding-block: 5rem 4rem;
+      scroll-snap-type: x proximity;
+    }
+    .work-reel [data-sc-pan] {
+      transform: none !important;
+    }
+    .work-reel [data-rail-item] {
+      scroll-snap-align: start;
+    }
+  }
+
+  /* The ice cube's canvas and poster fade out toward their edges, so the
+     render blends into whatever ground sits behind it. */
+  .ice-mask {
+    -webkit-mask-image: radial-gradient(closest-side, #000 86%, transparent 100%);
+    mask-image: radial-gradient(closest-side, #000 86%, transparent 100%);
+  }
+
+  /* Per-face cube posters (no WebGL, save-data, first paint): only the
+     still for the services act's current face is shown. */
+  .ice-posters--indexed > [data-poster-index] {
+    opacity: 0;
+    transition: opacity 420ms var(--ease-out-soft);
+  }
+  [data-facet="0"] .ice-posters--indexed > [data-poster-index="0"],
+  [data-facet="1"] .ice-posters--indexed > [data-poster-index="1"],
+  [data-facet="2"] .ice-posters--indexed > [data-poster-index="2"],
+  [data-facet="3"] .ice-posters--indexed > [data-poster-index="3"],
+  [data-facet="4"] .ice-posters--indexed > [data-poster-index="4"],
+  [data-facet="5"] .ice-posters--indexed > [data-poster-index="5"] {
+    opacity: 1;
+  }
+
+  /* Frost edge: a 1px icy rim plus a soft top highlight, used on
+     framed media and raised panels. */
+  .frost-edge {
+    box-shadow:
+      inset 0 0 0 1px rgba(203, 216, 240, 0.65),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
   }
 }
 
-@keyframes hero-pulse {
+/* ============================================================
+   Hero entrance: pure CSS so the headline paints on first frame
+   without waiting for JavaScript (it is the largest contentful
+   element). The global reduced-motion rule below collapses it.
+   ============================================================ */
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+/* Route entrance. Ends on `transform: none` so the page wrapper never
+   becomes a containing block for fixed descendants once it has settled. */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 8px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes float-y {
   0%,
   100% {
-    opacity: 0.15;
-    transform: scale(0.85);
+    transform: translate3d(0, 0, 0);
   }
   50% {
-    opacity: 0.65;
-    transform: scale(1);
+    transform: translate3d(0, -10px, 0);
+  }
+}
+@keyframes mist-drift {
+  0%,
+  100% {
+    transform: translate3d(-2%, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -1.5%, 0) scale(1.04);
   }
 }
 
 /* ============================================================
-   Trusted Clients marquee — content is duplicated so translating
-   exactly -50% loops seamlessly. Slow and calm; the reduced-motion
-   block below neutralises it for free, settling on a complete,
-   still-correct row of logos either way.
-   ============================================================ */
-@keyframes clients-marquee {
-  from {
-    transform: translateX(0);
-  }
-  to {
-    transform: translateX(-50%);
-  }
-}
-
-/* ============================================================
-   Custom cursor — the `custom-cursor-active` class is added by
-   components/ui/CustomCursor.tsx only after JS confirms a fine
-   pointer (mouse/trackpad), never on touch. Hiding the native
-   cursor only under that class means touch devices, and any
-   no-JS fallback, keep the ordinary system cursor untouched.
-   ============================================================ */
-html.custom-cursor-active,
-html.custom-cursor-active a,
-html.custom-cursor-active button {
-  cursor: none;
-}
-
-/* ============================================================
-   Video cover fallback — the cover image under a video (class
-   `video-fallback`, inside a `data-video` box; see ViewportVideo).
-   The image starts hidden and fades in on its own after 1.5s — pure
-   CSS, so it also works on a connection too slow to have loaded the
-   page's JS yet. JS then reports the video's state: "ready" hides the
-   image for good (the video's first frame is showing); "slow",
-   "failed" and "off" (reduced motion) show it now. "loading" restarts
-   the delay (a second keyframes name restarts the animation) when a
-   video starts loading later, e.g. on scrolling near it.
+   Video cover fallback (see ViewportVideo / video-fallback.ts).
+   The image under a cover video stays hidden while the video loads
+   normally, fades in on its own after 1.5s (pure CSS, works before
+   JS), and is shown at once when the video is slow, failed or off.
    Keep 1.5s in sync with SLOW_VIDEO_MS.
    ============================================================ */
 @keyframes video-fallback-in {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 @keyframes video-fallback-in-again {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 [data-video] .video-fallback {
   opacity: 0;
@@ -277,7 +473,6 @@ html.custom-cursor-active button {
   opacity: 1;
 }
 @media (prefers-reduced-motion: reduce) {
-  /* No video plays, so the image is the content — show it at once. */
   [data-video] .video-fallback {
     animation: none;
     opacity: 1;
@@ -285,7 +480,9 @@ html.custom-cursor-active button {
 }
 
 /* ============================================================
-   Reduced motion — honour the OS setting globally
+   Reduced motion: honour the OS setting globally. Opacity still
+   carries meaning (Scroll Craft cues fade); every position change
+   is dropped.
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   html {

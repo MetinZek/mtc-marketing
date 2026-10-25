@@ -130,7 +130,7 @@ export function WorkList({
           const cover = coverImage(project);
           const [w, h] = naturalCoverRatio(project);
           return (
-            <Reveal as="li" key={project.id} delay={Math.min(i, 6) * 0.05} amount={0.2}>
+            <Reveal as="li" key={project.id} delay={Math.min(i, 6) * 0.05}>
               <Link
                 href={href}
                 aria-label={interpolate(dict.work.viewCaseStudyAriaLabel, { title: project.title })}
@@ -168,7 +168,7 @@ export function WorkList({
                 {/* Touch devices: no hover, so the cover sits inline. */}
                 <span className="col-span-10 col-start-3 mt-5 block sm:col-span-7 sm:col-start-2 [@media(hover:hover)_and_(pointer:fine)]:hidden">
                   <span
-                    className="relative block overflow-hidden rounded-sm bg-paper"
+                    className="frost-edge relative block overflow-hidden rounded-lg bg-frost"
                     style={{ aspectRatio: `${w} / ${h}` }}
                     {...(hasCoverVideo(project) ? VIDEO_BOX : {})}
                   >
@@ -213,7 +213,7 @@ export function WorkList({
               <div
                 key={project.id}
                 className={cn(
-                  "absolute left-10 top-0 w-[clamp(15rem,24vw,24rem)] -translate-y-1/2 overflow-hidden rounded-sm bg-paper shadow-lift",
+                  "absolute left-10 top-0 w-[clamp(15rem,24vw,24rem)] -translate-y-1/2 overflow-hidden rounded-lg bg-frost shadow-float",
                   "transition-[opacity,scale] duration-[var(--duration-base)] ease-[var(--ease-out-soft)]",
                   isActive ? "scale-100 opacity-100" : "scale-75 opacity-0",
                 )}

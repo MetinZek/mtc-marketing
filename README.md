@@ -1,138 +1,136 @@
 # MTC — website
 
-Premium light-mode website for **MTC**, a creative digital agency
-(branding · web & app · social & marketing · content).
+Premium light-mode website for **MTC**, a creative digital agency in
+Mitrovica, Kosovo (branding · web & app · social & marketing · content).
+Public site in English, German and Swedish, with a small CMS and admin panel.
 
-Stage 1 of a section-by-section build: **foundation, design system,
-navigation, homepage shell, and a CMS-ready content architecture.** The
-homepage sections (Hero → Final CTA) are intentionally left as anchored
-stubs and are built in later stages.
+The current design is the **"Clear ice"** redesign: white and frost grounds,
+the logo's blue as the interface accent, four discipline hues, Archivo with
+its variable width axis, and a real-time WebGL ice cube as the hero object
+and the centrepiece of the services section. Background, research and the
+content inventory live in [`docs/redesign/`](docs/redesign/).
 
 ---
+
+## Run it
+
+```bash
+npm install
+npm run dev        # http://localhost:3000
+```
+
+Without a `.env.local` the site runs on the local content seed in
+`src/content/data` (no database, no email). See `.env.example` for the
+production variables.
+
+```bash
+npm run build      # production build + typecheck
+npm run start      # serve the production build
+npm run lint       # eslint
+npm run typecheck  # tsc --noEmit
+```
 
 ## Stack
 
 | Concern | Choice |
 | --- | --- |
-| Framework | Next.js 16 (App Router, RSC) · React 19 |
+| Framework | Next.js 16 (App Router, RSC, Turbopack) · React 19 |
 | Language | TypeScript |
 | Styling | Tailwind CSS v4 (`@theme` tokens in `src/app/globals.css`) |
-| Motion | framer-motion (`m` + `LazyMotion`, reduced-motion aware) |
+| Scroll motion | Scroll Craft engine (vendored, `src/vendor/scrollcraft/`) driven by `data-sc-*` attributes |
+| Smooth scrolling | Lenis |
+| UI motion | framer-motion (mobile menu, route transitions) |
+| 3D | three.js (lazy-loaded, client only) for the ice cube |
 | Validation | Zod (CMS content schemas) |
-| Content | Provider abstraction — local typed files now, Supabase later |
-
-> Toolchain note: `typescript` is pinned to `6.x` and `eslint` to `9.x`
-> because `typescript-eslint` / `eslint-plugin-react` do not yet support
-> TS 7 / ESLint 10 in this environment.
-
-## Scripts
-
-```bash
-npm run dev        # local dev (http://localhost:3000)
-npm run build      # production build + typecheck
-npm run start      # serve the production build
-npm run lint       # eslint (next/core-web-vitals + next/typescript)
-npm run typecheck  # tsc --noEmit
-```
-
-Copy `.env.example` → `.env.local`. Stage 1 runs fully on
-`CMS_PROVIDER=local` with **no backend**.
-
----
+| Content | Provider abstraction: local seed in dev, Postgres (Supabase) in production |
 
 ## Design system
 
-Defined once as CSS variables in **`src/app/globals.css`** under `@theme`,
-consumed everywhere through Tailwind utilities.
+Defined once in **`src/app/globals.css`** and consumed through Tailwind
+utilities. Token names used by the admin panel are kept.
 
-- **Light mode only.** `canvas` (white) and `paper` (warm off-white) are
-  the grounds; `ink` / `ink-muted` is the text.
-- **Blue is a strategic accent** — buttons, links, labels, active and
-  selected states, thin graphic details. Never a large fill, never a
-  gradient. The provisional value is `--color-blue: #1D4BFF`; change that
-  one line when the brand blue is confirmed from the logo.
-- **Typography:** one variable family (Archivo). The display role
-  (`h1–h3`, `.font-display`) pushes the font's width axis toward
-  *expanded* via `font-stretch` and tightens tracking; body stays normal.
-  Fluid scale: `text-display-1…3`, `text-title`, `text-lead`,
-  `text-body`, `text-meta`, `label`.
-- **Layout:** `Container` (max-width + gutter), `Grid` (12-col editorial
-  grid), `Section` (ground + vertical rhythm).
-- **Motion:** shared variants in `src/components/motion/variants.ts`;
-  `<Reveal>` for scroll-in. Global `prefers-reduced-motion` reset in CSS.
+- **Grounds:** `canvas` (white), `frost` (cool off-white). `paper` is an alias
+  of frost for the admin.
+- **Ink:** `ink`, `ink-muted`, `ink-faint` (faint is for non-essential text).
+- **Accent:** `blue` (`#0B45FF`, from the logo gradient), `sky`.
+- **Discipline hues:** `amber`, `azure`, `coral`, `mint`, each with `-tint`
+  and `-ink` shades. Mapped to services by id in `src/lib/disciplines.ts`.
+- **Type:** Archivo (variable, width 62–125) via `next/font`. Display type
+  (`text-display-hero`, `text-display-1…3`) runs expanded on the width axis;
+  body copy at normal width.
+- **Shape:** radius `xs/sm/md/lg/pill` (6/12/20/28px), pill buttons and chips,
+  `frost-edge` rims, shadows tinted to the ink.
+- **Ice glint:** `.ice-glint` on a surface (and `.glint-group` on its
+  trigger) runs a specular streak across it on hover. Fine pointers only.
 
-## Component architecture
+## Motion (Scroll Craft)
 
-```
-src/components/
-  ui/       Button · Container · Grid · Section · Label · ArrowLink · Logo   (presentational, no data)
-  layout/   Navbar · MobileMenu · Footer
-  motion/   Reveal · variants
-```
+The scroll choreography uses the Scroll Craft plugin's engine, vendored
+unchanged in `src/vendor/scrollcraft/` (see its README). `ScrollCraftRoot`
+mounts it on each page, destroys it on navigation, re-measures when content
+height changes, and reveals content rendered after mount.
 
-`ui/` never imports content. Pages/sections compose `ui/` + data from the
-CMS layer. `cn()` (`src/lib/utils.ts`) is the only styling helper.
+Homepage acts (plan and reasoning in `scrollcraft/builds/mtc-home/BRIEF.md`):
 
-## The logo
+1. **Hero** – flow act with parallax planes; the ice cube leans toward the
+   pointer and turns as the hero leaves.
+2. **Recent work** – `pan` act: the featured projects slide sideways.
+3. **Statement** – flow act with `kinetic` line reveal.
+4. **Four sides** (services) – pinned act; the cube turns one face per
+   discipline and the stage takes that discipline's tint (`src/lib/facets.ts`).
+5. **How we work** – flow act with `reveal` wipes.
+6. **Proof** – client logos, client words (only when real ones exist), journal.
+7. **Inquiry desk** – discipline chips whose selection is carried into the
+   contact form (`/contact?services=…`), magnetic CTA.
 
-Rendered from static files so the artwork is used **exactly as
-delivered** — never recoloured, gradient-ed, distorted, or redrawn.
+Reduced motion keeps every word: fades stay, movement goes, the work reel
+becomes an ordinary horizontal scroller and the cube snaps between faces.
 
-- `public/brand/mtc-logo.svg` — official **blue** logo (nav, brand touchpoints)
-- `public/brand/mtc-logo-mono.svg` — single-ink version (footer)
+`Reveal` (`src/components/motion/Reveal.tsx`) is a server-rendered wrapper
+around the engine's `data-sc-in` flow reveal.
 
-Both are **placeholders**. Drop the real artwork in with the same
-filenames — no code changes needed. See `public/brand/README.md`. If the
-real logo's proportions differ, update `ASPECT` in
-`src/components/ui/Logo.tsx`.
+## The ice cube
 
-## Homepage architecture
+`src/components/ice/ice-scene.ts` (three.js) renders a rounded ice cube with
+physical transmission, dispersion and a procedural frost map, four coloured
+cores (one per discipline) and light spilling onto the floor.
+`IceCube.tsx` lazy-loads it, renders only while it is on screen, and shows a
+poster still (`public/media/ice/`) without WebGL, with Save-Data, or until
+the first frame paints. Regenerate the posters from the running dev server
+with `scrollcraft/builds/mtc-home/capture-posters.mjs`.
 
-`src/app/(site)/page.tsx` renders the 12 sections from the brief, in
-order, as anchored stubs (`#hero`, `#intro`, `#work`, …). The `(site)`
-route group layout supplies `Navbar` + `Footer` and a skip link. Each
-real section will become a component in `src/components/sections/` that
-reads from the CMS layer.
-
-## CMS architecture
+## Content
 
 ```
 src/content/
-  schema.ts        Zod schemas — the shape every provider must return
-  types.ts         z.infer types
-  data/*.ts        local seed content (current source of truth)
-src/lib/cms/
-  provider.ts      ContentProvider interface (all methods async)
-  local.ts         reads src/content/data, validates via Zod   (server-only)
-  index.ts         picks provider from CMS_PROVIDER → exports `cms`
+  schema.ts        Zod schemas: the contract every provider returns
+  data/*.ts        local seed (real projects, clients and posts from mtcmarketing.co)
+  i18n/de.ts, sv.ts  German and Swedish overlays for CMS copy
+src/i18n/dictionaries/  UI strings (en is the source of truth, de/sv typed against it)
 ```
 
-Every content type carries SEO fields (`seoTitle`, `metaDescription`,
-`slug`, `noindex`). The public site and the future `/admin` panel both
-call `cms.*` — never files or a database directly.
-
-**Adding Supabase later:** implement `src/lib/cms/supabase.ts` against the
-same `ContentProvider` interface (Auth + Postgres + Storage), register it
-in `index.ts`, set `CMS_PROVIDER=supabase`. No section component changes.
+- Homepage, studio and site settings copy live in code (`src/content/data/`)
+  and ship with the site.
+- Projects, services, posts, clients, testimonials and team come from the
+  CMS database in production; the local seed only feeds development. **Copy
+  changed in the seed (e.g. the new service summaries) must also be entered
+  in /admin to appear on the live site.**
+- Testimonials, team members and statistics are not published anywhere
+  because none exist yet; the homepage shows a clearly labelled placeholder
+  for testimonials in development only.
+- Portfolio media (images, cover videos, client logos, journal covers) was
+  copied from the live site into `public/media/`.
 
 ## SEO
 
-- Per-route metadata via `buildMetadata()` (`src/lib/seo.ts`) — canonical
-  URLs, Open Graph, Twitter, robots.
-- `src/app/robots.ts`, `src/app/sitemap.ts` (expand from `cms` as routes land).
-- Dynamic default OG image at `src/app/opengraph-image.tsx`.
-- Organization JSON-LD in the root layout.
-- `/admin` is `noindex` (metadata + `X-Robots-Tag` header in `next.config.ts`).
+- Per-route metadata via `buildMetadata()` (`src/lib/seo.ts`) with canonical
+  URLs, hreflang alternates, Open Graph and Twitter.
+- Localized 404 for any unmatched public URL (`[locale]/(site)/[...missing]`).
+- Dynamic Open Graph image per locale; Organization JSON-LD.
+- `/admin` is `noindex`.
 
----
+## Verification
 
-## Build roadmap (remaining stages)
-
-1. ✅ Foundation · design system · nav · homepage shell · CMS architecture
-2. Hero + Intro/Positioning
-3. Selected Work (list + `/work/[slug]`)
-4. Services (numbered editorial rows) + `/services`
-5. Why MTC · Process · Results
-6. Testimonials · Clients · Final CTA + inquiry form
-7. Footer final · legal pages · `/studio` · `/journal`
-8. Supabase (Auth + DB + Storage) · `/admin` CRUD
+`scrollcraft/builds/mtc-home/` holds the Scroll Craft brief, the
+verification harness dependencies and helper scripts (`snap.mjs` for
+full-resolution screenshots, `capture-posters.mjs`).

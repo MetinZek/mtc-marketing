@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { Reveal } from "@/components/motion/Reveal";
-import { imageReveal } from "@/components/motion/variants";
-import { Label } from "@/components/ui/Label";
-import { Section } from "@/components/ui/Section";
+import { Icon } from "@/components/ui/Icon";
 import type { Post } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
+import { interpolate } from "@/i18n/format";
 import type { Locale } from "@/i18n/locales";
 import { withLocale } from "@/i18n/paths";
 import { formatArticleDate, formatCategory } from "@/lib/journal";
-import { cn } from "@/lib/utils";
 
 type Adjacent = Pick<Post, "title" | "slug"> | null;
 
@@ -23,16 +21,18 @@ type ArticleDetailProps = {
 };
 
 /**
- * /journal/[slug] — a single article, minimal and editorial: category,
- * title, date, byline, one hero image, the body as plain paragraphs
- * (split on blank lines), then previous/next. No CTA block — the brief
- * scopes the bottom of the page to article navigation only.
+ * /journal/[slug]: one article, set for reading. Category and date, the
+ * title, the byline, the cover, then the body at a comfortable measure.
+ * Paragraphs split on blank lines; a single line break inside a paragraph
+ * is kept (lists written one item per line stay lists). Older and newer
+ * articles close the page.
  */
 export function ArticleDetail({ post, prev, next, dict, locale }: ArticleDetailProps) {
   const paragraphs = post.body
     .split(/\n{2,}/)
     .map((p) => p.trim())
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((p) => p.split("\n").map((line) => line.trim()));
 
   const ratio =
     post.coverImage?.width && post.coverImage?.height
@@ -41,108 +41,97 @@ export function ArticleDetail({ post, prev, next, dict, locale }: ArticleDetailP
 
   return (
     <article>
-      <Section ground="canvas" spacing="md" className="pt-8 sm:pt-12">
-        <Reveal>
-          <Link
-            href={withLocale("/journal", locale)}
-            className="group inline-flex items-center gap-1.5 text-sm font-medium tracking-tight text-ink-muted transition-colors hover:text-blue"
-          >
-            <span
-              aria-hidden="true"
-              className="transition-transform duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] group-hover:-translate-x-0.5"
+      <section className="bg-canvas pb-10 pt-8 sm:pt-12">
+        <div className="container-mtc">
+          <Reveal>
+            <Link
+              href={withLocale("/journal", locale)}
+              className="group/back inline-flex items-center gap-1.5 rounded-xs text-meta font-semibold text-ink-muted transition-colors hover:text-blue"
             >
-              &larr;
-            </span>
-            {dict.journal.title}
-          </Link>
-        </Reveal>
-
-        <Reveal delay={0.05} className="mt-10 max-w-3xl">
-          <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-            <Label tone="blue">{formatCategory(post, dict.journal.title)}</Label>
-            <span className="label text-ink-faint">
-              {formatArticleDate(post.publishedAt, locale)}
-            </span>
-          </div>
-          <h1 className="text-display-2 mt-4 text-ink">{post.title}</h1>
-          <p className="label mt-5 text-ink-muted">{post.author}</p>
-        </Reveal>
-
-        {post.coverImage && (
-          <Reveal variants={imageReveal} amount={0} className="mt-12 lg:mt-16">
-            <div
-              className="relative overflow-hidden rounded-sm bg-paper"
-              style={{ aspectRatio: ratio }}
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven placeholder asset, not a static import */}
-              <img
-                src={post.coverImage.src}
-                alt={post.coverImage.alt}
-                className="h-full w-full object-cover object-center"
+              <Icon
+                name="arrow-left"
+                className="transition-transform duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover/back:-translate-x-0.5"
               />
-            </div>
+              {dict.journal.backToJournal}
+            </Link>
           </Reveal>
-        )}
-      </Section>
+
+          <Reveal delay={0.05} className="mx-auto mt-12 max-w-3xl text-center lg:mt-16">
+            <p className="text-meta text-ink-muted">
+              <span className="font-semibold text-blue">{formatCategory(post, dict.journal.title)}</span>
+            </p>
+            <h1 className="text-display-2 mt-5 text-ink">{post.title}</h1>
+            <p className="mt-6 text-meta text-ink-muted">
+              {interpolate(dict.journal.by, { author: post.author })} · {formatArticleDate(post.publishedAt, locale)}
+            </p>
+          </Reveal>
+
+          {post.coverImage && (
+            <Reveal variant="image" className="mx-auto mt-12 max-w-5xl lg:mt-16">
+              <div className="frost-edge relative overflow-hidden rounded-lg bg-frost" style={{ aspectRatio: ratio }}>
+                {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven cover */}
+                <img src={post.coverImage.src} alt={post.coverImage.alt} className="h-full w-full object-cover" />
+              </div>
+            </Reveal>
+          )}
+        </div>
+      </section>
 
       {paragraphs.length > 0 && (
-        <Section ground="canvas" spacing="sm">
-          <Reveal className="max-w-2xl lg:ml-[calc(100%/12)]">
-            {paragraphs.map((paragraph, i) => (
-              <p
-                key={i}
-                className={cn("text-lead text-ink", i > 0 && "mt-6")}
-              >
-                {paragraph}
-              </p>
-            ))}
+        <section className="bg-canvas pb-20 pt-6 sm:pb-28 sm:pt-10">
+          <Reveal className="container-mtc">
+            <div className="mx-auto max-w-[40rem] space-y-6">
+              {paragraphs.map((lines, i) => (
+                <p key={i} className="text-lead text-ink">
+                  {lines.map((line, l) => (
+                    <span key={l}>
+                      {l > 0 && <br />}
+                      {line}
+                    </span>
+                  ))}
+                </p>
+              ))}
+            </div>
           </Reveal>
-        </Section>
+        </section>
       )}
 
       {(prev || next) && (
-        <Section ground="paper" spacing="md" className="border-t border-line">
-          <Reveal>
-            <div className="flex flex-col gap-10 sm:flex-row sm:justify-between sm:gap-8">
-              {prev ? (
-                <Link href={withLocale(`/journal/${prev.slug}`, locale)} className="group max-w-xs">
-                  <span className="label text-ink-faint">{dict.journal.previous}</span>
-                  <span className="mt-2 flex items-baseline gap-2 text-title text-ink transition-colors duration-[var(--duration-base)] group-hover:text-blue">
-                    <span
-                      aria-hidden="true"
-                      className="transition-transform duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover:-translate-x-1"
-                    >
-                      &larr;
-                    </span>
-                    {prev.title}
-                  </span>
-                </Link>
-              ) : (
-                <span />
-              )}
-
-              {next ? (
-                <Link
-                  href={withLocale(`/journal/${next.slug}`, locale)}
-                  className="group max-w-xs sm:text-right"
-                >
-                  <span className="label text-ink-faint">{dict.journal.next}</span>
-                  <span className="mt-2 flex items-baseline gap-2 text-title text-ink transition-colors duration-[var(--duration-base)] group-hover:text-blue sm:justify-end">
-                    {next.title}
-                    <span
-                      aria-hidden="true"
-                      className="transition-transform duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover:translate-x-1"
-                    >
-                      &rarr;
-                    </span>
-                  </span>
-                </Link>
-              ) : (
-                <span />
-              )}
-            </div>
-          </Reveal>
-        </Section>
+        <nav aria-label={dict.journal.title} className="border-t border-line bg-frost py-14 sm:py-20">
+          <div className="container-mtc grid gap-10 sm:grid-cols-2 sm:gap-8">
+            {prev ? (
+              <Link href={withLocale(`/journal/${prev.slug}`, locale)} className="group/adj max-w-sm rounded-xs">
+                <span className="text-meta text-ink-muted">{dict.journal.previous}</span>
+                <span className="mt-2 flex items-start gap-2 text-title text-ink transition-colors group-hover/adj:text-blue">
+                  <Icon
+                    name="arrow-left"
+                    className="mt-1.5 transition-transform duration-[var(--duration-base)] group-hover/adj:-translate-x-1"
+                  />
+                  {prev.title}
+                </span>
+              </Link>
+            ) : (
+              <span />
+            )}
+            {next ? (
+              <Link
+                href={withLocale(`/journal/${next.slug}`, locale)}
+                className="group/adj max-w-sm justify-self-end rounded-xs sm:text-right"
+              >
+                <span className="text-meta text-ink-muted">{dict.journal.next}</span>
+                <span className="mt-2 flex items-start gap-2 text-title text-ink transition-colors group-hover/adj:text-blue sm:justify-end">
+                  {next.title}
+                  <Icon
+                    name="arrow-right"
+                    className="mt-1.5 transition-transform duration-[var(--duration-base)] group-hover/adj:translate-x-1"
+                  />
+                </span>
+              </Link>
+            ) : (
+              <span />
+            )}
+          </div>
+        </nav>
       )}
     </article>
   );

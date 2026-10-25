@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
 
   return buildMetadata({
     path: `/work/${project.slug}`,
-    title: `${project.title} — ${dict.work.metaTitleSuffix} — MTC`,
+    title: `${project.title} | ${dict.work.metaTitleSuffix} | MTC`,
     description: project.description,
     image: project.heroImage.src,
     seo: project,

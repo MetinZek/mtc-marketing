@@ -47,3 +47,7 @@ yarn-error.log*
 /public/uploads
 
 certificates
+# Scroll Craft verification (mtc-home build): screenshots and harness dependencies
+/scrollcraft/builds/mtc-home/lab/
+/scrollcraft/builds/mtc-home/node_modules/
+/scrollcraft/builds/mtc-home/package-lock.json

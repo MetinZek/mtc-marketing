@@ -17,7 +17,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
   return buildMetadata({
     path: "/legal/privacy",
-    title: `Privacy Policy — ${LEGAL_ENTITY_NAME}`,
+    title: `Privacy Policy | ${LEGAL_ENTITY_NAME}`,
     description: `How ${LEGAL_ENTITY_NAME} collects, uses, and protects information submitted through this website.`,
     locale,
   });
