@@ -59,7 +59,6 @@ export const sv: Dictionary = {
     sendFailure: "Vi kunde inte skicka ditt meddelande just nu. Försök igen om en liten stund.",
   },
   home: {
-    workEyebrow: "Utvalda arbeten",
     workHeadline: "Senaste arbeten",
     workSupporting: "Varumärkesidentiteter, webbplatser och webbappar, från Kosovo till Wien.",
     workCountOne: "{count} fallstudie",
@@ -71,7 +70,6 @@ export const sv: Dictionary = {
     servicesSeenIn: "Syns i",
     trustedClientsAriaLabel: "Kunder",
     trustedByLabel: "Varumärken vi har arbetat med",
-    journalEyebrow: "Journal",
     journalHeadline: "Vad som förändras inom marknadsföring, och vad det betyder för dig.",
     journalAll: "Läs journalen",
     inquiryChipsLabel: "Vad behöver du?",

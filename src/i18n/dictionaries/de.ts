@@ -60,7 +60,6 @@ export const de: Dictionary = {
       "Ihre Nachricht konnte gerade nicht gesendet werden. Bitte versuchen Sie es in Kürze erneut.",
   },
   home: {
-    workEyebrow: "Ausgewählte Arbeiten",
     workHeadline: "Aktuelle Arbeiten",
     workSupporting: "Markenidentitäten, Websites und Web-Apps, vom Kosovo bis nach Wien.",
     workCountOne: "{count} Fallstudie",
@@ -72,7 +71,6 @@ export const de: Dictionary = {
     servicesSeenIn: "Zu sehen bei",
     trustedClientsAriaLabel: "Kunden",
     trustedByLabel: "Marken, mit denen wir gearbeitet haben",
-    journalEyebrow: "Journal",
     journalHeadline: "Was sich im Marketing verändert und was das für Sie bedeutet.",
     journalAll: "Zum Journal",
     inquiryChipsLabel: "Was brauchen Sie?",

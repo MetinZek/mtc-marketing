@@ -113,7 +113,7 @@ export default async function PrivacyPolicyPage() {
         <LegalList
           items={[
             <span key="resend">
-              <strong className="font-medium text-ink">Resend</strong> — used to deliver the email
+              <strong className="font-medium text-ink">Resend</strong>: used to deliver the email
               notification generated when you submit our contact form, and to allow us to reply to
               you. Resend processes the information contained in your submission (including your
               name, email address, and message) solely to transmit that email. You can review

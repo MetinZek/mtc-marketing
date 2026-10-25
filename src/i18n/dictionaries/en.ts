@@ -65,7 +65,6 @@ export const en = {
     sendFailure: "We couldn't send your message just now. Please try again shortly.",
   },
   home: {
-    workEyebrow: "Selected work",
     workHeadline: "Recent work",
     workSupporting: "Brand identities, websites and web apps, from Kosovo to Vienna.",
     workCountOne: "{count} case study",
@@ -77,7 +76,6 @@ export const en = {
     servicesSeenIn: "Seen in",
     trustedClientsAriaLabel: "Clients",
     trustedByLabel: "Brands we’ve worked with",
-    journalEyebrow: "Journal",
     journalHeadline: "What’s changing in marketing, and what it means for you.",
     journalAll: "Read the journal",
     inquiryChipsLabel: "What do you need?",

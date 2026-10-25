@@ -50,8 +50,8 @@ export default function TermsOfUsePage() {
 
       <LegalSection heading="2. Intellectual property">
         <p>
-          Unless otherwise indicated, all content on this website — including text, graphics,
-          logos, layouts, visual design, case studies, and branding — is owned by or licensed to
+          Unless otherwise indicated, all content on this website (including text, graphics,
+          logos, layouts, visual design, case studies, and branding) is owned by or licensed to
           {" "}{LEGAL_ENTITY_NAME} and is protected by applicable copyright, trademark, and other
           intellectual property laws.
         </p>
@@ -83,8 +83,8 @@ export default function TermsOfUsePage() {
           by themselves, constitute a binding offer, quotation, or proposal.
         </p>
         <p>
-          Any actual project engagement with {LEGAL_ENTITY_NAME} — including scope, pricing,
-          timeline, and deliverables — will be governed by a separate proposal, quote, or
+          Any actual project engagement with {LEGAL_ENTITY_NAME} (including scope, pricing,
+          timeline, and deliverables) will be governed by a separate proposal, quote, or
           agreement entered into directly between {LEGAL_ENTITY_NAME} and the client. Where the
           terms of such an agreement conflict with these Terms, the separate agreement will govern
           for that engagement.

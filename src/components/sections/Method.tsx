@@ -1,5 +1,4 @@
 import { Reveal } from "@/components/motion/Reveal";
-import { Label } from "@/components/ui/Label";
 import type { HomepageContent } from "@/content/types";
 
 type MethodProps = {
@@ -27,8 +26,7 @@ export function Method({ content, steps }: MethodProps) {
       <div className="container-mtc">
         <Reveal className="grid gap-6 lg:grid-cols-12 lg:items-end">
           <div className="lg:col-span-7">
-            <Label>{content.label}</Label>
-            <h2 id="process-title" className="text-display-2 mt-5 max-w-[18ch] text-ink">
+            <h2 id="process-title" className="text-display-2 max-w-[18ch] text-ink">
               {content.headline}
             </h2>
           </div>

@@ -1,7 +1,6 @@
 import Link from "next/link";
 import { Reveal } from "@/components/motion/Reveal";
 import { ArrowLink } from "@/components/ui/ArrowLink";
-import { Label } from "@/components/ui/Label";
 import type { Post } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import type { Locale } from "@/i18n/locales";
@@ -30,8 +29,7 @@ export function JournalTeaser({
       <div className="container-mtc">
         <Reveal className="flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <Label>{dict.home.journalEyebrow}</Label>
-            <h2 id="journal-teaser-title" className="text-display-3 mt-5 max-w-[24ch] text-ink">
+            <h2 id="journal-teaser-title" className="text-display-3 max-w-[24ch] text-ink">
               {dict.home.journalHeadline}
             </h2>
           </div>

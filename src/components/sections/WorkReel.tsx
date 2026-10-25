@@ -3,7 +3,6 @@ import { PanFocusGuard } from "@/components/motion/PanFocusGuard";
 import { ArrowLink } from "@/components/ui/ArrowLink";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
-import { Label } from "@/components/ui/Label";
 import { ViewportVideo } from "@/components/ui/ViewportVideo";
 import type { Project } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
@@ -50,15 +49,13 @@ export function WorkReel({ projects, totalProjects, dict, locale }: WorkReelProp
         {/* Phones: the heading holds at the top of the stage while the
             cards travel beneath it (on wider screens it rides in the rail). */}
         <div className="container-mtc sm:hidden">
-          <Label tone="blue">{dict.home.workEyebrow}</Label>
-          <h2 className="text-display-2 mt-3 text-ink">{dict.home.workHeadline}</h2>
+          <h2 className="text-display-2 text-ink">{dict.home.workHeadline}</h2>
           <p className="mt-3 text-body text-ink-muted">{dict.home.workSupporting}</p>
         </div>
         <div data-sc-pan="0.02" className="flex w-max items-end gap-5 px-[var(--gutter)] sm:gap-8">
           {/* Heading as the first rail item. */}
           <div data-rail-item className="flex w-[min(30rem,84vw)] flex-none flex-col justify-end self-stretch pb-2 pr-4 max-sm:hidden sm:pr-10">
-            <Label tone="blue">{dict.home.workEyebrow}</Label>
-            <h2 className="text-display-1 mt-5 text-ink">
+            <h2 className="text-display-1 text-ink">
               {dict.home.workHeadline}
             </h2>
             <p className="mt-5 max-w-sm text-lead text-ink-muted">{dict.home.workSupporting}</p>
