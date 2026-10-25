@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ArticleDetail } from "@/components/sections/ArticleDetail";
-import { FinalCta } from "@/components/sections/FinalCta";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 import { cms } from "@/lib/cms";
-import { getHomepage, getPosts } from "@/lib/cms/localized";
+import { getPosts } from "@/lib/cms/localized";
 import { buildMetadata } from "@/lib/seo";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -45,12 +44,7 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
  */
 export default async function ArticlePage({ params }: Params) {
   const { slug } = await params;
-  const [posts, home, dict, locale] = await Promise.all([
-    getPosts({ status: "published" }),
-    getHomepage(),
-    getDictionary(),
-    getLocale(),
-  ]);
+  const [posts, dict, locale] = await Promise.all([getPosts({ status: "published" }), getDictionary(), getLocale()]);
 
   const index = posts.findIndex((p) => p.slug === slug);
   const post = index >= 0 ? posts[index] : undefined;
@@ -60,15 +54,12 @@ export default async function ArticlePage({ params }: Params) {
   const newer = posts[index - 1];
 
   return (
-    <>
-      <ArticleDetail
-        post={post}
-        prev={older ? { title: older.title, slug: older.slug } : null}
-        next={newer ? { title: newer.title, slug: newer.slug } : null}
-        dict={dict}
-        locale={locale}
-      />
-      <FinalCta content={home.finalCta} locale={locale} />
-    </>
+    <ArticleDetail
+      post={post}
+      prev={older ? { title: older.title, slug: older.slug } : null}
+      next={newer ? { title: newer.title, slug: newer.slug } : null}
+      dict={dict}
+      locale={locale}
+    />
   );
 }

@@ -1,7 +1,6 @@
 import { type ReactNode } from "react";
+import { SplitWords } from "@/components/motion/SplitWords";
 import { Reveal } from "@/components/motion/Reveal";
-import { Label } from "@/components/ui/Label";
-import { Section } from "@/components/ui/Section";
 import { cn } from "@/lib/utils";
 
 /**
@@ -12,7 +11,7 @@ import { cn } from "@/lib/utils";
 export const LEGAL_ENTITY_NAME = "MTC Marketing";
 
 const legalLinkClass =
-  "text-ink underline decoration-line-strong underline-offset-2 transition-colors hover:text-blue";
+  "text-blue underline decoration-blue/30 underline-offset-2 transition-colors hover:decoration-blue";
 
 /** A mailto/tel-style inline link styled for use inside legal body copy. */
 export function LegalLink({
@@ -37,9 +36,9 @@ export function LegalLink({
 }
 
 /**
- * Shared chrome for every legal page: eyebrow + title + "last updated"
- * meta, then the document body. Header + footer come from the (site)
- * route group layout — this only owns the page's own content.
+ * Shared chrome for every legal page: the title set large with its "last
+ * updated" line, then the document body at a reading measure. Header,
+ * footer and sign-off come from the (site) route group layout.
  */
 export function LegalDocument({
   title,
@@ -53,18 +52,28 @@ export function LegalDocument({
   children: ReactNode;
 }) {
   return (
-    <Section ground="canvas" spacing="md" className="pt-8 sm:pt-12">
-      <Reveal className="max-w-3xl">
-        <Label tone="blue">Legal</Label>
-        <h1 className="text-display-2 mt-4 text-ink">{title}</h1>
-        <p className="mt-5 text-meta text-ink-muted">Last updated: {lastUpdated}</p>
-        {intro && <p className="mt-6 text-lead text-ink-muted">{intro}</p>}
-      </Reveal>
+    <section className="pb-20 pt-6 sm:pb-28 sm:pt-10">
+      <div className="container-mtc">
+        <div className="max-w-4xl">
+          <Reveal as="p" variant="fade" className="text-eyebrow text-ink-muted">
+            Legal
+          </Reveal>
+          <SplitWords as="h1" text={title} className="text-display-1 mt-3 text-ink" />
+          <Reveal as="p" delay={0.1} className="mt-6 text-[0.9375rem] text-ink-muted">
+            Last updated: {lastUpdated}
+          </Reveal>
+          {intro && (
+            <Reveal as="p" delay={0.15} className="mt-8 max-w-3xl text-lead text-ink-muted">
+              {intro}
+            </Reveal>
+          )}
+        </div>
 
-      <Reveal delay={0.05} className="mt-14 max-w-3xl sm:mt-16">
-        <div className="space-y-12 sm:space-y-14">{children}</div>
-      </Reveal>
-    </Section>
+        <Reveal delay={0.05} className="mt-14 max-w-3xl border-t border-line pt-12 sm:mt-16 sm:pt-14">
+          <div className="space-y-12 sm:space-y-14">{children}</div>
+        </Reveal>
+      </div>
+    </section>
   );
 }
 
@@ -79,7 +88,7 @@ export function LegalSection({
   return (
     <section>
       <h2 className="text-title text-ink">{heading}</h2>
-      <div className="mt-4 space-y-4 text-body text-ink">{children}</div>
+      <div className="mt-4 space-y-4 text-body text-ink/85">{children}</div>
     </section>
   );
 }
@@ -96,7 +105,7 @@ export function LegalList({
   return (
     <Tag
       className={cn(
-        "space-y-2 pl-5 text-body text-ink",
+        "space-y-2 pl-5 text-body text-ink/85",
         ordered ? "list-decimal marker:text-ink-muted" : "list-disc marker:text-ink-faint",
       )}
     >

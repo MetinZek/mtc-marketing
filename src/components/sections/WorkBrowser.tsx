@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { Icon } from "@/components/ui/Icon";
 import type { GalleryItem, Project, WorkLayoutEntry } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import type { Locale } from "@/i18n/locales";
-import { toneFor } from "@/lib/disciplines";
 import { cn } from "@/lib/utils";
 import { WorkCombo, type ComboWork } from "./WorkCombo";
 import { WorkList } from "./WorkList";
@@ -22,10 +22,10 @@ export type ServiceRef = { id: string; number: string; title: string };
  * Order, big/small sizes, hidden items and the default view come from
  * admin → Work Page (`layout`, already merged with the current content).
  * Pills are the disciplines that have something to show, in service
- * order, each in its own colour, and filter projects and pieces together.
- * A project belongs to its admin "Service", else the service whose title
- * equals its category. Numbers always refer to the full project list.
- * Changing filter or view re-keys the content so it reveals again.
+ * order, and filter projects and pieces together. A project belongs to its
+ * admin "Service", else the service whose title equals its category.
+ * Numbers always refer to the full project list. Changing filter or view
+ * re-keys the content so it reveals again.
  */
 export function WorkBrowser({
   projects,
@@ -80,17 +80,16 @@ export function WorkBrowser({
     work.kind === "project" ? [{ project: work.project, number: work.number }] : [],
   );
 
-  const pill = (active: boolean, activeClass = "border-ink bg-ink text-canvas") =>
+  const pill = (active: boolean) =>
     cn(
-      "inline-flex min-h-10 items-center gap-2 rounded-pill border px-4 py-1.5 text-meta font-semibold",
-      "transition-[background-color,border-color,color] duration-[var(--duration-fast)] active:scale-[0.97]",
-      "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
-      active ? activeClass : "border-line-strong text-ink-muted hover:border-ink/30 hover:text-ink",
+      "inline-flex h-10 items-center gap-2 rounded-pill px-4 text-[0.9375rem] font-medium",
+      "transition-[background-color,color,transform] duration-[var(--duration-fast)] active:scale-[0.97]",
+      active ? "bg-ink text-white" : "bg-mist text-ink hover:bg-mist-deep",
     );
 
-  const views: { value: View; label: string }[] = [
-    { value: "grid", label: dict.work.viewGrid },
-    { value: "index", label: dict.work.viewIndex },
+  const views: { value: View; label: string; icon: "grid" | "list" }[] = [
+    { value: "grid", label: dict.work.viewGrid, icon: "grid" },
+    { value: "index", label: dict.work.viewIndex, icon: "list" },
   ];
 
   return (
@@ -98,62 +97,47 @@ export function WorkBrowser({
       <div className="flex flex-wrap items-center justify-between gap-x-6 gap-y-4">
         {pills.length > 1 ? (
           <div role="group" aria-label={dict.work.filterLabel} className="flex flex-wrap gap-2">
-            <button
-              type="button"
-              aria-pressed={filter === null}
-              onClick={() => setFilter(null)}
-              className={pill(filter === null)}
-            >
+            <button type="button" aria-pressed={filter === null} onClick={() => setFilter(null)} className={pill(filter === null)}>
               {dict.work.filterAll}
-              <span className="tabular-nums opacity-60">{all.length}</span>
+              <span className="tabular-nums opacity-55">{all.length}</span>
             </button>
-            {pills.map((service) => {
-              const tone = toneFor(service.id, services.indexOf(service));
-              return (
-                <button
-                  key={service.id}
-                  type="button"
-                  aria-pressed={filter === service.id}
-                  onClick={() => setFilter(service.id)}
-                  className={pill(filter === service.id, tone.chipOn)}
-                >
-                  <span aria-hidden="true" className={cn("size-2 rounded-full", tone.dot)} />
-                  {service.title}
-                  <span className="tabular-nums opacity-60">{countFor(service.id)}</span>
-                </button>
-              );
-            })}
+            {pills.map((service) => (
+              <button
+                key={service.id}
+                type="button"
+                aria-pressed={filter === service.id}
+                onClick={() => setFilter(service.id)}
+                className={pill(filter === service.id)}
+              >
+                {service.title}
+                <span className="tabular-nums opacity-55">{countFor(service.id)}</span>
+              </button>
+            ))}
           </div>
         ) : (
           <span />
         )}
 
-        <div
-          role="group"
-          aria-label={dict.work.viewLabel}
-          className="flex gap-0.5 rounded-pill border border-ink/[0.08] bg-ink/[0.03] p-0.5"
-        >
-          {views.map(({ value, label }) => (
+        <div role="group" aria-label={dict.work.viewLabel} className="flex gap-0.5 rounded-pill bg-mist p-1">
+          {views.map(({ value, label, icon }) => (
             <button
               key={value}
               type="button"
               aria-pressed={view === value}
               onClick={() => setView(value)}
               className={cn(
-                "inline-flex h-9 items-center rounded-pill px-4 text-meta font-semibold transition-colors duration-[var(--duration-fast)]",
-                "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus",
-                view === value
-                  ? "bg-canvas text-ink shadow-[0_1px_2px_rgba(11,18,34,0.08)]"
-                  : "text-ink-muted hover:text-ink",
+                "inline-flex h-9 items-center gap-1.5 rounded-pill px-3.5 text-[0.875rem] font-medium transition-colors duration-[var(--duration-fast)]",
+                view === value ? "bg-canvas text-ink shadow-[0_1px_3px_rgb(0_0_0/0.1)]" : "text-ink-muted hover:text-ink",
               )}
             >
+              <Icon name={icon} className="text-[1.05rem]" />
               {label}
             </button>
           ))}
         </div>
       </div>
 
-      <div key={`${view}:${filter ?? "all"}`} className="mt-10 lg:mt-12">
+      <div key={`${view}:${filter ?? "all"}`} className="mt-8 lg:mt-10">
         {view === "grid" ? (
           <WorkCombo works={visible} serviceTitle={serviceTitle} dict={dict} locale={locale} />
         ) : (

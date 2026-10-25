@@ -1,22 +1,22 @@
 import type { Metadata } from "next";
-import { Clients } from "@/components/sections/Clients";
-import { FourSides, type Facet } from "@/components/sections/FourSides";
+import { ClientWords, type ClientWord } from "@/components/sections/ClientWords";
+import { Disciplines, type Discipline } from "@/components/sections/Disciplines";
 import { Hero } from "@/components/sections/Hero";
-import { InquiryDesk } from "@/components/sections/InquiryDesk";
 import { JournalTeaser } from "@/components/sections/JournalTeaser";
-import { Method } from "@/components/sections/Method";
-import { Statement } from "@/components/sections/Statement";
-import { Testimonials } from "@/components/sections/Testimonials";
-import { WorkReel } from "@/components/sections/WorkReel";
+import { Showroom } from "@/components/sections/Showroom";
+import { StudioStatement } from "@/components/sections/StudioStatement";
+import { TrustedBy } from "@/components/sections/TrustedBy";
+import type { Testimonial } from "@/content/types";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
+import { withLocale } from "@/i18n/paths";
+import { listEntries } from "@/lib/cms/admin";
 import {
   getClients,
   getHomepage,
   getPosts,
   getProjects,
   getServices,
-  getSiteSettings,
   getTestimonials,
 } from "@/lib/cms/localized";
 import { buildMetadata } from "@/lib/seo";
@@ -27,33 +27,32 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /**
- * Homepage, in seven acts (see scrollcraft/builds/mtc-home/BRIEF.md):
- * hero (the ice cube) > recent work (lateral reel) > one quiet sentence >
- * the four disciplines (the cube turns: the peak) > how we work > proof
- * (clients, client words when real ones exist, the journal) > the
- * inquiry desk. Every section reads from the CMS layer through the
- * locale-aware wrapper in @/lib/cms/localized.
+ * Homepage (see docs/redesign/keynote-direction.md): the opener (fitted
+ * headline, stickers, client logos) > the showroom of featured projects >
+ * the night chapter (how we work, lit word by word over glass squares,
+ * then the four disciplines) > client words > the journal. The sign-off
+ * closes every page from the footer. Every section reads from the CMS
+ * layer through the locale-aware wrapper in @/lib/cms/localized.
  */
 export default async function HomePage() {
-  const [home, services, projects, testimonials, clients, posts, settings, dict, locale] =
-    await Promise.all([
-      getHomepage(),
-      getServices(),
-      getProjects(),
-      getTestimonials(),
-      getClients(),
-      getPosts({ status: "published" }),
-      getSiteSettings(),
-      getDictionary(),
-      getLocale(),
-    ]);
+  const [home, services, projects, testimonials, clients, posts, dict, locale] = await Promise.all([
+    getHomepage(),
+    getServices(),
+    getProjects(),
+    getTestimonials(),
+    getClients(),
+    getPosts({ status: "published" }),
+    getDictionary(),
+    getLocale(),
+  ]);
 
   const featured = projects.filter((project) => project.featured);
+
   const serviceOf = (serviceId: string | undefined, category: string) =>
     serviceId ?? services.find((s) => s.title === category)?.id;
-
-  const facets: Facet[] = services.map((service) => ({
+  const disciplines: Discipline[] = services.map((service) => ({
     id: service.id,
+    number: service.number,
     title: service.title,
     summary: service.summary,
     capabilities: service.capabilities,
@@ -62,24 +61,70 @@ export default async function HomePage() {
       .map(({ title, slug }) => ({ title, slug })),
   }));
 
+  // Unpublished client words (drafts waiting for the client's real words)
+  // show on a development server only, marked as drafts. A production
+  // build never reads them.
+  const drafts =
+    process.env.NODE_ENV === "development"
+      ? (await listEntries("testimonials")).filter((t) => !t.published)
+      : [];
+  const toWord = (t: Testimonial, draft: boolean): ClientWord => {
+    const logo = clients.find((c) => c.name === t.company)?.logo;
+    return {
+      id: t.id,
+      quote: t.quote,
+      person: t.person,
+      role: t.role,
+      company: t.company,
+      avatar: t.portrait
+        ? { src: t.portrait.src, alt: t.portrait.alt, kind: "photo" }
+        : logo
+          ? { src: logo.src, alt: logo.alt, kind: "logo" }
+          : undefined,
+      draft,
+    };
+  };
+  const words = [...testimonials.map((t) => toWord(t, false)), ...drafts.map((t) => toWord(t, true))];
+
   return (
     <>
-      <Hero content={home.hero} locale={locale} />
-      <WorkReel projects={featured} totalProjects={projects.length} dict={dict} locale={locale} />
-      <Statement content={home.intro} />
-      <FourSides content={home.services} facets={facets} dict={dict} locale={locale} />
-      <Method content={home.howWeWork} steps={home.process} />
-      <Clients clients={clients} dict={dict} />
-      <Testimonials content={home.testimonialsIntro} testimonials={testimonials} dict={dict} />
+      <Hero
+        label={home.hero.label}
+        headline={home.hero.headline}
+        supporting={home.hero.supporting}
+        primary={{ label: home.hero.primaryCta.label, href: withLocale(home.hero.primaryCta.href, locale) }}
+        secondary={{ label: home.hero.secondaryCta.label, href: withLocale(home.hero.secondaryCta.href, locale) }}
+        stickers={dict.home.stickers}
+      >
+        <TrustedBy clients={clients} dict={dict} />
+      </Hero>
+
+      <Showroom projects={featured} totalProjects={projects.length} dict={dict} locale={locale} />
+
+      <div className="relative isolate text-snow">
+        <div aria-hidden="true" data-reveal="sheet" className="absolute inset-0 -z-10 rounded-[28px] bg-night sm:rounded-[48px]" />
+        <StudioStatement label={home.howWeWork.label} statement={dict.home.statement} stages={home.process} />
+        <Disciplines
+          content={home.services}
+          statement={home.intro.statement}
+          disciplines={disciplines}
+          dict={dict}
+          locale={locale}
+        />
+      </div>
+
+      {words.length > 0 && (
+        <ClientWords
+          heading={home.testimonialsIntro.headline}
+          items={words}
+          labels={{
+            previous: dict.home.wordsPrevious,
+            next: dict.home.wordsNext,
+            draft: dict.home.wordsDraft,
+          }}
+        />
+      )}
       <JournalTeaser posts={posts} dict={dict} locale={locale} />
-      <InquiryDesk
-        content={home.finalCta}
-        services={services.map(({ id, title }) => ({ id, title }))}
-        email={settings.email}
-        phone={settings.phone}
-        dict={dict}
-        locale={locale}
-      />
     </>
   );
 }

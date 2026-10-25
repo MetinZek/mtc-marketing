@@ -20,9 +20,10 @@ export const de: Dictionary = {
     journal: "Journal",
     contact: "Kontakt",
     startAProject: "Projekt starten",
-    openMenu: "Menü öffnen",
     closeMenu: "Menü schließen",
     languageSwitcherAriaLabel: "Sprache",
+    menu: "Menü",
+    dockAriaLabel: "Schnellnavigation",
   },
   footer: {
     contactHeading: "Kontakt",
@@ -36,6 +37,7 @@ export const de: Dictionary = {
     allRightsReserved: "Alle Rechte vorbehalten.",
     signOff: "Lassen Sie uns etwas schaffen, das zählt.",
     backToTop: "Nach oben",
+    localTime: "Ortszeit in Mitrovica",
   },
   contactForm: {
     nameRequired: "Bitte geben Sie Ihren Namen ein.",
@@ -65,22 +67,26 @@ export const de: Dictionary = {
     workCountOne: "{count} Fallstudie",
     workCountOther: "{count} Fallstudien",
     workAll: "Alle Arbeiten ansehen",
-    servicesIndexLabel: "Disziplinen",
-    servicesShow: "{title} anzeigen",
     servicesIncludes: "Was dazugehört",
     servicesSeenIn: "Zu sehen bei",
     trustedClientsAriaLabel: "Kunden",
     trustedByLabel: "Marken, mit denen wir gearbeitet haben",
-    journalHeadline: "Was sich im Marketing verändert und was das für Sie bedeutet.",
-    journalAll: "Zum Journal",
-    inquiryChipsLabel: "Was brauchen Sie?",
-    inquiryChipsHint: "Wählen Sie alles, was passt. Ihre Auswahl wird in die Anfrage übernommen.",
-    inquiryEmailPrompt: "Lieber per E-Mail?",
+    journalHeadline: "Notizen aus dem Studio.",
+    journalLede:
+      "Kurze Texte darüber, was sich in Werbung, Suche und Social Media verändert, und was das für Ihre Marke bedeutet.",
+    journalAll: "Alle Notizen",
     copyEmail: "E-Mail kopieren",
     copied: "Kopiert",
-    placeholderTag: "Platzhalter",
-    testimonialsPlaceholder:
-      "Vorgeschlagener Bereich. Echte, namentlich zugeordnete Kundenstimmen erscheinen hier, sobald sie in /admin hinterlegt sind. Bis dahin sehen Besucher nichts.",
+    statement:
+      "Wir beginnen mit Zuhören: Ihr Geschäft, Ihr Publikum und wie Erfolg aussehen soll. Dann legen wir die Strategie fest, gestalten und bauen die Marke, die Website und die Inhalte und bringen alles an den Start. Danach bleiben wir dabei, messen, was wirkt, und verbessern es weiter.",
+    stickers: {
+      made: "Made in Kosovo",
+      disciplines: "Branding · Web · Social · Content",
+      languages: "EN · DE · SV",
+    },
+    wordsPrevious: "Vorheriges Zitat",
+    wordsNext: "Nächstes Zitat",
+    wordsDraft: "Entwurf",
   },
   work: {
     eyebrow: "Ausgewählte Arbeiten",
@@ -117,6 +123,7 @@ export const de: Dictionary = {
     outcomes: "Ergebnisse",
     moreProjects: "Weitere Arbeiten",
     viewAll: "Alle Arbeiten",
+    nextProject: "Nächstes Projekt",
   },
   journal: {
     title: "Journal",
@@ -151,7 +158,7 @@ export const de: Dictionary = {
   },
   notFound: {
     errorLabel: "Fehler 404",
-    title: "Diese Seite ist geschmolzen.",
+    title: "Diese Seite gibt es hier nicht.",
     body: "Die gesuchte Seite existiert nicht oder wurde verschoben.",
     backToHome: "Zur Startseite",
     viewOurWork: "Unsere Arbeiten ansehen",
@@ -161,8 +168,6 @@ export const de: Dictionary = {
     skipToContent: "Zum Inhalt springen",
   },
   carousel: {
-    previousTestimonial: "Vorheriges Testimonial",
-    nextTestimonial: "Nächstes Testimonial",
     theTeam: "Das Team",
     previousTeamMembers: "Vorherige Teammitglieder",
     nextTeamMembers: "Nächste Teammitglieder",

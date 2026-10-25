@@ -3,20 +3,20 @@ import { notFound } from "next/navigation";
 import { locale as rootLocale } from "next/root-params";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { hasLocale, locales, ogLocale, type Locale } from "@/i18n/locales";
-import { archivo } from "@/i18n/font";
+import { inter } from "@/i18n/font";
 import { withLocale } from "@/i18n/paths";
 import { siteConfig } from "@/config/site";
 import { organizationJsonLd } from "@/lib/seo";
 import "../globals.css";
-import "./scrollcraft.css";
 
 /**
- * Runs during HTML parsing, before first paint: marks the document as
- * script-capable so Scroll Craft's reveal states may start hidden (see
- * ./scrollcraft.css). If the engine has not mounted after a few seconds
- * (a failed chunk load), the mark is dropped so nothing stays invisible.
+ * Runs during HTML parsing, before first paint: unless the visitor prefers
+ * reduced motion, marks the document as animated so revealable elements may
+ * start hidden (see "Motion start states" in globals.css). If the motion
+ * code has not started after a few seconds (a failed chunk load), the mark
+ * is dropped so nothing stays invisible.
  */
-const SCROLLCRAFT_BOOT = `(function(){var d=document.documentElement;d.classList.add("sc-booting");setTimeout(function(){if(!d.classList.contains("sc-ready"))d.classList.remove("sc-booting")},5000)})();`;
+const MOTION_BOOT = `(function(){var d=document.documentElement;if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("motion");setTimeout(function(){if(!d.classList.contains("motion-ready"))d.classList.remove("motion")},3500)})();`;
 
 /**
  * Root layout for the public marketing site, branched from src/app/admin
@@ -83,14 +83,16 @@ export default async function LocaleRootLayout({ children }: { children: React.R
     // while route changes jump straight to the top (Next 16 no longer does
     // this by default). suppressHydrationWarning: the boot script below
     // adds a class to <html> before React hydrates.
-    <html
-      lang={locale}
-      className={archivo.variable}
-      data-scroll-behavior="smooth"
-      suppressHydrationWarning
-    >
+    <html lang={locale} className={inter.variable} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
-        <script dangerouslySetInnerHTML={{ __html: SCROLLCRAFT_BOOT }} />
+        {/* Executable when the server renders it; inert text when React
+            renders the layout on the client (it has already run), which
+            also keeps React's script-tag warning away. */}
+        <script
+          type={typeof window === "undefined" ? "text/javascript" : "text/plain"}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{ __html: MOTION_BOOT }}
+        />
         {children}
         <script
           type="application/ld+json"

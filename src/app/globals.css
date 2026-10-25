@@ -1,167 +1,151 @@
-/* Layer order is declared before anything else so the vendored Scroll Craft
-   engine (imported into the "scrollcraft" layer by the public site layout)
-   sits above Tailwind's base styles and below its components and
-   utilities: the engine's resets apply, and any utility still wins. */
-@layer theme, base, scrollcraft, components, utilities;
 @import "tailwindcss";
 
 /* ============================================================
-   MTC design system: "Clear ice"
-   Light mode. White and frost grounds, ink type, the logo's blue
-   as the one interface accent, and four discipline hues that each
-   own a region (never confetti).
+   MTC design system: "Keynote"
+   Work presented like product. White and Apple-grey grounds, one
+   deep black chapter, near-black ink, and the logo's blue as the
+   single interface accent. The work supplies every other colour.
+   See docs/redesign/keynote-direction.md.
    ============================================================ */
 
 @theme {
   /* ---- Grounds ---------------------------------------------- */
   --color-canvas: #ffffff;
-  --color-frost: #f4f7fd; /* cool off-white section ground */
-  --color-frost-deep: #e9effa; /* rare, slightly deeper ground */
-  /* Legacy names kept for the admin panel; they now resolve to frost. */
-  --color-paper: #f4f7fd;
-  --color-paper-deep: #e9effa;
+  --color-mist: #f5f5f7;
+  --color-mist-deep: #e8e8ed;
+  /* Names the admin panel still uses; they resolve to the mist ground. */
+  --color-frost: #f5f5f7;
+  --color-frost-deep: #e8e8ed;
+  --color-paper: #f5f5f7;
+  --color-paper-deep: #e8e8ed;
 
-  /* ---- Ink (cool, derived from the brand blue) -------------- */
-  --color-ink: #0b1222;
-  --color-ink-muted: #4a5468;
-  --color-ink-faint: #8790a3;
+  /* ---- Ink --------------------------------------------------- */
+  --color-ink: #1d1d1f;
+  --color-ink-muted: #6e6e73;
+  --color-ink-faint: #86868b;
+  --color-line: #e5e5ea;
+  --color-line-strong: #d2d2d7;
 
-  --color-line: #e3e8f2;
-  --color-line-strong: #cfd7e6;
+  /* ---- Night: the dark chapter ------------------------------ */
+  --color-night: #000000;
+  --color-night-soft: #161617;
+  --color-night-raised: #232326;
+  --color-night-line: #333336;
+  --color-snow: #f5f5f7;
+  --color-snow-muted: #a1a1a6;
+  --color-snow-faint: #6e6e73;
 
-  /* ---- Brand: the logo gradient's two ends ------------------ */
+  /* ---- Accent: the logo's blue ------------------------------- */
   --color-blue: #0b45ff;
   --color-blue-strong: #0034d1;
-  --color-blue-tint: #e8eeff;
+  --color-blue-tint: #eef2ff;
   --color-blue-contrast: #ffffff;
-  --color-sky: #22a0ff;
-
-  /* ---- Discipline hues: one per service, used as regions ---- */
-  --color-amber: #ffb020;
-  --color-amber-ink: #8a5300;
-  --color-amber-tint: #fff5e0;
-  --color-azure: #2563ff;
-  --color-azure-ink: #1d3fbf;
-  --color-azure-tint: #eaf0ff;
-  --color-coral: #ff5a5f;
-  --color-coral-ink: #b3262b;
-  --color-coral-tint: #ffeced;
-  --color-mint: #14b87c;
-  --color-mint-ink: #0b7a52;
-  --color-mint-tint: #e5f8f0;
+  --color-sky: #2997ff;
 
   --color-focus: #0b45ff;
-  --color-danger: #c4362b;
+  --color-danger: #d70015;
 
   /* ---- Typography ------------------------------------------
-     One variable family: Archivo (width 62-125, weight 100-900),
-     self-hosted by next/font as --font-archivo. Display type uses
-     the width axis (expanded); body stays at normal width. The
-     admin panel loads Inter instead, so the fallback chain keeps
-     it unchanged. */
+     Inter (variable, with optical size) from next/font as
+     --font-inter. Display sizes run tight; the optical-size axis
+     follows the font size on its own. */
   --font-sans:
-    var(--font-archivo, var(--font-inter)), ui-sans-serif, system-ui, -apple-system,
-    "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    var(--font-inter), ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
   --font-display: var(--font-sans);
 
-  --text-display-hero: clamp(2.4rem, 1rem + 3.55vw, 4.6rem);
-  --text-display-hero--line-height: 1;
-  --text-display-hero--letter-spacing: -0.038em;
+  --text-display-hero: clamp(2.75rem, 1.52rem + 5.26vw, 6.25rem);
+  --text-display-hero--line-height: 0.98;
+  --text-display-hero--letter-spacing: -0.045em;
+  --text-display-hero--font-weight: 600;
 
-  --text-display-1: clamp(2.5rem, 1.35rem + 4.4vw, 5.5rem);
+  --text-display-1: clamp(2.5rem, 1.53rem + 4.13vw, 5.25rem);
   --text-display-1--line-height: 1;
-  --text-display-1--letter-spacing: -0.038em;
+  --text-display-1--letter-spacing: -0.04em;
+  --text-display-1--font-weight: 600;
 
-  --text-display-2: clamp(2.05rem, 1.3rem + 3vw, 4.1rem);
-  --text-display-2--line-height: 1.03;
-  --text-display-2--letter-spacing: -0.032em;
+  --text-display-2: clamp(2rem, 1.29rem + 3vw, 4rem);
+  --text-display-2--line-height: 1.04;
+  --text-display-2--letter-spacing: -0.035em;
+  --text-display-2--font-weight: 600;
 
-  --text-display-3: clamp(1.6rem, 1.2rem + 1.6vw, 2.55rem);
-  --text-display-3--line-height: 1.08;
-  --text-display-3--letter-spacing: -0.025em;
+  --text-display-3: clamp(1.625rem, 1.32rem + 1.31vw, 2.5rem);
+  --text-display-3--line-height: 1.1;
+  --text-display-3--letter-spacing: -0.028em;
+  --text-display-3--font-weight: 600;
 
-  --text-title: clamp(1.25rem, 1.1rem + 0.65vw, 1.65rem);
+  /* The night chapter's lit paragraph, and client quotes. */
+  --text-statement: clamp(1.75rem, 1.05rem + 2.9vw, 3.75rem);
+  --text-statement--line-height: 1.1;
+  --text-statement--letter-spacing: -0.035em;
+  --text-statement--font-weight: 600;
+
+  --text-quote: clamp(1.75rem, 1.2rem + 2.3vw, 3.5rem);
+  --text-quote--line-height: 1.1;
+  --text-quote--letter-spacing: -0.032em;
+  --text-quote--font-weight: 600;
+
+  --text-title: clamp(1.25rem, 1.075rem + 0.75vw, 1.75rem);
   --text-title--line-height: 1.2;
-  --text-title--letter-spacing: -0.015em;
+  --text-title--letter-spacing: -0.02em;
+  --text-title--font-weight: 600;
 
-  --text-lead: clamp(1.075rem, 1rem + 0.38vw, 1.3rem);
-  --text-lead--line-height: 1.5;
-  --text-lead--letter-spacing: -0.008em;
+  --text-lead: clamp(1.125rem, 1.037rem + 0.38vw, 1.375rem);
+  --text-lead--line-height: 1.45;
+  --text-lead--letter-spacing: -0.015em;
 
-  --text-body: 1rem;
-  --text-body--line-height: 1.62;
+  --text-eyebrow: clamp(0.95rem, 0.9rem + 0.25vw, 1.125rem);
+  --text-eyebrow--line-height: 1.3;
+  --text-eyebrow--letter-spacing: -0.012em;
+  --text-eyebrow--font-weight: 600;
+
+  --text-body: 1.0625rem;
+  --text-body--line-height: 1.55;
+  --text-body--letter-spacing: -0.012em;
 
   --text-meta: 0.875rem;
-  --text-meta--line-height: 1.5;
+  --text-meta--line-height: 1.45;
+  --text-meta--letter-spacing: -0.005em;
 
   --text-label: 0.75rem;
   --text-label--line-height: 1.2;
-  --text-label--letter-spacing: 0.12em;
+  --text-label--letter-spacing: 0.08em;
 
-  /* ---- Radius: one rounded scale held across the site -------- */
-  --radius-xs: 6px;
+  /* ---- Radius ------------------------------------------------ */
+  --radius-xs: 8px;
   --radius-sm: 12px;
-  --radius-md: 20px;
+  --radius-md: 18px;
   --radius-lg: 28px;
+  --radius-xl: 36px;
   --radius-pill: 999px;
 
-  /* ---- Shadow: offset + blur, tinted to the ink hue ---------- */
-  --shadow-subtle: 0 1px 2px rgba(11, 18, 34, 0.05), 0 8px 24px -6px rgba(11, 18, 34, 0.08);
-  --shadow-lift: 0 2px 6px rgba(11, 18, 34, 0.06), 0 22px 48px -14px rgba(11, 18, 34, 0.16);
-  --shadow-float: 0 4px 10px rgba(11, 18, 34, 0.05), 0 34px 80px -24px rgba(11, 30, 90, 0.22);
+  /* ---- Shadow: soft, neutral, offset ------------------------- */
+  --shadow-subtle: 0 1px 2px rgb(0 0 0 / 0.04), 0 6px 20px -8px rgb(0 0 0 / 0.08);
+  --shadow-lift: 0 2px 6px rgb(0 0 0 / 0.05), 0 22px 48px -18px rgb(0 0 0 / 0.18);
+  --shadow-float: 0 4px 12px rgb(0 0 0 / 0.06), 0 30px 80px -24px rgb(0 0 0 / 0.28);
 
   /* ---- Layout ------------------------------------------------ */
-  --container-max: 1440px;
-  --gutter: clamp(1rem, 4.6vw, 5rem);
+  --container-max: 1400px;
+  --gutter: clamp(1rem, 3.2vw, 3rem);
 
-  /* ---- Motion -------------------------------------------------- */
-  --ease-out-soft: cubic-bezier(0.23, 1, 0.32, 1);
-  --ease-in-out-soft: cubic-bezier(0.77, 0, 0.175, 1);
+  /* ---- Motion ------------------------------------------------ */
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
   --duration-fast: 160ms;
   --duration-base: 280ms;
-  --duration-slow: 620ms;
+  --duration-slow: 640ms;
 }
 
 /* ============================================================
-   Scroll Craft tokens. Unlayered on purpose so they win over the
-   engine's own :root defaults (which live in the scrollcraft
-   layer). Six colour roles, two fonts, light-ground elevation.
-   ============================================================ */
-:root {
-  --sc-canvas: #ffffff;
-  --sc-surface: #f4f7fd;
-  --sc-ink: #0b1222;
-  --sc-ink-soft: #4a5468;
-  --sc-accent: #0b45ff;
-  --sc-accent-ink: #ffffff;
-
-  --sc-font-display: var(--font-display);
-  --sc-font-text: var(--font-sans);
-  --sc-font-mono: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-
-  --sc-t-base: 1rem;
-  --sc-gutter: var(--gutter);
-  --sc-maxw: var(--container-max);
-
-  /* A light canvas: halve the elevation alphas and tint toward the ink. */
-  --sc-shadow-color: 222 52% 9%;
-  --sc-e1: 0 1px 2px hsl(var(--sc-shadow-color) / 0.06), 0 2px 6px -1px hsl(var(--sc-shadow-color) / 0.06);
-  --sc-e2: 0 2px 4px hsl(var(--sc-shadow-color) / 0.05), 0 10px 22px -6px hsl(var(--sc-shadow-color) / 0.1);
-  --sc-e3: 0 4px 8px hsl(var(--sc-shadow-color) / 0.05), 0 22px 46px -12px hsl(var(--sc-shadow-color) / 0.14),
-    0 52px 90px -30px hsl(var(--sc-shadow-color) / 0.12);
-  --sc-edge: inset 0 1px 0 rgba(255, 255, 255, 0.75);
-
-  --sc-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-/* ============================================================
-   Base layer
+   Base
    ============================================================ */
 @layer base {
   html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    -webkit-text-size-adjust: 100%;
     scroll-behavior: smooth;
   }
 
@@ -171,18 +155,16 @@
     font-family: var(--font-sans);
     font-size: var(--text-body);
     line-height: var(--text-body--line-height);
+    letter-spacing: var(--text-body--letter-spacing);
+    font-optical-sizing: auto;
   }
 
-  /* Display role: Archivo pushed toward expanded on its width axis.
-     font-variation-settings only names "wdth", so font-weight still
-     drives the weight axis. */
   h1,
   h2,
   h3,
   .font-display {
     font-family: var(--font-display);
-    font-variation-settings: "wdth" 114;
-    font-weight: 650;
+    font-weight: 600;
     text-wrap: balance;
   }
 
@@ -190,7 +172,7 @@
   h5,
   h6 {
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
 
   p {
@@ -224,6 +206,11 @@
     display: block;
     max-width: 100%;
   }
+
+  /* Solar icons carry a 1.5 stroke; <Icon strokeWidth> overrides it. */
+  .icon [stroke-width] {
+    stroke-width: var(--icon-stroke, 1.5);
+  }
 }
 
 /* ============================================================
@@ -237,198 +224,276 @@
     padding-inline: var(--gutter);
   }
 
-  /* Small tracked labels. Width axis pulled slightly wide so caps
-     read evenly at small sizes. */
+  /* Small tracked caps, kept for the admin panel's form labels. */
   .label {
     font-size: var(--text-label);
     line-height: var(--text-label--line-height);
     letter-spacing: var(--text-label--letter-spacing);
     text-transform: uppercase;
     font-weight: 600;
-    font-variation-settings: "wdth" 106;
-  }
-
-  .text-expanded {
-    font-variation-settings: "wdth" 120;
-  }
-
-  .text-condensed {
-    font-variation-settings: "wdth" 88;
   }
 
   .tabular {
     font-variant-numeric: tabular-nums;
   }
-}
 
-/* ============================================================
-   Ice glint: the site's one hover signature. A narrow specular
-   streak crosses a surface once on hover, the way light runs
-   across a cut ice face. Only transform and opacity animate; the
-   element needs `relative overflow-hidden` (or rounded clipping).
-   Hover-capable fine pointers only; inert under reduced motion.
-   ============================================================ */
-@layer components {
-  .ice-glint {
-    isolation: isolate;
+  /* Rounded media frame: a hairline rim so white artwork keeps its edge
+     on white and mist grounds. */
+  .media-rim {
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.06);
   }
-  .ice-glint::after {
-    content: "";
-    position: absolute;
-    inset: -2px;
-    z-index: 3;
-    pointer-events: none;
-    background: linear-gradient(
-      105deg,
-      transparent 38%,
-      rgba(255, 255, 255, 0.05) 42%,
-      rgba(255, 255, 255, 0.55) 48%,
-      rgba(214, 233, 255, 0.35) 51%,
-      rgba(255, 255, 255, 0.05) 56%,
-      transparent 60%
-    );
-    transform: translate3d(-110%, 0, 0);
-    opacity: 0;
-  }
-  /* `.glint-group` lets a whole card trigger the glint on its media. */
-  @media (hover: hover) and (pointer: fine) {
-    .ice-glint:hover::after,
-    .glint-group:hover .ice-glint::after,
-    .glint-group:focus-visible .ice-glint::after {
-      opacity: 1;
-      transform: translate3d(110%, 0, 0);
-      transition:
-        transform 900ms var(--ease-out-soft),
-        opacity 200ms linear;
-    }
+  .media-rim-dark {
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.08);
   }
 
-  /* Reveal variants for the engine's flow device (see Reveal.tsx).
-     This layer sits above the engine's, so the settled state is
-     restated here too. */
-  [data-sc-in][data-reveal="fade"] {
-    transform: none;
+  /* Frosted chrome (navigation only). */
+  .glass {
+    background-color: rgb(255 255 255 / 0.72);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
   }
-  [data-sc-in][data-reveal="image"] {
-    transform: scale(1.03);
-    transform-origin: 50% 65%;
-    transition:
-      opacity 700ms var(--ease-out-soft),
-      transform 1100ms var(--ease-out-soft);
-  }
-  [data-sc-in][data-reveal="image"].sc-in {
-    transform: none;
-  }
-  @media (prefers-reduced-motion: reduce) {
-    [data-sc-in][data-reveal="image"] {
-      transform: none;
-    }
-  }
-
-  /* Reduced motion: the work reel stops being a scroll-driven pan and
-     becomes an ordinary horizontal scroller in normal flow, so every
-     project stays reachable without movement or a tall empty act. */
-  @media (prefers-reduced-motion: reduce) {
-    .work-reel {
-      height: auto !important;
-    }
-    .work-reel > [data-sc-stage] {
-      position: relative;
-      height: auto;
-      overflow-x: auto;
-      padding-block: 5rem 4rem;
-      scroll-snap-type: x proximity;
-    }
-    .work-reel [data-sc-pan] {
-      transform: none !important;
-    }
-    .work-reel [data-rail-item] {
-      scroll-snap-align: start;
-    }
-  }
-
-  /* The ice cube's canvas and poster fade out toward their edges, so the
-     render blends into whatever ground sits behind it. */
-  .ice-mask {
-    -webkit-mask-image: radial-gradient(closest-side, #000 86%, transparent 100%);
-    mask-image: radial-gradient(closest-side, #000 86%, transparent 100%);
-  }
-
-  /* Per-face cube posters (no WebGL, save-data, first paint): only the
-     still for the services act's current face is shown. */
-  .ice-posters--indexed > [data-poster-index] {
-    opacity: 0;
-    transition: opacity 420ms var(--ease-out-soft);
-  }
-  [data-facet="0"] .ice-posters--indexed > [data-poster-index="0"],
-  [data-facet="1"] .ice-posters--indexed > [data-poster-index="1"],
-  [data-facet="2"] .ice-posters--indexed > [data-poster-index="2"],
-  [data-facet="3"] .ice-posters--indexed > [data-poster-index="3"],
-  [data-facet="4"] .ice-posters--indexed > [data-poster-index="4"],
-  [data-facet="5"] .ice-posters--indexed > [data-poster-index="5"] {
-    opacity: 1;
-  }
-
-  /* Frost edge: a 1px icy rim plus a soft top highlight, used on
-     framed media and raised panels. */
-  .frost-edge {
-    box-shadow:
-      inset 0 0 0 1px rgba(203, 216, 240, 0.65),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  .glass-dark {
+    background-color: rgb(22 22 23 / 0.78);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    backdrop-filter: saturate(180%) blur(20px);
   }
 }
 
 /* ============================================================
-   Hero entrance: pure CSS so the headline paints on first frame
-   without waiting for JavaScript (it is the largest contentful
-   element). The global reduced-motion rule below collapses it.
+   Motion start states.
+   An inline script in the root layout puts `.motion` on <html>
+   before first paint, unless the visitor prefers reduced motion.
+   Only then do revealable elements start hidden; GSAP (see
+   MotionRoot) brings them in and marks them `.is-in`. If the
+   scripts never arrive, the class is dropped after a few seconds,
+   so nothing can stay hidden. Without JavaScript, or with reduced
+   motion, every element renders in its final state.
    ============================================================ */
-@keyframes rise-in {
+.motion [data-reveal="up"]:not(.is-in) {
+  opacity: 0;
+  transform: translate3d(0, 32px, 0);
+}
+.motion [data-reveal="fade"]:not(.is-in) {
+  opacity: 0;
+}
+.motion [data-reveal="stagger"]:not(.is-in) > * {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+}
+.motion [data-split]:not(.is-in) .split-word > span {
+  transform: translate3d(0, 105%, 0);
+}
+.motion [data-reveal="media"]:not(.is-in) {
+  clip-path: inset(6% 5% 0% 5% round 36px);
+}
+
+.motion [data-hero-fade]:not(.is-in) {
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+}
+.motion [data-hero-title]:not(.is-in) .hero-char {
+  opacity: 0;
+  transform: translate3d(0, 0.3em, 0);
+}
+.motion [data-hero-stickers]:not(.is-in) .sticker-pop {
+  opacity: 0;
+  transform: scale(0.4) rotate(-16deg);
+}
+
+/* The night chapter's ground widens to the full page as it rises, and
+   its paragraph lights up word by word (MotionRoot: "sheet", "ink"). */
+.motion [data-reveal="sheet"]:not(.is-in) {
+  transform: scaleX(0.95);
+}
+.motion [data-reveal="ink"]:not(.is-in) .ink-word {
+  opacity: 0.16;
+}
+
+/* ============================================================
+   Hero (Hero.tsx). The headline is heavy capitals, one box per
+   letter so each letter's weight can follow the pointer. From
+   768px its lines stay whole; below that the words wrap. The
+   script fits the size to the column; these sizes are the first
+   frame without it.
+   ============================================================ */
+.hero-title {
+  font-size: 12.4vw;
+  font-weight: 900;
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+  text-transform: uppercase;
+}
+.hero-word {
+  display: inline-block;
+  white-space: nowrap;
+}
+.hero-char {
+  display: inline-block;
+}
+@media (min-width: 768px) {
+  .hero-title {
+    font-size: clamp(3rem, 6.5vw, 9rem);
+  }
+  .hero-line {
+    display: block;
+    width: max-content;
+    margin-inline: auto;
+    white-space: nowrap;
+  }
+}
+
+/* Stickers: the outer box moves when dragged, the middle one pops in
+   and leans, the face is tilted and answers the hover. */
+.sticker {
+  position: absolute;
+  z-index: 2;
+  pointer-events: auto;
+  user-select: none;
+}
+.sticker-face {
+  transform: rotate(var(--rot));
+  transition: transform 450ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .sticker {
+    cursor: grab;
+  }
+  .sticker:hover .sticker-face {
+    transform: rotate(calc(var(--rot) * -0.6)) scale(1.08);
+  }
+  .sticker.is-held {
+    cursor: grabbing;
+  }
+  .sticker.is-held .sticker-face {
+    transform: rotate(var(--rot)) scale(1.1);
+    transition-duration: 250ms;
+  }
+}
+
+/* ============================================================
+   Glass squares (GlassSquares.tsx). The live scene draws on its
+   own canvas; the still of it shows only where the scene cannot
+   run: reduced motion, no script, no WebGL.
+   ============================================================ */
+.glass-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.motion .glass-poster {
+  display: none;
+}
+.motion .glass-host[data-state="failed"] .glass-poster {
+  display: block;
+}
+
+/* ============================================================
+   Client words (ClientWords.tsx): a quote's words go from grey to
+   ink one after another when it comes up.
+   ============================================================ */
+.is-active .quote-word {
+  animation: quote-word 700ms var(--ease-out-soft) both;
+  animation-delay: calc(var(--n) * 55ms);
+}
+@keyframes quote-word {
   from {
-    opacity: 0;
-    transform: translate3d(0, 18px, 0);
+    opacity: 0.14;
   }
   to {
     opacity: 1;
-    transform: none;
   }
 }
+@media (prefers-reduced-motion: reduce) {
+  .is-active .quote-word {
+    animation: none;
+  }
+}
+
+/* ============================================================
+   Journal rows (JournalTeaser.tsx): on hover a line in the four
+   discipline colours draws itself under the row, the title steps
+   in and the arrow fills.
+   ============================================================ */
+.note-row::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, #ff5b47, #ffb21e, #12b886, #1764ff);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 320ms var(--ease-out-soft);
+}
+.note-title {
+  transition: transform 220ms var(--ease-out-soft);
+}
+.note-go {
+  transition:
+    background-color 200ms var(--ease-out-soft),
+    color 200ms var(--ease-out-soft);
+}
+.note-row:focus-visible::after {
+  transform: scaleX(1);
+}
+@media (hover: hover) and (pointer: fine) {
+  .note-row:hover::after {
+    transform: scaleX(1);
+  }
+  .note-row:hover .note-title {
+    transform: translateX(6px);
+  }
+  .note-row:hover .note-go {
+    background-color: var(--color-ink);
+    color: #ffffff;
+  }
+}
+
+/* Split headings: each word sits in a clipping box with a little room
+   for descenders; the inner span is what rises. */
+.split-word {
+  display: inline-block;
+  overflow: clip;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+  vertical-align: top;
+}
+.split-word > span {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* ============================================================
+   Keyframes
+   ============================================================ */
 /* Route entrance. Ends on `transform: none` so the page wrapper never
-   becomes a containing block for fixed descendants once it has settled. */
+   becomes a containing block for fixed descendants once settled. */
 @keyframes page-in {
   from {
     opacity: 0;
-    transform: translate3d(0, 8px, 0);
+    transform: translate3d(0, 10px, 0);
   }
   to {
     opacity: 1;
     transform: none;
   }
 }
-@keyframes fade-in {
+@keyframes marquee {
   from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-@keyframes float-y {
-  0%,
-  100% {
     transform: translate3d(0, 0, 0);
   }
-  50% {
-    transform: translate3d(0, -10px, 0);
+  to {
+    transform: translate3d(-50%, 0, 0);
   }
 }
-@keyframes mist-drift {
-  0%,
-  100% {
-    transform: translate3d(-2%, 0, 0) scale(1);
+@keyframes story-fill {
+  from {
+    transform: scaleX(0);
   }
-  50% {
-    transform: translate3d(2%, -1.5%, 0) scale(1.04);
+  to {
+    transform: scaleX(1);
   }
 }
 
@@ -480,9 +545,8 @@
 }
 
 /* ============================================================
-   Reduced motion: honour the OS setting globally. Opacity still
-   carries meaning (Scroll Craft cues fade); every position change
-   is dropped.
+   Reduced motion: honour the OS setting globally. Nothing moves;
+   state changes are instant.
    ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   html {

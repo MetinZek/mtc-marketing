@@ -141,34 +141,34 @@ export function WorkList({
                   "group/row grid grid-cols-12 items-center gap-x-4 border-t border-line py-6 sm:gap-x-6 lg:py-9",
                   "transition-opacity duration-[var(--duration-base)] ease-[var(--ease-out-soft)]",
                   "group-hover/list:opacity-30 hover:opacity-100! focus-visible:opacity-100!",
-                  "focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus",
+                  "focus-visible:outline-offset-4",
                 )}
               >
-                <span className="label col-span-2 self-start pt-2 text-ink-faint transition-colors duration-[var(--duration-base)] group-hover/row:text-blue sm:col-span-1 lg:pt-4">
+                <span className="col-span-2 self-start pt-2 text-[0.9375rem] font-medium tabular text-ink-faint transition-colors duration-[var(--duration-base)] group-hover/row:text-ink sm:col-span-1 lg:pt-4">
                   {pad(number)}
                 </span>
 
                 <span className="col-span-10 sm:col-span-7 lg:col-span-7">
-                  <h2 className="text-display-2 text-ink transition-[color,transform] duration-[var(--duration-slow)] ease-[var(--ease-out-soft)] group-hover/row:translate-x-3 group-hover/row:text-blue lg:group-hover/row:translate-x-5">
+                  <h2 className="text-display-2 text-ink transition-[color,transform] duration-[var(--duration-slow)] ease-[var(--ease-out-soft)] group-hover/row:translate-x-3 lg:group-hover/row:translate-x-5">
                     {project.title}
                   </h2>
-                  <span className="label mt-3 block text-ink-muted sm:hidden">
+                  <span className="mt-2 block text-[0.9375rem] text-ink-muted sm:hidden">
                     {project.category} &middot; {project.year}
                   </span>
                 </span>
 
-                <span className="label hidden text-ink-muted sm:col-span-3 sm:block">
+                <span className="hidden text-[0.9375rem] text-ink-muted sm:col-span-3 sm:block">
                   {project.category}
                 </span>
 
                 <span className="hidden items-center justify-end gap-3 sm:col-span-1 sm:flex">
-                  <span className="label text-ink-faint">{project.year}</span>
+                  <span className="text-[0.9375rem] tabular text-ink-faint">{project.year}</span>
                 </span>
 
                 {/* Touch devices: no hover, so the cover sits inline. */}
                 <span className="col-span-10 col-start-3 mt-5 block sm:col-span-7 sm:col-start-2 [@media(hover:hover)_and_(pointer:fine)]:hidden">
                   <span
-                    className="frost-edge relative block overflow-hidden rounded-lg bg-frost"
+                    className="media-rim relative block overflow-hidden rounded-[20px] bg-mist"
                     style={{ aspectRatio: `${w} / ${h}` }}
                     {...(hasCoverVideo(project) ? VIDEO_BOX : {})}
                   >
@@ -213,7 +213,7 @@ export function WorkList({
               <div
                 key={project.id}
                 className={cn(
-                  "absolute left-10 top-0 w-[clamp(15rem,24vw,24rem)] -translate-y-1/2 overflow-hidden rounded-lg bg-frost shadow-float",
+                  "absolute left-10 top-0 w-[clamp(15rem,24vw,24rem)] -translate-y-1/2 overflow-hidden rounded-[22px] bg-mist shadow-float",
                   "transition-[opacity,scale] duration-[var(--duration-base)] ease-[var(--ease-out-soft)]",
                   isActive ? "scale-100 opacity-100" : "scale-75 opacity-0",
                 )}

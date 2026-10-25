@@ -1,31 +1,19 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Button } from "@/components/ui/Button";
-import { Label } from "@/components/ui/Label";
+import { Icon } from "@/components/ui/Icon";
 import type { TeamMember } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
+import { cn } from "@/lib/utils";
 
 const GAP = 16; // px, matches gap-4 on the track
 
-function initials(name: string) {
-  return name
-    .trim()
-    .split(/\s+/)
-    .map((word) => word.charAt(0))
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
-
 /**
- * Team as a horizontal carousel built from the homepage Services card
- * language — the same #f9f9f9 surface, soft neumorphic lift, rounded-md
- * corners, compact proportions and small type. Native CSS scroll-snap
- * does the sliding (so touch swipe works for free); the arrows step one
- * card at a time and disable at the ends, and only appear when the
- * track actually overflows. One fade-in comes from the parent
- * <Reveal>; there is no per-card scroll animation.
+ * The team as a horizontal row of mist cards. Native CSS scroll-snap does
+ * the sliding (so touch swipe works for free); the arrows step one card at
+ * a time, disable at the ends, and only appear when the row overflows.
+ * A card shows a portrait only when the CMS has a real photo; without one
+ * it is a name card, never initials or a drawn stand-in.
  */
 export function TeamCarousel({ members, dict }: { members: TeamMember[]; dict: Dictionary }) {
   const trackRef = useRef<HTMLDivElement>(null);
@@ -43,12 +31,13 @@ export function TeamCarousel({ members, dict }: { members: TeamMember[]; dict: D
   }, []);
 
   useEffect(() => {
-    sync();
     const el = trackRef.current;
     if (!el) return;
+    const frame = requestAnimationFrame(sync);
     el.addEventListener("scroll", sync, { passive: true });
     window.addEventListener("resize", sync);
     return () => {
+      cancelAnimationFrame(frame);
       el.removeEventListener("scroll", sync);
       window.removeEventListener("resize", sync);
     };
@@ -63,68 +52,53 @@ export function TeamCarousel({ members, dict }: { members: TeamMember[]; dict: D
     el.scrollBy({ left: direction * distance, behavior: reduce ? "auto" : "smooth" });
   };
 
+  const arrow = "flex size-10 items-center justify-center rounded-full bg-mist text-ink transition-colors hover:bg-mist-deep disabled:opacity-35";
+
   return (
     <div>
       <div className="flex items-end justify-between gap-4">
-        <Label tone="blue">{dict.carousel.theTeam}</Label>
+        <h2 className="text-display-2 text-ink">{dict.carousel.theTeam}</h2>
 
         {overflowing && (
           <div className="flex gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              className="w-9 shrink-0 px-0 text-[0.95rem]"
-              onClick={() => step(-1)}
-              disabled={atStart}
-              aria-label={dict.carousel.previousTeamMembers}
-            >
-              <span aria-hidden="true">&larr;</span>
-            </Button>
-            <Button
-              variant="secondary"
-              size="sm"
-              className="w-9 shrink-0 px-0 text-[0.95rem]"
-              onClick={() => step(1)}
-              disabled={atEnd}
-              aria-label={dict.carousel.nextTeamMembers}
-            >
-              <span aria-hidden="true">&rarr;</span>
-            </Button>
+            <button type="button" className={arrow} onClick={() => step(-1)} disabled={atStart} aria-label={dict.carousel.previousTeamMembers}>
+              <Icon name="chevron-left" strokeWidth={2} />
+            </button>
+            <button type="button" className={arrow} onClick={() => step(1)} disabled={atEnd} aria-label={dict.carousel.nextTeamMembers}>
+              <Icon name="chevron-right" strokeWidth={2} />
+            </button>
           </div>
         )}
       </div>
 
       <div
         ref={trackRef}
-        className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto py-3 [scrollbar-width:none] lg:mt-10 [&::-webkit-scrollbar]:hidden"
+        className="mt-8 flex snap-x snap-mandatory gap-4 overflow-x-auto pb-2 [scrollbar-width:none] lg:mt-10 [&::-webkit-scrollbar]:hidden"
       >
         {members.map((member) => (
           <figure
             key={member.id}
             data-team-card
-            className="group relative flex h-80 w-64 shrink-0 snap-start flex-col overflow-hidden rounded-md bg-[#f9f9f9] p-4 shadow-[-5px_-5px_12px_rgba(255,255,255,0.85),5px_5px_14px_rgba(23,25,30,0.06)] sm:w-[17rem]"
+            className={cn(
+              "group relative flex w-64 shrink-0 snap-start flex-col overflow-hidden rounded-[28px] bg-mist p-3 sm:w-72",
+              member.portrait ? "h-96" : "min-h-56",
+            )}
           >
-            <div className="relative flex-1 overflow-hidden rounded-sm bg-paper">
-              {member.portrait ? (
-                // eslint-disable-next-line @next/next/no-img-element -- CMS-driven placeholder asset, not a static import
+            {member.portrait && (
+              <div className="relative flex-1 overflow-hidden rounded-[20px] bg-mist-deep">
+                {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven portrait */}
                 <img
                   src={member.portrait.src}
                   alt={member.portrait.alt}
                   loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-[var(--duration-slow)] ease-[var(--ease-out-soft)] group-hover:scale-[1.03]"
+                  className="absolute inset-0 h-full w-full object-cover object-center transition-transform duration-[900ms] ease-[var(--ease-out-soft)] group-hover:scale-[1.03]"
                 />
-              ) : (
-                <span className="label absolute inset-0 flex items-center justify-center text-ink-faint">
-                  {initials(member.name)}
-                </span>
-              )}
-            </div>
-
-            <figcaption className="mt-3 shrink-0">
-              <h3 className="text-[0.9375rem] font-semibold leading-snug text-ink transition-colors duration-[var(--duration-base)] group-hover:text-blue">
-                {member.name}
-              </h3>
-              <p className="label mt-1 text-ink-muted">{member.role}</p>
+              </div>
+            )}
+            <figcaption className={cn("shrink-0 px-2 pb-2", member.portrait ? "pt-4" : "mt-auto pt-10")}>
+              <h3 className="text-[1.0625rem] font-semibold tracking-[-0.015em] text-ink">{member.name}</h3>
+              <p className="mt-0.5 text-meta text-ink-muted">{member.role}</p>
+              {!member.portrait && member.bio && <p className="mt-3 text-meta text-ink-muted">{member.bio}</p>}
             </figcaption>
           </figure>
         ))}

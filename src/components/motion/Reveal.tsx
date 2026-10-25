@@ -1,23 +1,19 @@
 import { type CSSProperties, type ElementType, type ReactNode } from "react";
 
-export type RevealVariant = "up" | "fade" | "image";
+export type RevealVariant = "up" | "fade" | "stagger" | "media";
 
 /**
- * Scroll-into-view reveal, driven by the Scroll Craft engine's flow device
- * (`data-sc-in`): fires once when the element enters the viewport, a 14px
- * rise and fade over 620ms on the engine's ease-out. `variant` adjusts the
- * entrance (see the `[data-reveal]` rules in globals.css); `stagger` reveals
- * direct children one after another, in milliseconds. Renders on the server
- * with no client JavaScript of its own: the engine (mounted by
- * ScrollCraftRoot) adds the `sc-in` class. Reduced motion keeps the fade and
- * drops the movement.
+ * Marks content for MotionRoot's scroll choreography (see its notes for
+ * what each variant does). Renders on the server with no client
+ * JavaScript of its own; without JavaScript or with reduced motion the
+ * content simply shows.
  */
 export function Reveal({
   children,
   as: Tag = "div",
   variant = "up",
   className,
-  delay = 0,
+  delay,
   stagger,
   id,
   style,
@@ -26,25 +22,21 @@ export function Reveal({
   as?: ElementType;
   variant?: RevealVariant;
   className?: string;
-  /** Seconds before this element's own entrance starts. */
+  /** Seconds before a one-shot reveal starts. */
   delay?: number;
-  /** Milliseconds between direct children's entrances. */
+  /** Seconds between children for `variant="stagger"`. */
   stagger?: number;
   id?: string;
   style?: CSSProperties;
-  /** @deprecated framer-motion era props, accepted and ignored until every call site moves to `variant`. */
-  variants?: unknown;
-  amount?: number;
-  once?: boolean;
 }) {
   return (
     <Tag
       id={id}
       className={className}
-      data-sc-in=""
-      data-reveal={variant === "up" ? undefined : variant}
-      data-sc-stagger={stagger}
-      style={delay ? { transitionDelay: `${delay}s`, ...style } : style}
+      style={style}
+      data-reveal={variant}
+      data-delay={delay || undefined}
+      data-stagger={stagger || undefined}
     >
       {children}
     </Tag>

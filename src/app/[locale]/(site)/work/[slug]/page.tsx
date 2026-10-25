@@ -4,7 +4,7 @@ import { ProjectDetail } from "@/components/sections/ProjectDetail";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 import { cms } from "@/lib/cms";
-import { getHomepage, getProjectBySlug, getProjects } from "@/lib/cms/localized";
+import { getProjectBySlug, getProjects } from "@/lib/cms/localized";
 import { buildMetadata } from "@/lib/seo";
 
 type Params = { params: Promise<{ slug: string }> };
@@ -43,17 +43,12 @@ export async function generateMetadata({ params }: Params): Promise<Metadata> {
  * /work/[slug] — dynamic case-study page. Everything on it comes from
  * the CMS project record (`getProjectBySlug`, locale-aware); slugs come
  * straight from `project.slug`, so every project the homepage and /work
- * index link to resolves here. Unknown slugs 404. The closing CTA reuses
- * the homepage's own FinalCta copy so it stays identical site-wide.
+ * index link to resolves here. Unknown slugs 404. The next project leads
+ * on, and the footer's sign-off closes the page.
  */
 export default async function ProjectPage({ params }: Params) {
   const { slug } = await params;
-  const [projects, home, dict, locale] = await Promise.all([
-    getProjects(),
-    getHomepage(),
-    getDictionary(),
-    getLocale(),
-  ]);
+  const [projects, dict, locale] = await Promise.all([getProjects(), getDictionary(), getLocale()]);
 
   const index = projects.findIndex((project) => project.slug === slug);
   const project = index >= 0 ? projects[index] : undefined;
@@ -73,12 +68,6 @@ export default async function ProjectPage({ params }: Params) {
   }));
 
   return (
-    <ProjectDetail
-      project={project}
-      moreProjects={moreProjects}
-      cta={home.finalCta}
-      dict={dict}
-      locale={locale}
-    />
+    <ProjectDetail project={project} moreProjects={moreProjects} dict={dict} locale={locale} />
   );
 }

@@ -20,9 +20,10 @@ export const sv: Dictionary = {
     journal: "Journal",
     contact: "Kontakt",
     startAProject: "Starta ett projekt",
-    openMenu: "Öppna menyn",
     closeMenu: "Stäng menyn",
     languageSwitcherAriaLabel: "Språk",
+    menu: "Meny",
+    dockAriaLabel: "Snabbnavigering",
   },
   footer: {
     contactHeading: "Kontakt",
@@ -36,6 +37,7 @@ export const sv: Dictionary = {
     allRightsReserved: "Alla rättigheter förbehållna.",
     signOff: "Låt oss skapa något som spelar roll.",
     backToTop: "Till toppen",
+    localTime: "Lokal tid i Mitrovica",
   },
   contactForm: {
     nameRequired: "Ange ditt namn.",
@@ -64,22 +66,26 @@ export const sv: Dictionary = {
     workCountOne: "{count} fallstudie",
     workCountOther: "{count} fallstudier",
     workAll: "Se alla arbeten",
-    servicesIndexLabel: "Discipliner",
-    servicesShow: "Visa {title}",
     servicesIncludes: "Det här ingår",
     servicesSeenIn: "Syns i",
     trustedClientsAriaLabel: "Kunder",
     trustedByLabel: "Varumärken vi har arbetat med",
-    journalHeadline: "Vad som förändras inom marknadsföring, och vad det betyder för dig.",
-    journalAll: "Läs journalen",
-    inquiryChipsLabel: "Vad behöver du?",
-    inquiryChipsHint: "Välj allt som passar. Ditt val följer med till förfrågan.",
-    inquiryEmailPrompt: "Hellre e-post?",
+    journalHeadline: "Anteckningar från studion.",
+    journalLede:
+      "Korta texter om vad som förändras inom reklam, sök och sociala medier, och vad det betyder för ditt varumärke.",
+    journalAll: "Alla anteckningar",
     copyEmail: "Kopiera e-post",
     copied: "Kopierad",
-    placeholderTag: "Platshållare",
-    testimonialsPlaceholder:
-      "Föreslagen sektion. Riktiga kundcitat med namn visas här när de har lagts in i /admin. Tills dess ser besökare ingenting.",
+    statement:
+      "Vi börjar med att lyssna: på ditt företag, din publik och hur framgång ska se ut. Sedan sätter vi strategin, formger och bygger varumärket, webbplatsen och innehållet och lanserar det. Efter lanseringen stannar vi kvar, mäter vad som fungerar och fortsätter att förbättra det.",
+    stickers: {
+      made: "Made in Kosovo",
+      disciplines: "Varumärke · Webb · Socialt · Innehåll",
+      languages: "EN · DE · SV",
+    },
+    wordsPrevious: "Föregående citat",
+    wordsNext: "Nästa citat",
+    wordsDraft: "Utkast",
   },
   work: {
     eyebrow: "Utvalda arbeten",
@@ -116,6 +122,7 @@ export const sv: Dictionary = {
     outcomes: "Resultat",
     moreProjects: "Fler arbeten",
     viewAll: "Alla arbeten",
+    nextProject: "Nästa projekt",
   },
   journal: {
     title: "Journal",
@@ -150,7 +157,7 @@ export const sv: Dictionary = {
   },
   notFound: {
     errorLabel: "Fel 404",
-    title: "Den här sidan har smält bort.",
+    title: "Den här sidan finns inte här.",
     body: "Sidan du letade efter finns inte eller har flyttats.",
     backToHome: "Till startsidan",
     viewOurWork: "Se våra arbeten",
@@ -160,8 +167,6 @@ export const sv: Dictionary = {
     skipToContent: "Hoppa till innehållet",
   },
   carousel: {
-    previousTestimonial: "Föregående omdöme",
-    nextTestimonial: "Nästa omdöme",
     theTeam: "Teamet",
     previousTeamMembers: "Föregående teammedlemmar",
     nextTeamMembers: "Nästa teammedlemmar",

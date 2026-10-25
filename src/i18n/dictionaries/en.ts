@@ -26,9 +26,10 @@ export const en = {
     journal: "Journal",
     contact: "Contact",
     startAProject: "Start a project",
-    openMenu: "Open menu",
     closeMenu: "Close menu",
     languageSwitcherAriaLabel: "Language",
+    menu: "Menu",
+    dockAriaLabel: "Quick navigation",
   },
   footer: {
     contactHeading: "Contact",
@@ -42,6 +43,7 @@ export const en = {
     allRightsReserved: "All rights reserved.",
     signOff: "Let’s create something that matters.",
     backToTop: "Back to top",
+    localTime: "Local time in Mitrovica",
   },
   contactForm: {
     nameRequired: "Please enter your name.",
@@ -70,22 +72,26 @@ export const en = {
     workCountOne: "{count} case study",
     workCountOther: "{count} case studies",
     workAll: "See all work",
-    servicesIndexLabel: "Disciplines",
-    servicesShow: "Show {title}",
     servicesIncludes: "What’s included",
     servicesSeenIn: "Seen in",
     trustedClientsAriaLabel: "Clients",
     trustedByLabel: "Brands we’ve worked with",
-    journalHeadline: "What’s changing in marketing, and what it means for you.",
-    journalAll: "Read the journal",
-    inquiryChipsLabel: "What do you need?",
-    inquiryChipsHint: "Pick any that apply. Your choice is carried into the brief.",
-    inquiryEmailPrompt: "Prefer email?",
+    journalHeadline: "Notes from the studio.",
+    journalLede:
+      "Short reads on what is changing in advertising, search and social, and what it means for your brand.",
+    journalAll: "All notes",
     copyEmail: "Copy email",
     copied: "Copied",
-    placeholderTag: "Placeholder",
-    testimonialsPlaceholder:
-      "Proposed section. Real, attributed client quotes appear here once they are added in /admin. Visitors see nothing until then.",
+    statement:
+      "We start by listening to your business, your audience and what success should look like. Then we set the strategy, design and build the brand, the website and the content, and launch it. After launch we stay on, measure what works and keep improving it.",
+    stickers: {
+      made: "Made in Kosovo",
+      disciplines: "Branding · Web · Social · Content",
+      languages: "EN · DE · SV",
+    },
+    wordsPrevious: "Previous quote",
+    wordsNext: "Next quote",
+    wordsDraft: "Draft",
   },
   work: {
     eyebrow: "Selected work",
@@ -122,6 +128,7 @@ export const en = {
     outcomes: "Outcomes",
     moreProjects: "More work",
     viewAll: "All work",
+    nextProject: "Next project",
   },
   journal: {
     title: "Journal",
@@ -156,7 +163,7 @@ export const en = {
   },
   notFound: {
     errorLabel: "Error 404",
-    title: "This page melted away.",
+    title: "This page isn’t here.",
     body: "The page you were looking for doesn’t exist or has moved.",
     backToHome: "Back to home",
     viewOurWork: "See our work",
@@ -166,8 +173,6 @@ export const en = {
     skipToContent: "Skip to content",
   },
   carousel: {
-    previousTestimonial: "Previous testimonial",
-    nextTestimonial: "Next testimonial",
     theTeam: "The team",
     previousTeamMembers: "Previous team members",
     nextTeamMembers: "Next team members",

@@ -45,21 +45,20 @@ function rhythm(sections: CaseStudySection[]): Row[] {
 
 /**
  * The project's images below the case-study header, each at its own
- * proportions (never cropped or stretched), on frost frames with rounded
- * corners. Optional descriptions sit under their image. Images settle in
- * as they reach the screen.
+ * proportions (never cropped or stretched) in large rounded frames that
+ * unveil as they scroll in. Optional descriptions sit under their image.
  */
 export function CaseStudySections({ sections, title }: { sections: CaseStudySection[]; title: string }) {
   if (sections.length === 0) return null;
 
   return (
-    <section aria-label={title} className="bg-canvas pb-20 sm:pb-28">
-      <div className="container-mtc flex flex-col gap-4 sm:gap-6">
+    <section aria-label={title} className="pb-20 sm:pb-28">
+      <div className="container-mtc flex flex-col gap-3 sm:gap-5">
         {rhythm(sections).map((row) =>
           row.kind === "full" ? (
             <CaseStudyItem key={row.items[0].id} section={row.items[0]} projectTitle={title} />
           ) : (
-            <div key={row.items[0].id} className="grid gap-4 sm:grid-cols-2 sm:gap-6">
+            <div key={row.items[0].id} className="grid gap-3 sm:grid-cols-2 sm:gap-5">
               {row.items.map((section) => (
                 <CaseStudyItem key={section.id} section={section} projectTitle={title} />
               ))}
@@ -78,16 +77,18 @@ function CaseStudyItem({ section, projectTitle }: { section: CaseStudySection; p
 
   return (
     <figure className={cn(ratio !== undefined && ratio < 0.95 && "mx-auto w-full max-w-2xl")}>
-      <Reveal variant="image" className="frost-edge overflow-hidden rounded-lg bg-frost">
-        {/* eslint-disable-next-line @next/next/no-img-element -- CMS-uploaded image, not a static import */}
-        <img
-          src={image.src}
-          alt={image.alt || projectTitle}
-          width={image.width}
-          height={image.height}
-          loading="lazy"
-          className="block h-auto w-full"
-        />
+      <Reveal variant="media" className="media-rim overflow-hidden rounded-[22px] bg-mist sm:rounded-[28px]">
+        <div data-zoom>
+          {/* eslint-disable-next-line @next/next/no-img-element -- CMS-uploaded image, not a static import */}
+          <img
+            src={image.src}
+            alt={image.alt || projectTitle}
+            width={image.width}
+            height={image.height}
+            loading="lazy"
+            className="block h-auto w-full"
+          />
+        </div>
       </Reveal>
 
       {text.length > 0 && (

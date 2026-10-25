@@ -1,36 +1,34 @@
 import Link from "next/link";
-import {
-  type AnchorHTMLAttributes,
-  type ButtonHTMLAttributes,
-  type ReactNode,
-} from "react";
+import { type AnchorHTMLAttributes, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { Icon } from "./Icon";
 
-type Variant = "primary" | "secondary" | "ghost";
+type Variant = "primary" | "secondary" | "light" | "glass" | "ghost";
 type Size = "sm" | "md" | "lg";
 
 const base =
-  "group/button relative inline-flex select-none items-center justify-center gap-2 overflow-hidden rounded-pill font-semibold tracking-[-0.01em] " +
-  "transition-[color,background-color,border-color,box-shadow,transform] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] " +
+  "group/button relative inline-flex select-none items-center justify-center gap-2 rounded-pill font-medium tracking-[-0.012em] " +
+  "transition-[color,background-color,box-shadow,transform] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)] " +
   "focus-visible:outline-2 focus-visible:outline-offset-3 focus-visible:outline-focus " +
-  "disabled:pointer-events-none disabled:opacity-45 active:scale-[0.97]";
+  "disabled:pointer-events-none disabled:opacity-40 active:scale-[0.97]";
 
 const variants: Record<Variant, string> = {
-  // The logo's electric blue, with a lit top edge and the ice glint.
-  primary:
-    "ice-glint bg-blue text-blue-contrast shadow-[inset_0_1px_0_rgba(255,255,255,0.28),0_10px_24px_-10px_rgba(11,69,255,0.7)] hover:bg-blue-strong",
-  // Frost on white: the quiet second action.
-  secondary:
-    "ice-glint border border-line-strong bg-canvas/80 text-ink backdrop-blur-sm hover:border-ink/25 hover:bg-canvas",
+  // Near-black: the one primary action.
+  primary: "bg-ink text-white hover:bg-black",
+  // Quiet grey: the second action beside it.
+  secondary: "bg-mist-deep text-ink hover:bg-[#dcdce1]",
+  // The primary action on the night ground.
+  light: "bg-white text-ink hover:bg-white/88",
+  // The secondary action on the night ground.
+  glass: "bg-white/12 text-white hover:bg-white/20",
   // Inline text action.
   ghost: "rounded-xs px-0 text-ink hover:text-blue",
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-10 px-4.5 text-[0.875rem]",
-  md: "h-12 px-6 text-[0.9375rem]",
-  lg: "h-14 px-7 text-base",
+  sm: "h-9 px-4 text-[0.875rem]",
+  md: "h-11 px-5.5 text-[0.9375rem]",
+  lg: "h-13 px-7 text-[1.0625rem]",
 };
 
 type CommonProps = {
@@ -62,20 +60,19 @@ export function Button(props: ButtonProps) {
   const classes = cn(base, variants[variant], variant !== "ghost" && sizes[size], className);
   const content = (
     <>
-      <span className="relative z-[1] whitespace-nowrap">{children}</span>
+      <span className="whitespace-nowrap">{children}</span>
       {arrow && (
         <Icon
           name="arrow-right"
-          className="relative z-[1] text-[1.05em] transition-transform duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover/button:translate-x-0.5"
+          strokeWidth={1.8}
+          className="text-[1.05em] transition-transform duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover/button:translate-x-0.5"
         />
       )}
     </>
   );
 
   if (typeof rest.href === "string") {
-    const { href, ...anchorProps } = rest as AnchorHTMLAttributes<HTMLAnchorElement> & {
-      href: string;
-    };
+    const { href, ...anchorProps } = rest as AnchorHTMLAttributes<HTMLAnchorElement> & { href: string };
     return (
       <Link href={href} className={classes} {...anchorProps}>
         {content}

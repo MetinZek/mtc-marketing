@@ -1,16 +1,14 @@
 import Link from "next/link";
+import { SplitWords } from "@/components/motion/SplitWords";
 import { Reveal } from "@/components/motion/Reveal";
 import { CaseStudySections } from "@/components/sections/CaseStudySections";
-import { FinalCta } from "@/components/sections/FinalCta";
 import { Icon } from "@/components/ui/Icon";
-import { Label } from "@/components/ui/Label";
 import { ViewportVideo } from "@/components/ui/ViewportVideo";
-import type { CaseStudySection, HomepageContent, ImageRef, Project } from "@/content/types";
+import type { CaseStudySection, ImageRef, Project } from "@/content/types";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { interpolate } from "@/i18n/format";
 import type { Locale } from "@/i18n/locales";
 import { withLocale } from "@/i18n/paths";
-import { toneFor } from "@/lib/disciplines";
 import { coverImage, hasCoverVideo, naturalCoverRatio } from "@/lib/project-cover";
 import { cn } from "@/lib/utils";
 import { FALLBACK_IMAGE, VIDEO_BOX } from "@/lib/video-fallback";
@@ -20,7 +18,6 @@ type RelatedProject = Pick<Project, "title" | "slug" | "category" | "year" | "he
 type ProjectDetailProps = {
   project: Project;
   moreProjects: RelatedProject[];
-  cta: HomepageContent["finalCta"];
   dict: Dictionary;
   locale: Locale;
 };
@@ -57,55 +54,60 @@ function displayUrl(url: string) {
 }
 
 /**
- * /work/[slug]: a single case study. The header names the project, says
- * what was made in one paragraph and lists the facts (client, discipline,
- * year, services, website) beside it; the cover film (or cover image)
- * follows full width, then the project's images, then a short rail of
- * other work and the closing call to action.
+ * /work/[slug]: one case study, presented like a product page. The name
+ * set very large, one paragraph on what was made beside the facts
+ * (client, year, services, website), then the cover film (or still) in a
+ * large frame, the project's images at their own proportions, outcomes
+ * when there are real ones, and the next project as a full-width tile
+ * with the rest of the work beneath it.
  */
-export function ProjectDetail({ project, moreProjects, cta, dict, locale }: ProjectDetailProps) {
+export function ProjectDetail({ project, moreProjects, dict, locale }: ProjectDetailProps) {
   const website = project.websiteUrl;
   const external = website ? /^https?:\/\//.test(website) : false;
   const video = hasCoverVideo(project);
   const cover = coverImage(project);
   const [w, h] = naturalCoverRatio(project);
-  const tone = toneFor(project.serviceId);
+  const [next, ...others] = moreProjects;
 
   return (
     <article>
-      <section className="bg-canvas pb-10 pt-8 sm:pb-14 sm:pt-12">
+      <header className="pb-12 pt-6 sm:pb-16 sm:pt-10">
         <div className="container-mtc">
-          <Reveal>
+          <Reveal variant="fade">
             <Link
               href={withLocale("/work", locale)}
-              className="group/back inline-flex items-center gap-1.5 rounded-xs text-meta font-semibold text-ink-muted transition-colors hover:text-blue"
+              className="group/back inline-flex items-center gap-1 rounded-xs text-[0.9375rem] font-medium text-ink-muted transition-colors hover:text-ink"
             >
               <Icon
-                name="arrow-left"
-                className="transition-transform duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover/back:-translate-x-0.5"
+                name="chevron-left"
+                strokeWidth={2}
+                className="transition-transform duration-[var(--duration-base)] group-hover/back:-translate-x-0.5"
               />
               {dict.work.backToWork}
             </Link>
           </Reveal>
 
-          <div className="mt-10 grid gap-10 lg:mt-14 lg:grid-cols-12 lg:gap-8">
-            <Reveal className="lg:col-span-7">
-              <Label tone="ink" dot={tone.dot}>
-                {project.category}
-              </Label>
-              <h1 className="text-display-1 mt-5 text-ink">{project.title}</h1>
-              {project.description.trim() && (
-                <p className="mt-6 max-w-2xl text-lead text-ink-muted sm:mt-8">{project.description}</p>
-              )}
-            </Reveal>
+          <Reveal as="p" variant="fade" delay={0.05} className="mt-10 text-eyebrow text-ink-muted sm:mt-14">
+            {project.category}
+          </Reveal>
+          <SplitWords as="h1" text={project.title} className="text-display-hero mt-3 text-ink" />
 
-            <Reveal delay={0.08} className="lg:col-span-4 lg:col-start-9 lg:pt-2">
+          <div className="mt-10 grid gap-10 sm:mt-14 lg:grid-cols-12 lg:gap-8">
+            {project.description.trim() && (
+              <Reveal as="p" delay={0.1} className="text-lead max-w-2xl text-ink-muted lg:col-span-7">
+                {project.description}
+              </Reveal>
+            )}
+
+            <Reveal delay={0.15} className="lg:col-span-4 lg:col-start-9">
               <dl className="divide-y divide-line border-y border-line text-[0.9375rem]">
                 <Fact term={dict.projectDetail.client}>{project.client}</Fact>
-                <Fact term={dict.projectDetail.year}>{project.year}</Fact>
+                <Fact term={dict.projectDetail.year}>
+                  <span className="tabular">{project.year}</span>
+                </Fact>
                 {project.services.length > 0 && (
                   <Fact term={dict.projectDetail.servicesLabel}>
-                    <ul className="space-y-1">
+                    <ul className="space-y-0.5">
                       {project.services.map((service) => (
                         <li key={service}>{service}</li>
                       ))}
@@ -117,7 +119,7 @@ export function ProjectDetail({ project, moreProjects, cta, dict, locale }: Proj
                     <a
                       href={website}
                       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                      className="inline-flex items-center gap-1 rounded-xs font-semibold text-blue underline decoration-blue/30 underline-offset-[0.3em] transition-colors hover:decoration-blue"
+                      className="inline-flex items-center gap-1 rounded-xs font-medium text-blue hover:underline hover:underline-offset-[0.25em]"
                     >
                       {displayUrl(website)}
                       {external && <Icon name="arrow-up-right" />}
@@ -128,21 +130,22 @@ export function ProjectDetail({ project, moreProjects, cta, dict, locale }: Proj
             </Reveal>
           </div>
         </div>
-      </section>
+      </header>
 
       {/* Cover: the project film when there is one, else the cover image. */}
-      <section aria-label={project.title} className="bg-canvas pb-4 sm:pb-6">
+      <section aria-label={project.title} className="pb-3 sm:pb-5">
         <div className="container-mtc">
-          <Reveal variant="image">
-            <div
-              className="frost-edge relative overflow-hidden rounded-lg bg-frost"
-              style={{ aspectRatio: `${w} / ${h}` }}
-              {...(video ? VIDEO_BOX : {})}
-            >
+          <Reveal
+            variant="media"
+            className="media-rim relative overflow-hidden rounded-[22px] bg-mist sm:rounded-[36px]"
+            style={{ aspectRatio: `${w} / ${h}` }}
+          >
+            <div data-zoom className="absolute inset-0" {...(video ? VIDEO_BOX : {})}>
               {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven media */}
               <img
                 src={cover.src}
                 alt={cover.alt}
+                fetchPriority="high"
                 className={cn("absolute inset-0 h-full w-full object-cover", video && FALLBACK_IMAGE)}
               />
               {video && (
@@ -160,15 +163,15 @@ export function ProjectDetail({ project, moreProjects, cta, dict, locale }: Proj
       <CaseStudySections sections={projectImages(project, video ? undefined : cover.src)} title={project.title} />
 
       {project.results.length > 0 && (
-        <section className="bg-frost py-20 sm:py-28">
+        <section aria-label={dict.projectDetail.outcomes} className="pb-20 sm:pb-28">
           <div className="container-mtc">
-            <Reveal>
-              <Label>{dict.projectDetail.outcomes}</Label>
+            <Reveal className="rounded-[28px] bg-mist p-8 sm:rounded-[36px] sm:p-12">
+              <p className="text-eyebrow text-ink-muted">{dict.projectDetail.outcomes}</p>
               <dl className="mt-8 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-3">
                 {project.results.map((result) => (
                   <div key={result.label}>
-                    <dt className="text-display-3 text-ink">{result.value}</dt>
-                    <dd className="mt-2 text-meta text-ink-muted">{result.label}</dd>
+                    <dt className="text-display-2 text-ink">{result.value}</dt>
+                    <dd className="mt-2 text-[0.9375rem] text-ink-muted">{result.label}</dd>
                   </div>
                 ))}
               </dl>
@@ -177,35 +180,37 @@ export function ProjectDetail({ project, moreProjects, cta, dict, locale }: Proj
         </section>
       )}
 
-      {moreProjects.length > 0 && (
-        <section aria-labelledby="more-work" className="border-t border-line bg-canvas py-20 sm:py-24">
+      {next && (
+        <section aria-labelledby="next-project" className="pb-6 pt-6 sm:pb-10 sm:pt-10">
           <div className="container-mtc">
-            <Reveal className="flex items-baseline justify-between gap-4">
-              <h2 id="more-work" className="text-display-3 text-ink">
-                {dict.projectDetail.moreProjects}
-              </h2>
-              <Link
-                href={withLocale("/work", locale)}
-                className="group/all inline-flex items-center gap-1.5 rounded-xs text-[0.9375rem] font-semibold text-ink transition-colors hover:text-blue"
-              >
-                {dict.projectDetail.viewAll}
-                <Icon
-                  name="arrow-right"
-                  className="transition-transform duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover/all:translate-x-0.5"
-                />
-              </Link>
-            </Reveal>
+            <NextProject project={next} dict={dict} locale={locale} />
 
-            <Reveal stagger={50} className="mt-10 grid grid-cols-2 gap-4 sm:gap-6 lg:grid-cols-4">
-              {moreProjects.map((related) => (
-                <RelatedProjectCard key={related.slug} project={related} dict={dict} locale={locale} />
-              ))}
-            </Reveal>
+            {others.length > 0 && (
+              <div className="mt-16 sm:mt-24">
+                <div className="flex items-baseline justify-between gap-4">
+                  <h2 className="text-display-3 text-ink">{dict.projectDetail.moreProjects}</h2>
+                  <Link
+                    href={withLocale("/work", locale)}
+                    className="group/all inline-flex items-center gap-1 rounded-xs text-[1.0625rem] font-medium text-blue hover:underline hover:underline-offset-[0.3em]"
+                  >
+                    {dict.projectDetail.viewAll}
+                    <Icon
+                      name="chevron-right"
+                      strokeWidth={2}
+                      className="transition-transform duration-[var(--duration-base)] group-hover/all:translate-x-0.5"
+                    />
+                  </Link>
+                </div>
+                <Reveal variant="stagger" className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 sm:gap-x-5 lg:grid-cols-3">
+                  {others.map((related) => (
+                    <RelatedProjectCard key={related.slug} project={related} dict={dict} locale={locale} />
+                  ))}
+                </Reveal>
+              </div>
+            )}
           </div>
         </section>
       )}
-
-      <FinalCta content={cta} locale={locale} />
     </article>
   );
 }
@@ -213,43 +218,75 @@ export function ProjectDetail({ project, moreProjects, cta, dict, locale }: Proj
 function Fact({ term, children }: { term: string; children: React.ReactNode }) {
   return (
     <div className="grid grid-cols-3 gap-4 py-4">
-      <dt className="text-meta text-ink-muted">{term}</dt>
+      <dt className="text-ink-muted">{term}</dt>
       <dd className="col-span-2 text-ink">{children}</dd>
     </div>
   );
 }
 
-function RelatedProjectCard({
-  project,
-  dict,
-  locale,
-}: {
-  project: RelatedProject;
-  dict: Dictionary;
-  locale: Locale;
-}) {
+/** The next case study as one wide night tile: its still, its name set
+ * large, and a round arrow. */
+function NextProject({ project, dict, locale }: { project: RelatedProject; dict: Dictionary; locale: Locale }) {
   return (
     <Link
       href={withLocale(`/work/${project.slug}`, locale)}
       aria-label={interpolate(dict.work.viewCaseStudyAriaLabel, { title: project.title })}
-      className="group/rel glint-group block rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
+      className="group/next block rounded-[28px] bg-night p-2.5 text-snow focus-visible:outline-offset-4 sm:rounded-[36px] sm:p-3.5"
     >
-      <div
-        className="ice-glint frost-edge relative overflow-hidden rounded-lg bg-frost"
-        style={{ aspectRatio: ratioOf(project.heroImage, "4 / 3") }}
-      >
+      <div className="grid items-center gap-6 lg:grid-cols-12">
+        <div className="order-2 px-4 pb-5 sm:px-6 lg:order-1 lg:col-span-5 lg:px-10 lg:pb-0">
+          <p id="next-project" className="text-eyebrow text-snow-muted">
+            {dict.projectDetail.nextProject}
+          </p>
+          <p className="text-display-1 mt-3 text-snow">{project.title}</p>
+          <p className="mt-3 text-[0.9375rem] text-snow-muted">
+            {project.category} · {project.year}
+          </p>
+          <span
+            aria-hidden="true"
+            className="mt-8 flex size-12 items-center justify-center rounded-full bg-white/12 text-white transition-[background-color,color,transform] duration-[var(--duration-base)] group-hover/next:translate-x-1 group-hover/next:bg-white group-hover/next:text-ink"
+          >
+            <Icon name="arrow-right" className="text-[1.25rem]" strokeWidth={1.8} />
+          </span>
+        </div>
+        <Reveal
+          variant="media"
+          className="media-rim-dark relative order-1 overflow-hidden rounded-[20px] bg-night-soft sm:rounded-[26px] lg:order-2 lg:col-span-7"
+          style={{ aspectRatio: ratioOf(project.heroImage, "16 / 10") }}
+        >
+          <div data-zoom className="absolute inset-0">
+            {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven media */}
+            <img
+              src={project.heroImage.src}
+              alt={project.heroImage.alt}
+              loading="lazy"
+              className="h-full w-full object-cover transition-transform duration-[900ms] ease-[var(--ease-out-soft)] group-hover/next:scale-[1.03]"
+            />
+          </div>
+        </Reveal>
+      </div>
+    </Link>
+  );
+}
+
+function RelatedProjectCard({ project, dict, locale }: { project: RelatedProject; dict: Dictionary; locale: Locale }) {
+  return (
+    <Link
+      href={withLocale(`/work/${project.slug}`, locale)}
+      aria-label={interpolate(dict.work.viewCaseStudyAriaLabel, { title: project.title })}
+      className="group/rel block rounded-[22px] focus-visible:outline-offset-4"
+    >
+      <div className="media-rim relative aspect-[4/3] overflow-hidden rounded-[18px] bg-mist sm:rounded-[22px]">
         {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven media */}
         <img
           src={project.heroImage.src}
           alt={project.heroImage.alt}
           loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-[var(--duration-slow)] ease-[var(--ease-out-soft)] group-hover/rel:scale-[1.035]"
+          className="h-full w-full object-cover transition-transform duration-[900ms] ease-[var(--ease-out-soft)] group-hover/rel:scale-[1.04]"
         />
       </div>
-      <h3 className="mt-4 text-body font-semibold text-ink transition-colors duration-[var(--duration-base)] group-hover/rel:text-blue">
-        {project.title}
-      </h3>
-      <p className="mt-1 text-meta text-ink-muted">
+      <h3 className="mt-4 text-[1.0625rem] font-semibold tracking-[-0.015em] text-ink">{project.title}</h3>
+      <p className="mt-0.5 text-meta text-ink-muted">
         {project.category} · {project.year}
       </p>
     </Link>

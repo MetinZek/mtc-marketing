@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { Icon } from "@/components/ui/Icon";
 import { pauseSmoothScroll } from "@/lib/smooth-scroll";
 import { SLOW_VIDEO_MS } from "@/lib/video-fallback";
 import type { GalleryItem } from "@/content/types";
@@ -21,9 +22,7 @@ const pad = (n: number) => String(n).padStart(2, "0");
  * click on the background. Page scroll is locked while it is open. A
  * video's image is only a fallback: shown as its poster if the video is
  * slow to start, or instead of it if it fails.
- *
- * The site's custom cursor hides the native one and can't draw above
- * the dialog's top layer, so the viewer brings the system cursor back.
+
  */
 export function GalleryViewer({
   items,
@@ -93,23 +92,24 @@ export function GalleryViewer({
         if (e.key === "ArrowLeft") step(-1);
       }}
       aria-label={current?.title}
-      className="m-0 h-dvh max-h-none w-screen max-w-none cursor-default bg-ink p-0 text-canvas backdrop:bg-transparent"
+      className="m-0 h-dvh max-h-none w-screen max-w-none bg-night p-0 text-white backdrop:bg-transparent"
     >
       {current && index !== null && (
         <div className="flex h-full flex-col px-4 py-4 sm:px-8 sm:py-6" onClick={onBackground}>
           <div className="flex items-center justify-between gap-4">
-            <span className="label text-canvas/60">
+            <span className="text-meta text-white/60">
               {contextLabel(current)}
-              <span className="ml-3 tabular-nums text-canvas">
+              <span className="ml-3 tabular-nums text-white">
                 {pad(index + 1)} / {pad(count)}
               </span>
             </span>
             <button
               type="button"
               onClick={close}
-              className="label cursor-pointer! rounded-pill border border-canvas/25 px-3.5 py-2 text-canvas transition-colors hover:border-canvas/60"
+              className="inline-flex h-10 items-center gap-1.5 rounded-pill bg-white/12 px-4 text-[0.9375rem] font-medium text-white transition-colors hover:bg-white/20"
             >
-              {dict.work.closeViewer} &times;
+              <Icon name="close" className="text-[1.15rem]" />
+              {dict.work.closeViewer}
             </button>
           </div>
 
@@ -128,7 +128,7 @@ export function GalleryViewer({
                 loop
                 playsInline
                 controls
-                className="max-h-full max-w-full rounded-sm object-contain"
+                className="max-h-full max-w-full rounded-[18px] object-contain"
               />
             ) : (
               // eslint-disable-next-line @next/next/no-img-element -- CMS-driven asset, not a static import
@@ -136,17 +136,17 @@ export function GalleryViewer({
                 key={current.id}
                 src={current.image.src}
                 alt={current.image.alt}
-                className="max-h-full max-w-full rounded-sm object-contain"
+                className="max-h-full max-w-full rounded-[18px] object-contain"
               />
             )}
 
             {count > 1 && (
               <>
                 <ViewerButton side="left" label={dict.work.previousPiece} onClick={() => step(-1)}>
-                  &larr;
+                  <Icon name="chevron-left" strokeWidth={2} />
                 </ViewerButton>
                 <ViewerButton side="right" label={dict.work.nextPiece} onClick={() => step(1)}>
-                  &rarr;
+                  <Icon name="chevron-right" strokeWidth={2} />
                 </ViewerButton>
               </>
             )}
@@ -155,15 +155,16 @@ export function GalleryViewer({
           <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-2">
             <p>
               <span className="text-[1.0625rem] font-semibold">{current.title}</span>
-              {current.client && <span className="label ml-3 text-canvas/60">{current.client}</span>}
+              {current.client && <span className="ml-3 text-meta text-white/60">{current.client}</span>}
             </p>
             {link && (
               <Link
                 href={external ? link : withLocale(link, locale)}
                 {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                className="label cursor-pointer! text-canvas underline-offset-4 hover:underline"
+                className="inline-flex items-center gap-1 text-[0.9375rem] font-medium text-sky underline-offset-4 hover:underline"
               >
-                {dict.work.viewProject} &rarr;
+                {dict.work.viewProject}
+                <Icon name="chevron-right" strokeWidth={2} />
               </Link>
             )}
           </div>
@@ -190,8 +191,8 @@ function ViewerButton({
       onClick={onClick}
       aria-label={label}
       className={cn(
-        "absolute top-1/2 flex h-11 w-11 -translate-y-1/2 cursor-pointer! items-center justify-center rounded-full",
-        "bg-canvas/10 text-lg text-canvas transition-colors hover:bg-canvas/25",
+        "absolute top-1/2 flex size-11 -translate-y-1/2 items-center justify-center rounded-full",
+        "bg-white/12 text-[1.2rem] text-white transition-colors hover:bg-white/25",
         side === "left" ? "left-0 sm:left-2" : "right-0 sm:right-2",
       )}
     >

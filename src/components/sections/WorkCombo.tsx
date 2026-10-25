@@ -25,8 +25,6 @@ export type ComboWork =
 const ROWS =
   "md:auto-rows-[calc(((100cqw-2.5rem)/3/1.5-1.25rem)/2)] lg:auto-rows-[calc(((100cqw-3rem)/3/1.5-1.5rem)/2)]";
 
-const pad = (n: number) => String(n).padStart(2, "0");
-
 function pieceRatio(item: GalleryItem): [number, number] {
   if (item.videoUrl && item.videoWidth && item.videoHeight) return [item.videoWidth, item.videoHeight];
   const { width, height } = item.image;
@@ -36,8 +34,8 @@ function pieceRatio(item: GalleryItem): [number, number] {
 /**
  * /work grid view: projects and Work gallery pieces in one mosaic, in
  * the order and big/small sizes from admin → Work Page (or the automatic
- * arrangement). Project tiles (cover
- * video/image, number, title, "Case study" tag) open their page; piece
+ * arrangement). Project tiles (cover video or image, title, discipline
+ * and year) open their page; piece
  * tiles open in the full-screen GalleryViewer. On phones every
  * tile stacks at its media's own proportions.
  */
@@ -68,7 +66,7 @@ export function WorkCombo({
             className={cn("group relative", span)}
           >
             {value.kind === "project" ? (
-              <ProjectTile project={value.project} number={value.number} dict={dict} locale={locale} />
+              <ProjectTile project={value.project} dict={dict} locale={locale} />
             ) : (
               <PieceTile
                 item={value.item}
@@ -105,7 +103,7 @@ function MediaFrame({
 }) {
   return (
     <div
-      className="ice-glint frost-edge relative aspect-(--ratio) overflow-hidden rounded-lg bg-frost md:aspect-auto md:h-full"
+      className="media-rim relative aspect-(--ratio) overflow-hidden rounded-[22px] bg-mist sm:rounded-[28px] md:aspect-auto md:h-full"
       style={{ "--ratio": `${ratio[0]} / ${ratio[1]}` } as React.CSSProperties}
       {...(video ? VIDEO_BOX : {})}
     >
@@ -114,27 +112,16 @@ function MediaFrame({
   );
 }
 
-const zoom =
-  "transition-transform duration-[var(--duration-slow)] ease-[var(--ease-out-soft)] group-hover:scale-[1.04]";
+const zoom = "transition-transform duration-[900ms] ease-[var(--ease-out-soft)] group-hover:scale-[1.03]";
 
-function ProjectTile({
-  project,
-  number,
-  dict,
-  locale,
-}: {
-  project: Project;
-  number: number;
-  dict: Dictionary;
-  locale: Locale;
-}) {
+function ProjectTile({ project, dict, locale }: { project: Project; dict: Dictionary; locale: Locale }) {
   const cover = coverImage(project);
   const video = hasCoverVideo(project);
   return (
     <Link
       href={withLocale(`/work/${project.slug}`, locale)}
       aria-label={interpolate(dict.work.viewCaseStudyAriaLabel, { title: project.title })}
-      className="glint-group block h-full rounded-lg focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
+      className="block h-full rounded-[28px] focus-visible:outline-offset-4"
     >
       <MediaFrame ratio={naturalCoverRatio(project)} video={video}>
         {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven asset, not a static import */}
@@ -156,21 +143,20 @@ function ProjectTile({
         )}
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-ink/80 via-ink/30 to-transparent"
+          className="pointer-events-none absolute inset-x-0 bottom-0 h-3/5 bg-gradient-to-t from-black/70 via-black/20 to-transparent"
         />
-        <div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-4 lg:inset-x-6 lg:bottom-6">
-          <div>
-            <span className="text-meta font-semibold text-canvas/75 tabular">{pad(number)}</span>
-            <h2 className="text-display-3 mt-1 text-canvas">{project.title}</h2>
-            <p className="mt-2 text-meta text-canvas/85">
+        <div className="absolute inset-x-4 bottom-4 flex items-end justify-between gap-4 sm:inset-x-5 sm:bottom-5 lg:inset-x-7 lg:bottom-7">
+          <div className="min-w-0">
+            <h2 className="text-display-3 text-white">{project.title}</h2>
+            <p className="mt-1.5 text-[0.9375rem] text-white/80">
               {project.category} · {project.year}
             </p>
           </div>
           <span
             aria-hidden="true"
-            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-canvas text-base text-ink transition-[background-color,color] duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover:bg-blue group-hover:text-white"
+            className="glass-dark flex size-11 shrink-0 items-center justify-center rounded-full text-white transition-[background-color,color,transform] duration-[var(--duration-base)] ease-[var(--ease-out-soft)] group-hover:translate-x-0.5 group-hover:bg-white group-hover:text-ink sm:size-12"
           >
-            <Icon name="arrow-right" className="text-lg" />
+            <Icon name="arrow-right" className="text-[1.2rem]" strokeWidth={1.8} />
           </span>
         </div>
       </MediaFrame>
@@ -213,20 +199,20 @@ function PieceTile({
         {/* Caption: revealed on hover; always shown where there's no hover. */}
         <div
           className={cn(
-            "absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-ink/75 to-transparent px-4 pb-4 pt-12",
+            "absolute inset-x-0 bottom-0 flex items-end justify-between gap-3 bg-gradient-to-t from-black/70 to-transparent px-4 pb-4 pt-12 sm:px-5 sm:pb-5",
             "opacity-0 transition-opacity duration-[var(--duration-base)] group-hover:opacity-100 group-focus-within:opacity-100",
             "[@media(hover:none)]:opacity-100",
           )}
         >
           <div>
-            <p className="text-[0.9375rem] font-semibold leading-snug text-canvas">{item.title}</p>
-            {item.client && <p className="label mt-1 text-canvas/70">{item.client}</p>}
+            <p className="text-[1.0625rem] font-semibold leading-snug tracking-[-0.015em] text-white">{item.title}</p>
+            {item.client && <p className="mt-0.5 text-meta text-white/70">{item.client}</p>}
           </div>
           <span
             aria-hidden="true"
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-canvas text-base text-ink"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-white text-ink"
           >
-            +
+            <Icon name="plus" className="text-[1.15rem]" />
           </span>
         </div>
       </MediaFrame>
@@ -235,7 +221,7 @@ function PieceTile({
         type="button"
         onClick={onOpen}
         aria-label={interpolate(dict.work.openPiece, { title: item.title })}
-        className="absolute inset-0 rounded-sm focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-focus"
+        className="absolute inset-0 rounded-[28px] focus-visible:outline-offset-4"
       />
     </div>
   );

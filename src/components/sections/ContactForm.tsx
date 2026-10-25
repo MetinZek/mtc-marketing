@@ -5,10 +5,8 @@ import { usePathname } from "next/navigation";
 import { submitContactAction } from "@/app/[locale]/(site)/contact/_action";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
-import { Label } from "@/components/ui/Label";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { splitLocaleFromPathname } from "@/i18n/paths";
-import { toneFor } from "@/lib/disciplines";
 import { cn } from "@/lib/utils";
 
 type FieldKey = "name" | "email" | "company" | "phone" | "message";
@@ -43,17 +41,16 @@ function validate(values: Record<FieldKey, string>, cf: Dictionary["contactForm"
 
 const fieldClass = (invalid: boolean) =>
   cn(
-    "mt-2 w-full rounded-sm border bg-canvas px-4 py-3 text-body text-ink",
+    "mt-2 w-full rounded-sm border bg-canvas px-4 py-3.5 text-body text-ink",
     "transition-[border-color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]",
-    "placeholder:text-ink-faint focus:border-blue focus:shadow-[0_0_0_4px_rgba(11,69,255,0.12)] focus:outline-none",
-    invalid ? "border-danger" : "border-line-strong hover:border-ink/30",
+    "placeholder:text-ink-faint focus:border-blue focus:shadow-[0_0_0_4px_rgb(11_69_255/0.14)] focus:outline-none",
+    invalid ? "border-danger" : "border-line-strong hover:border-ink-faint",
   );
 
 /**
  * Contact form, built from the site's own tokens. "What do you need?" is a
- * row of discipline chips (each in its colour); the homepage's inquiry
- * desk pre-selects them through `?services=…`, so the brief is already
- * begun. Validates on submit (and re-checks a field on blur afterwards),
+ * row of discipline chips; a link can pre-select them through
+ * `?services=…`, so the brief is already begun. Validates on submit (and re-checks a field on blur afterwards),
  * then swaps to a confirmation. Submits through the existing
  * submitContactAction Server Action, unchanged: the chosen disciplines
  * are sent as one readable `service` line.
@@ -76,7 +73,7 @@ export function ContactForm({
   const [attempted, setAttempted] = useState(false);
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
 
-  // Carry the inquiry desk's selection over (?services=branding,web-app).
+  // Carry a pre-selection over (?services=branding,web-app).
   useEffect(() => {
     const wanted = new URLSearchParams(window.location.search).get("services");
     if (!wanted) return;
@@ -147,14 +144,12 @@ export function ContactForm({
 
   if (status === "success") {
     return (
-      <div role="status" className="rounded-lg bg-canvas p-8 sm:p-10">
-        <span className="flex size-12 items-center justify-center rounded-full bg-mint-tint text-mint-ink">
-          <Icon name="check" className="text-2xl" strokeWidth={2.4} />
+      <div role="status" className="rounded-[22px] bg-canvas p-8 sm:p-12">
+        <span className="flex size-12 items-center justify-center rounded-full bg-ink text-white">
+          <Icon name="check" className="text-2xl" strokeWidth={2} />
         </span>
-        <Label tone="ink" className="mt-6">
-          {cf.successLabel}
-        </Label>
-        <p className="text-display-3 mt-3 max-w-md text-ink">{cf.successMessage}</p>
+        <p className="mt-6 text-eyebrow text-ink-muted">{cf.successLabel}</p>
+        <p className="text-display-3 mt-2 max-w-md text-ink">{cf.successMessage}</p>
       </div>
     );
   }
@@ -162,11 +157,10 @@ export function ContactForm({
   return (
     <form ref={formRef} noValidate onSubmit={handleSubmit}>
       <fieldset>
-        <legend className="text-body font-semibold text-ink">{cf.servicesLabel}</legend>
+        <legend className="text-title text-ink">{cf.servicesLabel}</legend>
         <p className="mt-1 text-meta text-ink-muted">{cf.servicesHint}</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          {services.map((service, i) => {
-            const tone = toneFor(service.id, i);
+          {services.map((service) => {
             const on = selected.includes(service.id);
             return (
               <button
@@ -175,19 +169,19 @@ export function ContactForm({
                 aria-pressed={on}
                 onClick={() => toggle(service.id)}
                 className={cn(
-                  "inline-flex min-h-11 items-center gap-2 rounded-pill border bg-canvas px-4 py-2 text-meta font-semibold text-ink",
-                  "transition-[background-color,border-color,color] duration-[var(--duration-fast)] active:scale-[0.97]",
-                  on ? tone.chipOn : "border-line-strong hover:border-ink/30",
+                  "inline-flex min-h-11 items-center gap-2 rounded-pill border px-4 py-2 text-[0.9375rem] font-medium",
+                  "transition-[background-color,border-color,color,transform] duration-[var(--duration-fast)] active:scale-[0.97]",
+                  on ? "border-ink bg-ink text-white" : "border-line-strong bg-canvas text-ink hover:border-ink-faint",
                 )}
               >
                 <span
                   aria-hidden="true"
                   className={cn(
                     "flex size-4.5 items-center justify-center rounded-full",
-                    on ? cn(tone.dot, "text-white") : "border border-line-strong",
+                    on ? "bg-white text-ink" : "border border-line-strong",
                   )}
                 >
-                  {on && <Icon name="check" className="text-[0.7rem]" strokeWidth={2.8} />}
+                  {on && <Icon name="check" className="text-[0.75rem]" strokeWidth={2.4} />}
                 </span>
                 {service.title}
               </button>
@@ -247,7 +241,7 @@ export function ContactForm({
         />
 
         <div className="sm:col-span-2">
-          <label htmlFor={idFor("message")} className="block text-meta font-semibold text-ink">
+          <label htmlFor={idFor("message")} className="block text-[0.9375rem] font-medium text-ink">
             {cf.messageLabel}
           </label>
           <textarea
@@ -305,7 +299,7 @@ function TextField({
 }) {
   return (
     <div>
-      <label htmlFor={id} className="block text-meta font-semibold text-ink">
+      <label htmlFor={id} className="block text-[0.9375rem] font-medium text-ink">
         {label}
         {!required && <span className="ml-1.5 font-normal text-ink-muted">{optionalSuffix}</span>}
       </label>
