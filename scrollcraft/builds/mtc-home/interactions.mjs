@@ -20,26 +20,50 @@ async function newPage(options = {}) {
   });
   const page = await context.newPage();
   const errors = [];
+  const failed = [];
   page.on("pageerror", (e) => errors.push(String(e)));
   page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
-  return { page, errors };
+  page.on("response", (r) => {
+    if (r.status() < 400) return;
+    const url = new URL(r.url());
+    failed.push(`${r.status()} ${url.pathname}${url.search}`);
+  });
+  return { page, errors, failed };
 }
 
-// 1. Homepage inquiry desk carries chips into the CTA link.
-{
-  const { page, errors } = await newPage();
-  await page.goto(base + "/", { waitUntil: "networkidle" });
+// 1. The inquiry desk carries chips into the CTA link and on into the
+// contact form, in English (unprefixed) and German. Background prefetches
+// of each new CTA href must not fail (they 404'd through the locale rewrite
+// until next.config.ts turned off optimistic routing; production only).
+for (const { label, home, picks, expected } of [
+  { label: "", home: "/", picks: [0, 2], expected: "/contact?services=branding,social-marketing" },
+  { label: "German ", home: "/de", picks: [1, 3], expected: "/de/contact?services=web-app,content-advertising" },
+]) {
+  const { page, errors, failed } = await newPage();
+  await page.goto(base + home, { waitUntil: "networkidle" });
   const desk = page.locator("#start");
   await desk.scrollIntoViewIfNeeded();
   const chips = desk.locator("button[aria-pressed]");
-  check("inquiry desk shows 4 discipline chips", (await chips.count()) === 4);
-  await chips.nth(0).click();
-  await chips.nth(2).click();
+  check(`${label}inquiry desk shows 4 discipline chips`, (await chips.count()) === 4);
+  for (const i of picks) await chips.nth(i).click();
   const pressed = await desk.locator('button[aria-pressed="true"]').count();
-  check("two chips toggle on", pressed === 2);
-  const href = await desk.locator('a[href*="/contact"]').first().getAttribute("href");
-  check("CTA carries the selection", href === "/contact?services=branding,social-marketing", href ?? "");
-  check("no console errors on homepage", errors.length === 0, errors.slice(0, 2).join(" | "));
+  check(`${label}two chips toggle on`, pressed === 2);
+  const cta = desk.locator('a[href*="/contact"]').first();
+  const href = await cta.getAttribute("href");
+  check(`${label}CTA carries the selection`, href === expected, href ?? "");
+  await page.waitForTimeout(2000);
+  check(`${label}no failed requests after choosing chips`, failed.length === 0, failed.slice(0, 2).join(" | "));
+  check(`${label}no console errors on the homepage`, errors.length === 0, errors.slice(0, 2).join(" | "));
+  await cta.click();
+  const arrived = await page.waitForURL((url) => url.pathname + url.search === expected, { timeout: 15000 }).then(
+    () => true,
+    () => false,
+  );
+  check(`${label}CTA opens the contact page`, arrived, page.url().replace(base, ""));
+  await page.waitForTimeout(1000);
+  const carried = await page.locator('form button[aria-pressed="true"]').count();
+  check(`${label}contact form starts with both chips chosen`, carried === 2, `${carried} chosen`);
+  check(`${label}no errors after the hand-off`, errors.length === 0 && failed.length === 0, [...errors, ...failed].slice(0, 2).join(" | "));
   await page.context().close();
 }
 

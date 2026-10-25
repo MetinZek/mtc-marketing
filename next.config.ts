@@ -18,6 +18,14 @@ const nextConfig: NextConfig = {
       // multipart overhead, capped server-side at 10MB in `uploadImageAction`.
       bodySizeLimit: "12mb",
     },
+    // The client router predicts the shape of routes it hasn't fetched yet
+    // from ones it has. With this proxy the prediction is wrong: /de and
+    // /sv match the [locale] segment directly, so the router learns that
+    // "/<anything>" is a locale's homepage, while English is unprefixed and
+    // rewritten to /en. A link like /contact?services=branding was then
+    // prefetched as the homepage of a "contact" locale and 404'd. With
+    // prediction off, the router asks the server for unknown routes.
+    optimisticRouting: false,
   },
   images: {
     formats: ["image/avif", "image/webp"],
