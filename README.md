@@ -41,7 +41,7 @@ npm run typecheck  # tsc --noEmit
 | Motion | GSAP + ScrollTrigger (`src/lib/gsap.ts`), driven from markup attributes by `MotionRoot`; Draggable for the hero stickers |
 | Smooth scrolling | Lenis, the only scroll engine, on GSAP's ticker and feeding ScrollTrigger |
 | 3D | three.js, for the night chapter's glass squares only (loaded when the section comes near) |
-| Icons | Solar (480 Design, CC BY 4.0) via Iconify, extracted by `scripts/build-icons.mjs` |
+| Icons | Solar (480 Design, CC BY 4.0) via Iconify, extracted by `scripts/build-icons.mjs`; sticker emojis are Microsoft Fluent Emoji 3D (MIT, `public/media/emoji/LICENSE.txt`) |
 | Validation | Zod (CMS content schemas) |
 | Content | Provider abstraction: local seed in dev, Postgres (Supabase) in production |
 
@@ -56,7 +56,8 @@ utilities. Token names the admin panel uses are kept.
   `snow-faint` on night.
 - **Accent:** `blue` (`#0b45ff`, from the logo) for links, focus and
   selection on light; `sky` on night. Nothing else is coloured, apart from
-  the journal's hover line in the four discipline colours.
+  the four discipline colours (`hue-*` tokens) on the stickers and the
+  journal's hover line.
 - **Type:** Inter via `next/font` with its optical-size axis, so display sizes
   get Inter's tighter cut on their own. Roles: `text-display-hero`,
   `text-display-1…3`, `text-title`, `text-lead`, `text-eyebrow`, `text-body`,
@@ -82,9 +83,10 @@ starts.
 Homepage (`src/app/[locale]/(site)/page.tsx`):
 
 1. **Opener** (`Hero`): the headline in heavy capitals fitted to the column,
-   its letters thinning out near the pointer; four stickers that pop in and
-   can be dragged; the two actions; the real client logos on a slow loop
-   (`TrustedBy`).
+   its letters thinning out near the pointer (a slow drift on touch screens;
+   `FitLetters`); four colourful stickers, two of them 3D emojis, that pop in
+   and can be dragged (`ui/Sticker`); the two actions; the real client logos
+   on a slow loop (`TrustedBy`).
 2. **Showroom**: featured projects as large night and mist tiles.
 3. **Night chapter**: "How we work" lit word by word over thin glass squares
    (`StudioStatement`, `GlassSquares`, `glass-scene.ts`), then the four
@@ -93,9 +95,10 @@ Homepage (`src/app/[locale]/(site)/page.tsx`):
    arrows and the count; only real, published quotes.
 5. **Journal**: the five newest notes as a ruled list.
 
-Every page closes with the footer's sign-off: "Let's talk." fitted to the full
-width, the call to action, email, phone and the studio's local time
-(`SignOff`, hidden on /contact). Navigation is a top bar plus a dark floating
+Every page closes with the footer's sign-off: "LET'S TALK." in the hero's
+fitted capitals with the same letter effect and three stickers, then the call
+to action, email, phone and the studio's local time (`SignOff`, hidden on
+/contact). Navigation is a top bar plus a dark floating
 dock that appears once the opener has gone (`Navbar`).
 
 ## Content

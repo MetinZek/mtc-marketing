@@ -44,6 +44,7 @@ export const en = {
     signOff: "Let’s create something that matters.",
     backToTop: "Back to top",
     localTime: "Local time in Mitrovica",
+    openForProjects: "Open for new projects",
   },
   contactForm: {
     nameRequired: "Please enter your name.",

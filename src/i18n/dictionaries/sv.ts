@@ -38,6 +38,7 @@ export const sv: Dictionary = {
     signOff: "Låt oss skapa något som spelar roll.",
     backToTop: "Till toppen",
     localTime: "Lokal tid i Mitrovica",
+    openForProjects: "Öppna för nya projekt",
   },
   contactForm: {
     nameRequired: "Ange ditt namn.",

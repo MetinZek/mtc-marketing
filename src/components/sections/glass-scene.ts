@@ -1,15 +1,28 @@
-import { DoubleSide, Group, MathUtils, Mesh, PerspectiveCamera, Scene, ShaderMaterial, WebGLRenderer } from "three";
-import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
+import {
+  AdditiveBlending,
+  DoubleSide,
+  ExtrudeGeometry,
+  Group,
+  MathUtils,
+  Mesh,
+  PerspectiveCamera,
+  Scene,
+  ShaderMaterial,
+  Shape,
+  Vector2,
+  WebGLRenderer,
+} from "three";
 
 /**
- * Thin glass squares for the night chapter (see GlassSquares.tsx): a dozen
- * square panes, each a very thin rounded slab, drifting at different
- * depths. Scrolling through the section lifts them (nearer panes faster)
- * and turns them; a pointer tilts the whole group a little. One shared
- * geometry and one shader: faces stay almost clear, edges and grazing
- * angles catch a white studio light, so the panes read as glass on black
- * without colour. Rendering is driven from outside (GSAP's ticker), so
- * nothing runs while the section is off screen.
+ * Glass squares for the night chapter (see GlassSquares.tsx): a dozen
+ * square panes with little rounded corners, each a thin bevelled slab,
+ * drifting at different depths. Scrolling through the section lifts them
+ * (nearer panes faster) and turns them; a pointer tilts the whole group a
+ * little. One shared geometry and one shader that treats them as clear
+ * glass in a small studio: the faces show soft light through themselves,
+ * the bevels and edges catch it brightly and split it a little by colour,
+ * with only a faint cool cast. Rendering is driven from outside (GSAP's
+ * ticker), so nothing runs while the section is off screen.
  */
 
 export type GlassScene = {
@@ -17,6 +30,9 @@ export type GlassScene = {
   render(time: number): void;
   /** Scroll progress through the section, 0 to 1. */
   setProgress(progress: number): void;
+  /** Where the paragraph ends, as a share of the canvas width from the
+   * left: faces left of it stay faint so the text reads over them. */
+  setTextRight(share: number): void;
   /** Pointer position across the window, -1 to 1 on both axes. */
   setPointer(x: number, y: number): void;
   destroy(): void;
@@ -51,51 +67,114 @@ type Pane = {
 const FOV = 32;
 const CAMERA_Z = 14;
 
+/** Half the pane's side and its corner radius, before the bevel. */
+const HALF = 0.5;
+const CORNER = 0.085;
+
+/** A square pane with little rounded corners: a thin slab, softly bevelled. */
+function paneGeometry() {
+  const shape = new Shape();
+  shape.moveTo(-HALF + CORNER, -HALF);
+  shape.lineTo(HALF - CORNER, -HALF);
+  shape.absarc(HALF - CORNER, -HALF + CORNER, CORNER, -Math.PI / 2, 0, false);
+  shape.lineTo(HALF, HALF - CORNER);
+  shape.absarc(HALF - CORNER, HALF - CORNER, CORNER, 0, Math.PI / 2, false);
+  shape.lineTo(-HALF + CORNER, HALF);
+  shape.absarc(-HALF + CORNER, HALF - CORNER, CORNER, Math.PI / 2, Math.PI, false);
+  shape.lineTo(-HALF, -HALF + CORNER);
+  shape.absarc(-HALF + CORNER, -HALF + CORNER, CORNER, Math.PI, Math.PI * 1.5, false);
+  const geometry = new ExtrudeGeometry(shape, {
+    depth: 0.03,
+    bevelEnabled: true,
+    bevelThickness: 0.016,
+    bevelSize: 0.014,
+    bevelSegments: 4,
+    curveSegments: 10,
+  });
+  geometry.center();
+  return geometry;
+}
+
 const vertexShader = /* glsl */ `
   varying vec3 vNormalW;
+  varying vec3 vNormalL;
   varying vec3 vViewW;
-  varying vec3 vLocal;
+  varying vec2 vLocal;
   void main() {
     vec4 world = modelMatrix * vec4(position, 1.0);
     vNormalW = normalize(mat3(modelMatrix) * normal);
+    vNormalL = normal;
     vViewW = cameraPosition - world.xyz;
-    vLocal = position;
+    vLocal = position.xy;
     gl_Position = projectionMatrix * viewMatrix * world;
   }
 `;
 
-// Faces: nearly clear, and never more than a faint sheen even when a
-// studio light is reflected full on (white text runs over them). Edges:
-// a hairline that catches the light, brightest at grazing angles.
+// Clear glass in a small studio, added as light over the black page. The
+// faces show the studio through themselves (bent, and split a little by
+// colour) with a soft band of light that slides across as the pane turns;
+// where they pass behind the paragraph (left of uTextRight) they are held
+// to a faint sheen so white text stays readable. The bevels, the slab's
+// edge and a band just inside the outline carry the bright light. The
+// cast is only faintly cool.
 const fragmentShader = /* glsl */ `
   uniform float uOpacity;
+  uniform vec2 uViewport;
+  uniform float uTextRight;
   varying vec3 vNormalW;
+  varying vec3 vNormalL;
   varying vec3 vViewW;
-  varying vec3 vLocal;
+  varying vec2 vLocal;
 
-  float softbox(vec3 r, vec3 dir, float size, float soft) {
-    return smoothstep(1.0 - size - soft, 1.0 - size, dot(r, normalize(dir)));
+  float softbox(vec3 d, vec3 dir, float from, float to) {
+    return smoothstep(from, to, dot(d, normalize(dir)));
+  }
+
+  // A wide soft light overhead, strip lights to the sides, one low behind
+  // the panes, and a dim cool fill.
+  float studio(vec3 d) {
+    return 0.03 + 0.04 * smoothstep(-0.2, 1.0, d.y)
+      + 1.1 * softbox(d, vec3(0.3, 1.0, 0.45), 0.74, 0.93)
+      + 0.9 * softbox(d, vec3(-1.0, 0.2, 0.3), 0.93, 0.985)
+      + 0.6 * softbox(d, vec3(1.0, -0.15, 0.55), 0.95, 0.99)
+      + 0.7 * softbox(d, vec3(-0.3, 0.4, -1.0), 0.9, 0.975);
+  }
+
+  float roundRect(vec2 p, float halfSide, float radius) {
+    vec2 q = abs(p) - vec2(halfSide - radius);
+    return length(max(q, 0.0)) + min(max(q.x, q.y), 0.0) - radius;
   }
 
   void main() {
     vec3 n = normalize(vNormalW);
+    float side = gl_FrontFacing ? 1.0 : 0.55;
     if (!gl_FrontFacing) n = -n;
     vec3 v = normalize(vViewW);
+    vec3 incoming = -v;
     float facing = clamp(dot(n, v), 0.0, 1.0);
-    float fresnel = pow(1.0 - facing, 3.0);
-    vec3 r = reflect(-v, n);
+    float fresnel = 0.04 + 0.96 * pow(1.0 - facing, 5.0);
 
-    float env = softbox(r, vec3(0.35, 1.0, 0.45), 0.08, 0.14)
-              + 0.7 * softbox(r, vec3(-1.0, 0.25, 0.35), 0.025, 0.05)
-              + 0.45 * softbox(r, vec3(0.9, -0.45, 0.5), 0.02, 0.04);
-    float rim = smoothstep(0.47, 0.5, max(abs(vLocal.x), abs(vLocal.y)));
-    float face = min(0.03 + env * 0.26 + fresnel * 0.22, 0.3);
-    float edge = rim * (0.35 + 0.6 * fresnel + 0.4 * env);
-    float light = clamp(env + fresnel * 0.3 + rim, 0.0, 1.0);
+    float mirror = studio(reflect(incoming, n));
+    vec3 through = vec3(
+      studio(refract(incoming, n, 1.0 / 1.45)),
+      studio(refract(incoming, n, 1.0 / 1.5)),
+      studio(refract(incoming, n, 1.0 / 1.55))
+    );
 
-    float alpha = clamp(face + edge, 0.0, 0.92) * uOpacity;
-    vec3 color = mix(vec3(0.68, 0.72, 0.78), vec3(1.0), light);
-    gl_FragColor = vec4(color, alpha);
+    vec3 tint = vec3(0.9, 0.95, 1.0);
+    vec3 edgeTint = vec3(0.86, 0.94, 1.0);
+    float bevel = 1.0 - abs(normalize(vNormalL).z);
+    float rim = 1.0 - smoothstep(0.0, 0.06, -roundRect(vLocal, ${HALF.toFixed(3)}, ${CORNER.toFixed(3)}));
+    float sweep = dot(vLocal, vec2(0.7071)) + (n.x - n.y) * 0.9;
+    float band = exp(-pow(sweep * 3.4, 2.0)) + 0.5 * exp(-pow((sweep - 0.24) * 8.0, 2.0));
+
+    vec3 face = tint * through * 0.12 * (1.0 - fresnel) + vec3(mirror) * fresnel + tint * band * 0.32;
+    float overText = 1.0 - smoothstep(uTextRight, uTextRight + 0.1, gl_FragCoord.x / uViewport.x);
+    face *= min(1.0, mix(0.42, 0.15, overText) / max(dot(face, vec3(0.3333)), 1e-4));
+    vec3 edge = edgeTint * (through * 0.9 + mirror) * bevel
+              + edgeTint * rim * (0.06 + 0.6 * fresnel + 0.3 * mirror + 0.25 * band);
+
+    gl_FragColor = vec4((face + edge) * side * uOpacity, 1.0);
   }
 `;
 
@@ -132,13 +211,18 @@ export function createGlassScene(host: HTMLElement, { compact, onLost }: Options
   const group = new Group();
   scene.add(group);
 
-  const geometry = new RoundedBoxGeometry(1, 1, 0.028, 3, 0.012);
+  const geometry = paneGeometry();
   const material = new ShaderMaterial({
     vertexShader,
     fragmentShader,
-    uniforms: { uOpacity: { value: 0 } },
+    uniforms: {
+      uOpacity: { value: 0 },
+      uViewport: { value: new Vector2(1, 1) },
+      uTextRight: { value: compact ? 1 : 0.7 },
+    },
     transparent: true,
     depthWrite: false,
+    blending: AdditiveBlending,
     side: DoubleSide,
   });
 
@@ -191,6 +275,7 @@ export function createGlassScene(host: HTMLElement, { compact, onLost }: Options
     const height = host.clientHeight;
     if (!width || !height) return;
     renderer.setSize(width, height, false);
+    renderer.getDrawingBufferSize(material.uniforms.uViewport!.value);
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
   };
@@ -235,6 +320,9 @@ export function createGlassScene(host: HTMLElement, { compact, onLost }: Options
       progress = value;
       // The first frame starts where the page already is.
       if (startedAt < 0) shownProgress = value;
+    },
+    setTextRight(share) {
+      material.uniforms.uTextRight!.value = share;
     },
     setPointer(x, y) {
       pointer.x = x;

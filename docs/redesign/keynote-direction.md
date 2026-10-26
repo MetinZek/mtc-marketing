@@ -13,6 +13,15 @@ glass squares; client words get a Dovv-like slider; the journal becomes the
 ruled list from the Scroll Craft redesign. The navigation (top bar, then the
 bottom dock) stays as it was.
 
+**Iteration 3** (2026-10-26): black and white felt too serious, so the
+stickers take MTC's four colours with a Dovv-like shine, and two are 3D emojis
+(eyes and a rocket in the hero; a speech bubble and a waving hand in the
+footer). The glass squares get the material of a clear-glass reference: small
+rounded corners, a slightly thicker bevelled slab, light inside the faces,
+bright edges and only a faint cool tint. On touch screens the letter effect
+plays by itself as a slow drift. The footer's "Let's talk." gets the hero's
+treatment, like Dovv's "SAY HELLO".
+
 ## What was taken from the references
 
 - **dovvstudio.com**, high-level traits only: a centred, heavy, all-caps
@@ -21,11 +30,14 @@ bottom dock) stays as it was.
   answer the hover with a spring and can be dragged, real client logos on a
   loop right under the actions, a dark chapter whose paragraph lights up word
   by word, and a quote slider with a filling progress line, arrows and a
-  count. MTC's own words, facts and logos throughout; Inter instead of Dovv's
-  condensed face; black, white and glass stickers instead of colourful ones;
-  no illustrations, no rating, no counter (no verified figure exists).
+  count, and a footer line treated like the headline with stickers around
+  it. MTC's own words, facts and logos throughout; Inter instead of Dovv's
+  condensed face; stickers in MTC's own colours; licensed 3D emojis instead
+  of drawn illustrations; no rating, no counter (no verified figure exists).
 - **laboiteaslides.fr**: the idea of glass shapes drifting in 3D behind the
   type. Here they are squares, much thinner, monochrome, on black.
+- **A clear-glass render the owner supplied**: the material only (clear glass
+  with light inside it and bright bevelled edges), with a much fainter tint.
 - **MTC's Scroll Craft redesign** (the owner's own earlier build): the
   journal's ruled list with the four-colour line on hover.
 
@@ -34,8 +46,8 @@ bottom dock) stays as it was.
 **Work, presented like product.** A quiet monochrome stage (white, Apple grey
 `#f5f5f7` and one deep black chapter) where MTC's real projects are unveiled
 one at a time, at scale. The only saturated colour is the work itself, the
-logo's blue as the interface accent, and the four discipline colours in one
-place: the journal's hover line.
+logo's blue as the interface accent, and the four discipline colours where
+the page plays: the stickers and the journal's hover line.
 
 ## Hero focal asset
 
@@ -43,10 +55,12 @@ The **headline itself**: "WE MAKE BRANDS / IMPOSSIBLE TO IGNORE." in Inter at
 weight 900, fitted so its widest line spans the column (on phones the words
 wrap and the longest word spans it). Each letter is its own box; with a mouse
 or trackpad the letters near the pointer drop toward weight 200 and fill back
-in as it moves on. Four stickers sit on its corners: "Made in Kosovo" (black),
-the MTC logo (white), "EN · DE · SV" (frosted glass, blurring the letters it
-overlaps) and the four disciplines (white, hidden on phones). Static first
-frame: everything in place at full weight.
+in as it moves on; on touch screens an invisible point drifts through the
+text in a slow figure of eight instead. Four stickers sit on its corners:
+"Made in Kosovo" (red to pink), a 3D eyes emoji (for "impossible to
+ignore"), a 3D rocket (launches) and the four disciplines (blue to violet).
+The pill above names the agency and its three languages. Static first frame:
+everything in place at full weight.
 
 ## Type
 
@@ -72,9 +86,11 @@ anywhere visible.
 
 `#ffffff` canvas, `#f5f5f7` mist, `#1d1d1f` ink, `#6e6e73` muted, `#86868b`
 faint, `#d2d2d7` hairline, `#000000` night. Accent: the logo blue `#0b45ff` on
-light, `#2997ff` on dark. The journal's hover line runs through the four
-discipline colours (`#ff5b47`, `#ffb21e`, `#12b886`, `#1764ff`). Errors use
-`#d70015`.
+light, `#2997ff` on dark. The four discipline colours (`#ff5b47`, `#ffb21e`,
+`#12b886`, `#1764ff`) are the `hue-*` tokens: each sticker blends one toward a
+brighter neighbour under a white edge and a soft rainbow shine that follows
+the pointer (or drifts on touch screens), and the journal's hover line runs
+through all four. Errors use `#d70015`.
 
 ## Sequence (homepage)
 
@@ -92,8 +108,10 @@ discipline colours (`#ff5b47`, `#ffb21e`, `#12b886`, `#1764ff`). Errors use
    count. Only shows real, published quotes (see Content below).
 5. **Journal**: "Notes from the studio." and the five newest notes as a ruled
    list; hover draws the four-colour line and fills the arrow.
-6. **Sign-off** (site-wide footer): "Let's talk." set to the full width as the
-   link to the brief, with email, phone and the studio's local time.
+6. **Sign-off** (site-wide footer): "LET'S TALK." in the hero's fitted
+   capitals as the link to the brief (letters thinning near the pointer, the
+   drift on phones), with a 3D speech bubble, a waving hand and "Open for new
+   projects" around it; then email, phone and the studio's local time.
 
 Tell-someone sentence: *it's the site where the headline thins out under your
 mouse and you can pick the stickers up and move them.*
@@ -106,8 +124,9 @@ stickers (mouse and trackpad only, so touch scrolling is never caught),
 ScrollTrigger for the night chapter's ground, the lit paragraph and the glass
 squares' scroll progress, and server-split headings that rise in word by
 word with the unsplit text kept for assistive technology. The letter weights
-follow the pointer in a small requestAnimationFrame loop that stops as soon
-as every letter has settled. **Lenis** is the sole smooth-scroll engine
+(`FitLetters.tsx`) follow the pointer in a small requestAnimationFrame loop
+that stops as soon as every letter has settled; on touch screens the same
+loop follows a slow drifting point, only while the text is on screen. **Lenis** is the sole smooth-scroll engine
 (chosen over Locomotive Scroll: already in the stack, native scrolling for
 sticky and touch, and Locomotive v5 is itself built on Lenis), driven from
 GSAP's ticker and feeding ScrollTrigger. CSS handles hover, focus and tap
@@ -119,10 +138,13 @@ in its final state, and the glass squares are a still image.
 ## Three.js
 
 Used once, for the glass squares (`src/components/sections/glass-scene.ts`):
-twelve very thin rounded slabs (seven on phones) at different depths, one
-shared geometry and one small shader (faces nearly clear and capped to a
-faint sheen so white text stays readable over them, hairline edges that catch
-a white studio light). Scroll lifts and turns them, a pointer tilts the
+twelve squares with small rounded corners (seven on phones), thin bevelled
+slabs at different depths, one shared geometry and one small shader. It
+treats them as clear glass in a small studio: the faces show its light bent
+through them, split a little by colour, with a soft band of light that slides
+across as each pane turns; the bevels and edges catch it brightly; the cast is
+only faintly cool. Faces that pass behind the paragraph are held to a faint
+sheen so white text stays readable over them. Scroll lifts and turns them, a pointer tilts the
 group. It earns its place by giving the night chapter depth without adding
 colour or competing with the work. three.js is fetched only as the section
 comes near; the scene draws on GSAP's ticker only while the section is on
@@ -136,8 +158,10 @@ instead (`public/media/glass/squares.webp`, rendered from the scene itself).
 All imagery is MTC's own: project stills and cover films (copied from the live
 site into `public/media/` on the earlier redesign branch), the seven client
 logos from the live site's client strip, and the MTC logo from `public/brand/`.
-The glass still is a frame of the site's own WebGL scene. No generated or
-stock imagery, no illustrations. Interface icons are Solar (480 Design,
+The glass still is a frame of the site's own WebGL scene. The four sticker
+emojis are Microsoft's Fluent Emoji 3D (MIT licence, `public/media/emoji/`
+with its LICENSE.txt), converted to small WebP files. No generated or stock
+imagery, no drawn illustrations. Interface icons are Solar (480 Design,
 CC BY 4.0) taken from the Iconify set by `scripts/build-icons.mjs`. No people
 are shown.
 

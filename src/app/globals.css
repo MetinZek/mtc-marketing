@@ -42,6 +42,13 @@
   --color-blue-contrast: #ffffff;
   --color-sky: #2997ff;
 
+  /* ---- MTC's four discipline colours: stickers and the journal's
+     hover line only ------------------------------------------ */
+  --color-hue-red: #ff5b47;
+  --color-hue-amber: #ffb21e;
+  --color-hue-green: #12b886;
+  --color-hue-blue: #1764ff;
+
   --color-focus: #0b45ff;
   --color-danger: #d70015;
 
@@ -291,11 +298,12 @@
   opacity: 0;
   transform: translate3d(0, 18px, 0);
 }
-.motion [data-hero-title]:not(.is-in) .hero-char {
+.motion [data-hero-title]:not(.is-in) .fit-char,
+.motion [data-signoff-line]:not(.is-in) .fit-char {
   opacity: 0;
   transform: translate3d(0, 0.3em, 0);
 }
-.motion [data-hero-stickers]:not(.is-in) .sticker-pop {
+.motion [data-stickers]:not(.is-in) .sticker-pop {
   opacity: 0;
   transform: scale(0.4) rotate(-16deg);
 }
@@ -310,31 +318,42 @@
 }
 
 /* ============================================================
-   Hero (Hero.tsx). The headline is heavy capitals, one box per
-   letter so each letter's weight can follow the pointer. From
-   768px its lines stay whole; below that the words wrap. The
-   script fits the size to the column; these sizes are the first
-   frame without it.
+   Fitted capitals (FitLetters.tsx): the hero's headline and the
+   footer's "Let's talk.". One box per letter so each letter's
+   weight can follow the pointer; from 768px lines stay whole,
+   below that the words wrap. The script fits the size to the
+   column; these sizes are the first frame without it.
    ============================================================ */
-.hero-title {
-  font-size: 12.4vw;
+.hero-title,
+.signoff-line {
   font-weight: 900;
-  line-height: 0.9;
   letter-spacing: -0.035em;
   text-transform: uppercase;
 }
-.hero-word {
+.hero-title {
+  font-size: 12.4vw;
+  line-height: 0.9;
+}
+.signoff-line {
+  font-size: 24vw;
+  line-height: 0.86;
+  text-align: center;
+}
+.fit-word {
   display: inline-block;
   white-space: nowrap;
 }
-.hero-char {
+.fit-char {
   display: inline-block;
 }
 @media (min-width: 768px) {
   .hero-title {
     font-size: clamp(3rem, 6.5vw, 9rem);
   }
-  .hero-line {
+  .signoff-line {
+    font-size: clamp(3rem, 12vw, 11rem);
+  }
+  .fit-line {
     display: block;
     width: max-content;
     margin-inline: auto;
@@ -342,8 +361,14 @@
   }
 }
 
-/* Stickers: the outer box moves when dragged, the middle one pops in
-   and leans, the face is tilted and answers the hover. */
+/* ============================================================
+   Stickers (ui/Sticker.tsx). The outer box moves when dragged,
+   the middle one pops in and leans, the face is tilted and
+   answers the hover. Pills and badges take one of MTC's four
+   colours, blended toward a brighter neighbour, under a white
+   edge and a shine that follows the pointer (--shine) or drifts
+   on its own on touch screens. Emojis get a cut-out white edge.
+   ============================================================ */
 .sticker {
   position: absolute;
   z-index: 2;
@@ -368,6 +393,94 @@
     transform: rotate(var(--rot)) scale(1.1);
     transition-duration: 250ms;
   }
+}
+
+.sticker-pill,
+.sticker-badge {
+  border: 4px solid #ffffff;
+  font-weight: 800;
+  box-shadow: 0 14px 28px -12px rgb(0 0 0 / 0.38);
+}
+.sticker-pill {
+  display: block;
+  white-space: nowrap;
+  border-radius: 999px;
+  padding: 0.75rem 1.3rem;
+  font-size: 1.125rem;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+.sticker-badge {
+  display: grid;
+  place-items: center;
+  width: 6.5rem;
+  height: 6.5rem;
+  border-radius: 999px;
+  font-size: 0.9375rem;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  text-align: center;
+}
+.sticker-red {
+  background: linear-gradient(118deg, var(--color-hue-red) 0%, #ff6b3d 40%, #ff4f8f 100%);
+  color: #ffffff;
+}
+.sticker-amber {
+  background: linear-gradient(118deg, var(--color-hue-amber) 0%, #ffd23f 55%, #ff9b3d 100%);
+  color: #3d2600;
+}
+.sticker-green {
+  background: linear-gradient(118deg, var(--color-hue-green) 0%, #4ccf7c 48%, #c3f23a 100%);
+  color: #05301f;
+}
+.sticker-blue {
+  background: linear-gradient(118deg, var(--color-hue-blue) 0%, #3f7cff 42%, #8f5bff 100%);
+  color: #ffffff;
+}
+.sticker-shine {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.sticker-shine::after {
+  content: "";
+  position: absolute;
+  inset: -50% -60%;
+  background:
+    linear-gradient(100deg, transparent 40%, rgb(255 255 255 / 0.75) 48%, rgb(255 255 255 / 0.12) 54%, transparent 60%),
+    linear-gradient(
+      100deg,
+      var(--color-hue-red) 10%,
+      var(--color-hue-amber) 30%,
+      var(--color-hue-green) 50%,
+      var(--color-hue-blue) 70%,
+      #b45cff 90%
+    );
+  mix-blend-mode: soft-light;
+  opacity: 0.55;
+  pointer-events: none;
+  transform: translate3d(var(--shine, 0%), 0, 0);
+  transition: transform 600ms var(--ease-out-soft);
+}
+@media (hover: none) {
+  .sticker-shine::after {
+    animation: sticker-shine 7s ease-in-out infinite alternate;
+  }
+}
+@keyframes sticker-shine {
+  from {
+    transform: translate3d(-30%, 0, 0);
+  }
+  to {
+    transform: translate3d(30%, 0, 0);
+  }
+}
+.sticker-emoji {
+  display: block;
+  width: 6rem;
+  height: 6rem;
+  filter: drop-shadow(3px 0 0 #ffffff) drop-shadow(-3px 0 0 #ffffff) drop-shadow(0 3px 0 #ffffff)
+    drop-shadow(0 -3px 0 #ffffff) drop-shadow(0 14px 16px rgb(0 0 0 / 0.2));
 }
 
 /* ============================================================
@@ -422,7 +535,13 @@
   right: 0;
   bottom: -1px;
   height: 2px;
-  background: linear-gradient(90deg, #ff5b47, #ffb21e, #12b886, #1764ff);
+  background: linear-gradient(
+    90deg,
+    var(--color-hue-red),
+    var(--color-hue-amber),
+    var(--color-hue-green),
+    var(--color-hue-blue)
+  );
   transform: scaleX(0);
   transform-origin: left;
   transition: transform 320ms var(--ease-out-soft);

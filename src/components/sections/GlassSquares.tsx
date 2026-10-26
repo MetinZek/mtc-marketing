@@ -6,6 +6,8 @@ import type { GlassScene } from "./glass-scene";
 
 const COMPACT_QUERY = "(max-width: 767px)";
 const FINE_POINTER = "(hover: hover) and (pointer: fine)";
+/** The text the glass passes behind: the lit paragraph and the stages. */
+const TEXT_SELECTOR = '[data-reveal="ink"], ol';
 
 /**
  * The glass squares behind the night chapter's paragraph. Fills its parent
@@ -39,6 +41,16 @@ export function GlassSquares({ poster }: { poster: string }) {
       if (next) gsap.ticker.add(tick);
       else gsap.ticker.remove(tick);
     };
+    // Faces behind the text are held faint: tell the scene where it ends.
+    const measureText = () => {
+      if (!scene) return;
+      const box = host.getBoundingClientRect();
+      let right = 0;
+      section.querySelectorAll<HTMLElement>(TEXT_SELECTOR).forEach((el) => {
+        right = Math.max(right, el.getBoundingClientRect().right);
+      });
+      if (box.width > 0 && right > 0) scene.setTextRight((right - box.left) / box.width);
+    };
     const fail = () => {
       host.dataset.state = "failed";
       setDrawing(false);
@@ -60,6 +72,7 @@ export function GlassSquares({ poster }: { poster: string }) {
         onToggle: (self) => setDrawing(self.isActive),
       });
       scene.setProgress(trigger.progress);
+      measureText();
       setDrawing(trigger.isActive);
     };
 
@@ -77,6 +90,7 @@ export function GlassSquares({ poster }: { poster: string }) {
     const onPointer = (e: PointerEvent) =>
       scene?.setPointer((e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1);
     const onVisibility = () => setDrawing(Boolean(trigger?.isActive));
+    window.addEventListener("resize", measureText);
     if (fine) window.addEventListener("pointermove", onPointer, { passive: true });
     document.addEventListener("visibilitychange", onVisibility);
 
@@ -89,6 +103,7 @@ export function GlassSquares({ poster }: { poster: string }) {
       scene = null;
       if (fine) window.removeEventListener("pointermove", onPointer);
       document.removeEventListener("visibilitychange", onVisibility);
+      window.removeEventListener("resize", measureText);
       delete host.dataset.state;
     };
   }, []);

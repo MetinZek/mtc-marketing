@@ -38,6 +38,7 @@ export const de: Dictionary = {
     signOff: "Lassen Sie uns etwas schaffen, das zählt.",
     backToTop: "Nach oben",
     localTime: "Ortszeit in Mitrovica",
+    openForProjects: "Offen für neue Projekte",
   },
   contactForm: {
     nameRequired: "Bitte geben Sie Ihren Namen ein.",
