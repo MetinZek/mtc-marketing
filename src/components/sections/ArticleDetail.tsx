@@ -75,7 +75,7 @@ export function ArticleDetail({ post, prev, next, dict, locale }: ArticleDetailP
               className="media-rim relative mx-auto mt-12 max-w-6xl overflow-hidden rounded-[22px] bg-mist sm:rounded-[36px] lg:mt-16"
               style={{ aspectRatio: ratio }}
             >
-              <div data-zoom className="absolute inset-0">
+              <div data-zoom data-lens className="absolute inset-0">
                 {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven cover */}
                 <img src={post.coverImage.src} alt={post.coverImage.alt} fetchPriority="high" className="h-full w-full object-cover" />
               </div>

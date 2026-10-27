@@ -47,6 +47,7 @@ export async function Footer() {
         prompt={home.finalCta.headline}
         line={dict.contactPage.title}
         openLabel={dict.footer.openForProjects}
+        heyLabel={dict.footer.hey}
         ctaLabel={dict.nav.startAProject}
         ctaHref={withLocale(navCta.href, locale)}
         email={settings.email}

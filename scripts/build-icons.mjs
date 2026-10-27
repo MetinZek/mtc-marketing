@@ -38,6 +38,8 @@ const ICONS = {
   pin: "map-point-linear",
   grid: "widget-linear",
   list: "list-linear",
+  // The base shape of the footer's "hey!" speech-bubble sticker.
+  "chat-round": "chat-round-bold",
 };
 
 const root = path.dirname(path.dirname(fileURLToPath(import.meta.url)));

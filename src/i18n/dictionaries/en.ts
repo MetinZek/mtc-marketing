@@ -45,6 +45,7 @@ export const en = {
     backToTop: "Back to top",
     localTime: "Local time in Mitrovica",
     openForProjects: "Open for new projects",
+    hey: "hey!",
   },
   contactForm: {
     nameRequired: "Please enter your name.",
@@ -86,8 +87,8 @@ export const en = {
     statement:
       "We start by listening to your business, your audience and what success should look like. Then we set the strategy, design and build the brand, the website and the content, and launch it. After launch we stay on, measure what works and keep improving it.",
     stickers: {
-      made: "Made in Kosovo",
-      disciplines: "Branding · Web · Social · Content",
+      hello: "Say hi!",
+      ready: "Ready when you are",
       languages: "EN · DE · SV",
     },
     wordsPrevious: "Previous quote",
@@ -101,6 +102,7 @@ export const en = {
     projectCountOne: "project",
     projectCountOther: "projects",
     viewCaseStudy: "View case study",
+    viewLiveSite: "View live site",
     viewCaseStudyAriaLabel: "View case study: {title}",
     metaTitle: "Work | MTC",
     metaDescription:

@@ -105,6 +105,7 @@ function MediaFrame({
     <div
       className="media-rim relative aspect-(--ratio) overflow-hidden rounded-[22px] bg-mist sm:rounded-[28px] md:aspect-auto md:h-full"
       style={{ "--ratio": `${ratio[0]} / ${ratio[1]}` } as React.CSSProperties}
+      data-lens
       {...(video ? VIDEO_BOX : {})}
     >
       {children}
@@ -112,7 +113,6 @@ function MediaFrame({
   );
 }
 
-const zoom = "transition-transform duration-[900ms] ease-[var(--ease-out-soft)] group-hover:scale-[1.03]";
 
 function ProjectTile({ project, dict, locale }: { project: Project; dict: Dictionary; locale: Locale }) {
   const cover = coverImage(project);
@@ -129,7 +129,7 @@ function ProjectTile({ project, dict, locale }: { project: Project; dict: Dictio
           src={cover.src}
           alt={cover.alt}
           loading="lazy"
-          className={cn("h-full w-full object-cover", zoom, video && ["transition-[transform,opacity]", FALLBACK_IMAGE])}
+          className={cn("h-full w-full object-cover", video && ["transition-[transform,opacity]", FALLBACK_IMAGE])}
         />
         {video && (
           <ViewportVideo
@@ -137,7 +137,6 @@ function ProjectTile({ project, dict, locale }: { project: Project; dict: Dictio
             mobileSrc={project.mobileVideoUrl}
             className={cn(
               "absolute inset-0 h-full w-full object-cover opacity-0 transition-[transform,opacity] data-[ready]:opacity-100",
-              zoom,
             )}
           />
         )}
@@ -183,7 +182,6 @@ function PieceTile({
           loading="lazy"
           className={cn(
             "h-full w-full object-cover",
-            zoom,
             item.videoUrl && ["transition-[transform,opacity]", FALLBACK_IMAGE],
           )}
         />
@@ -192,7 +190,6 @@ function PieceTile({
             desktopSrc={item.videoUrl}
             className={cn(
               "absolute inset-0 h-full w-full object-cover opacity-0 transition-[transform,opacity] data-[ready]:opacity-100",
-              zoom,
             )}
           />
         )}

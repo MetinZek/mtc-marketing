@@ -6,17 +6,9 @@ import { hasLocale, locales, ogLocale, type Locale } from "@/i18n/locales";
 import { inter } from "@/i18n/font";
 import { withLocale } from "@/i18n/paths";
 import { siteConfig } from "@/config/site";
+import { MotionBoot } from "@/components/motion/MotionBoot";
 import { organizationJsonLd } from "@/lib/seo";
 import "../globals.css";
-
-/**
- * Runs during HTML parsing, before first paint: unless the visitor prefers
- * reduced motion, marks the document as animated so revealable elements may
- * start hidden (see "Motion start states" in globals.css). If the motion
- * code has not started after a few seconds (a failed chunk load), the mark
- * is dropped so nothing stays invisible.
- */
-const MOTION_BOOT = `(function(){var d=document.documentElement;if(window.matchMedia&&matchMedia("(prefers-reduced-motion: reduce)").matches)return;d.classList.add("motion");setTimeout(function(){if(!d.classList.contains("motion-ready"))d.classList.remove("motion")},3500)})();`;
 
 /**
  * Root layout for the public marketing site, branched from src/app/admin
@@ -85,14 +77,7 @@ export default async function LocaleRootLayout({ children }: { children: React.R
     // adds a class to <html> before React hydrates.
     <html lang={locale} className={inter.variable} data-scroll-behavior="smooth" suppressHydrationWarning>
       <body>
-        {/* Executable when the server renders it; inert text when React
-            renders the layout on the client (it has already run), which
-            also keeps React's script-tag warning away. */}
-        <script
-          type={typeof window === "undefined" ? "text/javascript" : "text/plain"}
-          suppressHydrationWarning
-          dangerouslySetInnerHTML={{ __html: MOTION_BOOT }}
-        />
+        <MotionBoot />
         {children}
         <script
           type="application/ld+json"

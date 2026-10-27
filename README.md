@@ -40,7 +40,7 @@ npm run typecheck  # tsc --noEmit
 | Styling | Tailwind CSS v4 (`@theme` tokens in `src/app/globals.css`) |
 | Motion | GSAP + ScrollTrigger (`src/lib/gsap.ts`), driven from markup attributes by `MotionRoot`; Draggable for the hero stickers |
 | Smooth scrolling | Lenis, the only scroll engine, on GSAP's ticker and feeding ScrollTrigger |
-| 3D | three.js, for the night chapter's glass squares only (loaded when the section comes near) |
+| 3D | three.js, for the night chapter's glass squares (tap one to break it) and the glass lens over project pictures; both load on first need |
 | Icons | Solar (480 Design, CC BY 4.0) via Iconify, extracted by `scripts/build-icons.mjs`; sticker emojis are Microsoft Fluent Emoji 3D (MIT, `public/media/emoji/LICENSE.txt`) |
 | Validation | Zod (CMS content schemas) |
 | Content | Provider abstraction: local seed in dev, Postgres (Supabase) in production |
@@ -87,16 +87,21 @@ Homepage (`src/app/[locale]/(site)/page.tsx`):
    `FitLetters`); four colourful stickers, two of them 3D emojis, that pop in
    and can be dragged (`ui/Sticker`); the two actions; the real client logos
    on a slow loop (`TrustedBy`).
-2. **Showroom**: featured projects as large night and mist tiles.
-3. **Night chapter**: "How we work" lit word by word over thin glass squares
-   (`StudioStatement`, `GlassSquares`, `glass-scene.ts`), then the four
-   services with where each was used (`Disciplines`).
+2. **Showroom**: featured projects as large night and mist tiles, each with
+   "View case study" and "View live site" (`ProjectTile`). A tiny glass lens
+   follows the pointer over every picture on the site (`WorkLens`,
+   `work-lens.ts`, on any `[data-lens]` box).
+3. **Night chapter**: "How we work" lit word by word over glass squares that
+   break when clicked or tapped and grow back (`StudioStatement`,
+   `GlassSquares`, `glass-scene.ts`), then the four services with where each
+   was used (`Disciplines`).
 4. **Client words** (`ClientWords`): one quote at a time with a filling line,
    arrows and the count; only real, published quotes.
 5. **Journal**: the five newest notes as a ruled list.
 
 Every page closes with the footer's sign-off: "LET'S TALK." in the hero's
-fitted capitals with the same letter effect and three stickers, then the call
+fitted capitals with the same letter effect and three stickers (a "hey!"
+bubble, a waving hand, "Open for new projects"), then the call
 to action, email, phone and the studio's local time (`SignOff`, hidden on
 /contact). Navigation is a top bar plus a dark floating
 dock that appears once the opener has gone (`Navbar`).

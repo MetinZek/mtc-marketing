@@ -7,7 +7,7 @@ import { Letters, useFitLetters, useLetterWeights } from "@/components/motion/Fi
 import { Button } from "@/components/ui/Button";
 import { CopyEmail } from "@/components/ui/CopyEmail";
 import { Icon } from "@/components/ui/Icon";
-import { Sticker, StickerEmoji, StickerPill, useStickers } from "@/components/ui/Sticker";
+import { Sticker, StickerBubble, StickerEmoji, StickerPill, useStickers } from "@/components/ui/Sticker";
 import { splitLocaleFromPathname } from "@/i18n/paths";
 import { gsap, motionDisabled, ScrollTrigger } from "@/lib/gsap";
 import { LocalTime } from "./LocalTime";
@@ -19,6 +19,8 @@ type SignOffProps = {
   line: string;
   /** "Open for new projects", on a sticker. */
   openLabel: string;
+  /** "hey!", in the speech bubble. */
+  heyLabel: string;
   ctaLabel: string;
   ctaHref: string;
   email: string;
@@ -39,8 +41,8 @@ type SignOffProps = {
  *
  * The big line behaves like the hero's headline: fitted to the width (its
  * words stack on phones), letters thinning near the pointer, a slow drift
- * on touch screens. Three stickers sit around it (a speech bubble, a
- * waving hand and "Open for new projects") and can be moved with a mouse.
+ * on touch screens. Three stickers sit around it (a "hey!" speech bubble,
+ * a waving hand and "Open for new projects") and can be moved with a mouse.
  * When it first reaches the screen its letters rise in and the stickers
  * pop on. The link's name is the plain line; its letters are hidden from
  * assistive technology.
@@ -56,6 +58,7 @@ function SignOffInner({
   prompt,
   line,
   openLabel,
+  heyLabel,
   ctaLabel,
   ctaHref,
   email,
@@ -127,13 +130,13 @@ function SignOffInner({
           </Link>
 
           <div data-stickers aria-hidden="true" className="pointer-events-none absolute inset-0">
-            <Sticker rot={-10} className="left-[-2%] top-[-16%] origin-top-left max-md:scale-[0.6] md:left-[1%] md:top-[-20%]">
-              <StickerEmoji src="/media/emoji/speech-balloon.webp" />
+            <Sticker rot={-10} className="left-[-2%] top-[-16%] origin-top-left max-md:scale-[0.6] md:left-[1%] md:top-[-20%] md:max-lg:scale-[0.7]">
+              <StickerBubble tone="amber">{heyLabel}</StickerBubble>
             </Sticker>
-            <Sticker rot={12} className="right-[-3%] top-[-14%] origin-top-right max-md:scale-[0.6] md:right-[2%] md:top-[-22%]">
+            <Sticker rot={12} className="right-[-3%] top-[-14%] origin-top-right max-md:scale-[0.6] md:right-[2%] md:top-[-22%] md:max-lg:scale-[0.7]">
               <StickerEmoji src="/media/emoji/waving-hand.webp" />
             </Sticker>
-            <Sticker rot={-5} className="bottom-[-12%] right-[4%] origin-bottom-right max-md:scale-[0.6] md:bottom-[-10%] md:left-[40%] md:right-auto">
+            <Sticker rot={-5} className="bottom-[-12%] right-[4%] origin-bottom-right max-md:scale-[0.6] md:bottom-[-10%] md:left-[40%] md:right-auto md:max-lg:scale-[0.7]">
               <StickerPill tone="green">{openLabel}</StickerPill>
             </Sticker>
           </div>

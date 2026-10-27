@@ -39,6 +39,7 @@ export const sv: Dictionary = {
     backToTop: "Till toppen",
     localTime: "Lokal tid i Mitrovica",
     openForProjects: "Öppna för nya projekt",
+    hey: "hej!",
   },
   contactForm: {
     nameRequired: "Ange ditt namn.",
@@ -80,8 +81,8 @@ export const sv: Dictionary = {
     statement:
       "Vi börjar med att lyssna: på ditt företag, din publik och hur framgång ska se ut. Sedan sätter vi strategin, formger och bygger varumärket, webbplatsen och innehållet och lanserar det. Efter lanseringen stannar vi kvar, mäter vad som fungerar och fortsätter att förbättra det.",
     stickers: {
-      made: "Made in Kosovo",
-      disciplines: "Varumärke · Webb · Socialt · Innehåll",
+      hello: "Säg hej!",
+      ready: "Redo när du är det",
       languages: "EN · DE · SV",
     },
     wordsPrevious: "Föregående citat",
@@ -95,6 +96,7 @@ export const sv: Dictionary = {
     projectCountOne: "projekt",
     projectCountOther: "projekt",
     viewCaseStudy: "Se fallstudien",
+    viewLiveSite: "Se webbplatsen",
     viewCaseStudyAriaLabel: "Se fallstudien: {title}",
     metaTitle: "Arbeten | MTC",
     metaDescription:

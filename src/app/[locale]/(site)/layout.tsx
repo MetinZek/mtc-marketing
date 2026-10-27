@@ -3,6 +3,7 @@ import { Navbar } from "@/components/layout/Navbar";
 import { MotionRoot } from "@/components/motion/MotionRoot";
 import { PageTransition } from "@/components/motion/PageTransition";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
+import { WorkLens } from "@/components/sections/WorkLens";
 import { getDictionary } from "@/i18n/get-dictionary";
 
 /**
@@ -10,8 +11,9 @@ import { getDictionary } from "@/i18n/get-dictionary";
  * around every marketing route. Only the routed content inside <main>
  * fades in between routes (PageTransition) and gets a fresh scroll
  * choreography per page (MotionRoot, remounted with it); the navigation
- * and footer stay put. `dict` is fetched once here (Navbar is a Client
- * Component and can't call next/root-params itself) and passed down.
+ * and footer stay put, and so does the glass lens over project pictures
+ * (WorkLens). `dict` is fetched once here (Navbar is a Client Component
+ * and can't call next/root-params itself) and passed down.
  */
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const dict = await getDictionary();
@@ -31,6 +33,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       </main>
       <Footer />
       <SmoothScroll />
+      <WorkLens />
     </>
   );
 }

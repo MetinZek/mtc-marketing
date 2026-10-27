@@ -1,9 +1,10 @@
 "use client";
 
 import { Draggable } from "gsap/Draggable";
-import { useEffect, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { useEffect, useId, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { gsap } from "@/lib/gsap";
 import { cn } from "@/lib/utils";
+import { SOLAR_ICONS } from "./solar-icons";
 
 gsap.registerPlugin(Draggable);
 
@@ -45,6 +46,43 @@ export function StickerBadge({ tone, children }: { tone: StickerTone; children: 
   return (
     <span className={cn("sticker-badge sticker-shine", `sticker-${tone}`)}>
       <span className="relative z-[1]">{children}</span>
+    </span>
+  );
+}
+
+/** Gradient stops for the speech bubble, matching the pills' tones. */
+const BUBBLE_STOPS: Record<StickerTone, [string, string, string]> = {
+  red: ["#ff5b47", "#ff6b3d", "#ff4f8f"],
+  amber: ["#ffb21e", "#ffd23f", "#ff9b3d"],
+  green: ["#12b886", "#4ccf7c", "#c3f23a"],
+  blue: ["#1764ff", "#3f7cff", "#8f5bff"],
+};
+
+/**
+ * A speech bubble with a word in it: Solar's round chat bubble (CC BY 4.0),
+ * filled with one of the four colours under the stickers' white edge, and
+ * the word set over its middle.
+ */
+export function StickerBubble({ tone, children }: { tone: StickerTone; children: ReactNode }) {
+  const gradient = `bubble-${useId().replace(/[^\w-]/g, "")}`;
+  const [from, middle, to] = BUBBLE_STOPS[tone];
+  const shape = SOLAR_ICONS["chat-round"].replace(
+    'fill="currentColor"',
+    `fill="url(#${gradient})" stroke="#fff" stroke-width="1.7" stroke-linejoin="round" paint-order="stroke"`,
+  );
+  return (
+    <span className={cn("sticker-bubble", `sticker-${tone}`)}>
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <defs>
+          <linearGradient id={gradient} x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stopColor={from} />
+            <stop offset="0.55" stopColor={middle} />
+            <stop offset="1" stopColor={to} />
+          </linearGradient>
+        </defs>
+        <g dangerouslySetInnerHTML={{ __html: shape }} />
+      </svg>
+      <span className="sticker-bubble-word">{children}</span>
     </span>
   );
 }

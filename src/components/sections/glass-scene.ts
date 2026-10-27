@@ -2,14 +2,18 @@ import {
   AdditiveBlending,
   DoubleSide,
   ExtrudeGeometry,
+  Float32BufferAttribute,
   Group,
   MathUtils,
+  Matrix4,
   Mesh,
   PerspectiveCamera,
+  Raycaster,
   Scene,
   ShaderMaterial,
   Shape,
   Vector2,
+  Vector3,
   WebGLRenderer,
 } from "three";
 
@@ -21,8 +25,10 @@ import {
  * little. One shared geometry and one shader that treats them as clear
  * glass in a small studio: the faces show soft light through themselves,
  * the bevels and edges catch it brightly and split it a little by colour,
- * with only a faint cool cast. Rendering is driven from outside (GSAP's
- * ticker), so nothing runs while the section is off screen.
+ * with only a faint cool cast. A pane that is clicked or tapped breaks into
+ * shards that fly apart and fall, and a new one grows in its place.
+ * Rendering is driven from outside (GSAP's ticker), so nothing runs while
+ * the section is off screen.
  */
 
 export type GlassScene = {
@@ -35,6 +41,10 @@ export type GlassScene = {
   setTextRight(share: number): void;
   /** Pointer position across the window, -1 to 1 on both axes. */
   setPointer(x: number, y: number): void;
+  /** Whether a whole pane is under this point of the canvas (CSS px). */
+  hit(x: number, y: number): boolean;
+  /** Breaks the pane under this point of the canvas (CSS px), if any. */
+  shatter(x: number, y: number): boolean;
   destroy(): void;
 };
 
@@ -51,6 +61,8 @@ type Pane = {
   nx: number;
   ny: number;
   z: number;
+  /** Side length in world units. */
+  size: number;
   rx: number;
   ry: number;
   rz: number;
@@ -62,6 +74,15 @@ type Pane = {
   phase: number;
   /** Rise over the whole section, in visible heights. */
   travel: number;
+  /** After a break: when the new pane starts to grow (seconds), else 0. */
+  regrowAt: number;
+};
+
+/** One break: its shards, flying and falling, and their shared fade. */
+type Burst = {
+  shards: { mesh: Mesh; velocity: Vector3; spin: Vector3 }[];
+  material: ShaderMaterial;
+  born: number;
 };
 
 const FOV = 32;
@@ -71,8 +92,8 @@ const CAMERA_Z = 14;
 const HALF = 0.5;
 const CORNER = 0.085;
 
-/** A square pane with little rounded corners: a thin slab, softly bevelled. */
-function paneGeometry() {
+/** The pane's outline: a square with little rounded corners. */
+function paneShape() {
   const shape = new Shape();
   shape.moveTo(-HALF + CORNER, -HALF);
   shape.lineTo(HALF - CORNER, -HALF);
@@ -83,7 +104,12 @@ function paneGeometry() {
   shape.absarc(-HALF + CORNER, HALF - CORNER, CORNER, Math.PI / 2, Math.PI, false);
   shape.lineTo(-HALF, -HALF + CORNER);
   shape.absarc(-HALF + CORNER, -HALF + CORNER, CORNER, Math.PI, Math.PI * 1.5, false);
-  const geometry = new ExtrudeGeometry(shape, {
+  return shape;
+}
+
+/** A pane: the outline as a thin slab, softly bevelled. */
+function paneGeometry() {
+  const geometry = new ExtrudeGeometry(paneShape(), {
     depth: 0.03,
     bevelEnabled: true,
     bevelThickness: 0.016,
@@ -92,7 +118,100 @@ function paneGeometry() {
     curveSegments: 10,
   });
   geometry.center();
+  smoothSides(geometry);
   return geometry;
+}
+
+/**
+ * ExtrudeGeometry shades its bevel and corners in flat facets, which flicker
+ * as the panes turn. Average the side normals wherever facets meet (the
+ * faces stay flat), so the edges catch light as one smooth curve.
+ */
+function smoothSides(geometry: ExtrudeGeometry) {
+  const sides = geometry.groups.find((g) => g.materialIndex === 1);
+  const position = geometry.getAttribute("position");
+  const normal = geometry.getAttribute("normal");
+  if (!sides || !position || !normal) return;
+  const key = (i: number) => `${position.getX(i).toFixed(4)},${position.getY(i).toFixed(4)},${position.getZ(i).toFixed(4)}`;
+  const sums = new Map<string, [number, number, number]>();
+  const end = sides.start + sides.count;
+  for (let i = sides.start; i < end; i++) {
+    const sum = sums.get(key(i)) ?? [0, 0, 0];
+    sum[0] += normal.getX(i);
+    sum[1] += normal.getY(i);
+    sum[2] += normal.getZ(i);
+    sums.set(key(i), sum);
+  }
+  for (let i = sides.start; i < end; i++) {
+    const [x, y, z] = sums.get(key(i))!;
+    const length = Math.hypot(x, y, z) || 1;
+    normal.setXYZ(i, x / length, y / length, z / length);
+  }
+  normal.needsUpdate = true;
+}
+
+/**
+ * Breaks a pane at `impact` (in its own units): cracks run from the impact
+ * to the outline in 7 to 10 directions, and a ring crack splits each wedge
+ * in two. The shards come back as thin slabs centred on themselves, with
+ * where each sat on the pane (`paneXY`, so the rim light stays put) and
+ * its centre on the pane.
+ */
+function fracture(impact: Vector2) {
+  const outline = paneShape().getSpacedPoints(84);
+  outline.pop();
+  const count = outline.length;
+  const angle = (p: Vector2) => Math.atan2(p.y - impact.y, p.x - impact.x);
+  const rays = 7 + Math.floor(Math.random() * 4);
+  const start = Math.random() * Math.PI * 2;
+  const cuts = new Set<number>();
+  for (let k = 0; k < rays; k++) {
+    const aim = start + (k + 0.2 + Math.random() * 0.6) * ((Math.PI * 2) / rays);
+    let best = 0;
+    let bestGap = Infinity;
+    outline.forEach((point, i) => {
+      const gap = Math.abs(((angle(point) - aim + Math.PI * 3) % (Math.PI * 2)) - Math.PI);
+      if (gap < bestGap) {
+        bestGap = gap;
+        best = i;
+      }
+    });
+    cuts.add(best);
+  }
+  let ordered = [...cuts].sort((a, b) => a - b);
+  if (ordered.length < 3) ordered = [0, 1, 2, 3].map((q) => Math.floor((q * count) / 4));
+
+  const polygons: Vector2[][] = [];
+  ordered.forEach((from, k) => {
+    const to = ordered[(k + 1) % ordered.length]!;
+    const arc: Vector2[] = [];
+    for (let i = from; ; i = (i + 1) % count) {
+      arc.push(outline[i]!);
+      if (i === to) break;
+    }
+    if (arc.length < 2) return;
+    const ring = 0.3 + Math.random() * 0.28;
+    const a = impact.clone().lerp(arc[0]!, ring);
+    const b = impact.clone().lerp(arc[arc.length - 1]!, ring);
+    polygons.push([impact.clone(), a, b], [a, ...arc, b]);
+  });
+
+  return polygons.map((polygon) => {
+    const center = polygon.reduce((sum, p) => sum.add(p), new Vector2()).divideScalar(polygon.length);
+    const geometry = new ExtrudeGeometry(new Shape(polygon.map((p) => p.clone().sub(center))), {
+      depth: 0.06,
+      bevelEnabled: false,
+    });
+    geometry.translate(0, 0, -0.03);
+    const position = geometry.getAttribute("position");
+    const paneXY = new Float32Array(position.count * 2);
+    for (let i = 0; i < position.count; i++) {
+      paneXY[i * 2] = position.getX(i) + center.x;
+      paneXY[i * 2 + 1] = position.getY(i) + center.y;
+    }
+    geometry.setAttribute("paneXY", new Float32BufferAttribute(paneXY, 2));
+    return { geometry, center };
+  });
 }
 
 const vertexShader = /* glsl */ `
@@ -109,6 +228,11 @@ const vertexShader = /* glsl */ `
     gl_Position = projectionMatrix * viewMatrix * world;
   }
 `;
+
+/** Shards light their rim from where they sat on the pane. */
+const shardVertexShader = vertexShader
+  .replace("varying vec3 vNormalW;", "attribute vec2 paneXY;\n  varying vec3 vNormalW;")
+  .replace("vLocal = position.xy;", "vLocal = paneXY;");
 
 // Clear glass in a small studio, added as light over the black page. The
 // faces show the studio through themselves (bent, and split a little by
@@ -226,31 +350,30 @@ export function createGlassScene(host: HTMLElement, { compact, onLost }: Options
     side: DoubleSide,
   });
 
+  const tanHalf = Math.tan(MathUtils.degToRad(FOV / 2));
+  const travelAt = (z: number) => Math.max(0.2, 0.35 + ((z + 7) / 10) * 0.6);
+
   // Placement: most panes to the right of the paragraph, the rest at the
   // left edge, none too close to another (in screen terms).
   const random = seeded(compact ? 11 : 7);
   const range = (min: number, max: number) => min + (max - min) * random();
   const sign = () => (random() < 0.5 ? -1 : 1);
   const count = compact ? 7 : 12;
-  const panes: Pane[] = [];
+  const specs: Omit<Pane, "mesh">[] = [];
   for (let i = 0; i < count; i++) {
     let nx = 0;
     let ny = 0;
     for (let attempt = 0; attempt < 40; attempt++) {
       nx = compact ? range(-1, 1) : random() < 0.7 ? range(0.32, 1.05) : range(-1.1, -0.72);
       ny = range(-1.15, 1.15);
-      if (panes.every((p) => Math.hypot(p.nx - nx, p.ny - ny) > (compact ? 0.55 : 0.36))) break;
+      if (specs.every((p) => Math.hypot(p.nx - nx, p.ny - ny) > (compact ? 0.55 : 0.36))) break;
     }
     const z = range(-7, 3);
-    const size = range(compact ? 0.8 : 0.75, compact ? 1.5 : 2) * (1 + -Math.min(z, 0) * 0.07);
-    const mesh = new Mesh(geometry, material);
-    mesh.scale.setScalar(size);
-    group.add(mesh);
-    panes.push({
-      mesh,
+    specs.push({
       nx,
       ny,
       z,
+      size: range(compact ? 0.8 : 0.75, compact ? 1.5 : 2) * (1 + -Math.min(z, 0) * 0.07),
       rx: range(-0.6, 0.6),
       ry: range(-0.9, 0.9),
       rz: range(-0.5, 0.5),
@@ -258,17 +381,78 @@ export function createGlassScene(host: HTMLElement, { compact, onLost }: Options
       turnY: sign() * range(0.8, 2.1),
       spin: sign() * range(0.02, 0.07),
       phase: range(0, Math.PI * 2),
-      travel: 0.35 + ((z + 7) / 10) * 0.6,
+      travel: travelAt(z),
+      regrowAt: 0,
     });
   }
 
-  const tanHalf = Math.tan(MathUtils.degToRad(FOV / 2));
+  // Panes never pass through one another, whatever they turn to: where two
+  // could come within reach of each other anywhere along the section's
+  // scroll (checked on the narrowest screen of the kind), the farther one
+  // steps back and grows to keep its size on screen.
+  const narrowest = compact ? 0.42 : 0.7;
+  const reachOf = (p: Omit<Pane, "mesh">) => p.size * 0.76;
+  const placeAt = (p: Omit<Pane, "mesh">, t: number) => {
+    const halfH = tanHalf * (CAMERA_Z - p.z);
+    return [p.nx * halfH * narrowest, p.ny * halfH + (t - 0.5) * p.travel * 2 * halfH, p.z];
+  };
+  for (let pass = 0; pass < 8; pass++) {
+    let moved = false;
+    for (let i = 0; i < specs.length; i++) {
+      for (let j = i + 1; j < specs.length; j++) {
+        const a = specs[i]!;
+        const b = specs[j]!;
+        let closest = Infinity;
+        for (let step = 0; step <= 16; step++) {
+          const [ax, ay, az] = placeAt(a, step / 16);
+          const [bx, by, bz] = placeAt(b, step / 16);
+          closest = Math.min(closest, Math.hypot(ax! - bx!, ay! - by!, az! - bz!));
+        }
+        const needed = reachOf(a) + reachOf(b) + 0.25;
+        if (closest >= needed) continue;
+        const far = a.z < b.z ? a : b;
+        const depth = CAMERA_Z - far.z;
+        far.z -= needed - closest + 0.1;
+        far.size *= (CAMERA_Z - far.z) / depth;
+        far.travel = travelAt(far.z);
+        moved = true;
+      }
+    }
+    if (!moved) break;
+  }
+
+  const panes: Pane[] = specs.map((spec) => {
+    const mesh = new Mesh(geometry, material);
+    mesh.scale.setScalar(spec.size);
+    group.add(mesh);
+    return { ...spec, mesh };
+  });
   let progress = 0;
   let shownProgress = 0;
   const pointer = { x: 0, y: 0 };
   const tilt = { x: 0, y: 0 };
   let startedAt = -1;
+  let lastTime = 0;
   let destroyed = false;
+  const bursts: Burst[] = [];
+  const raycaster = new Raycaster();
+  const aimAt = new Vector2();
+
+  /** The whole pane under a point of the canvas (CSS px), and where it was hit. */
+  const paneAt = (x: number, y: number) => {
+    const width = host.clientWidth;
+    const height = host.clientHeight;
+    if (!width || !height) return null;
+    aimAt.set((x / width) * 2 - 1, -(y / height) * 2 + 1);
+    raycaster.setFromCamera(aimAt, camera);
+    const whole = panes.filter((p) => p.mesh.visible && !p.regrowAt);
+    const [first] = raycaster.intersectObjects(
+      whole.map((p) => p.mesh),
+      false,
+    );
+    const pane = first && whole.find((p) => p.mesh === first.object);
+    return pane ? { pane, point: first.point } : null;
+  };
 
   const resize = () => {
     const width = host.clientWidth;
@@ -293,6 +477,8 @@ export function createGlassScene(host: HTMLElement, { compact, onLost }: Options
     render(time) {
       if (destroyed) return;
       if (startedAt < 0) startedAt = time;
+      const dt = lastTime ? Math.min(0.05, Math.max(0, time - lastTime)) : 0;
+      lastTime = time;
       shownProgress += (progress - shownProgress) * 0.12;
       tilt.x += (pointer.x - tilt.x) * 0.05;
       tilt.y += (pointer.y - tilt.y) * 0.05;
@@ -311,10 +497,90 @@ export function createGlassScene(host: HTMLElement, { compact, onLost }: Options
           p.ry + shownProgress * p.turnY + time * p.spin,
           p.rz,
         );
+        // A broken pane grows back from nothing after a pause.
+        if (p.regrowAt) {
+          const grown = (time - p.regrowAt) / 1.3;
+          p.mesh.visible = grown > 0;
+          if (grown >= 1) {
+            p.regrowAt = 0;
+            p.mesh.scale.setScalar(p.size);
+          } else if (grown > 0) {
+            p.mesh.scale.setScalar(p.size * Math.max(0.001, 1 - Math.pow(1 - grown, 3)));
+          }
+        }
       }
 
-      material.uniforms.uOpacity!.value = Math.min(1, (time - startedAt) / 1.2);
+      const opacity = Math.min(1, (time - startedAt) / 1.2);
+      material.uniforms.uOpacity!.value = opacity;
+
+      // Shards fly apart, fall and fade out.
+      for (let i = bursts.length - 1; i >= 0; i--) {
+        const burst = bursts[i]!;
+        const age = time - burst.born;
+        burst.material.uniforms.uOpacity!.value = opacity * (1 - MathUtils.smoothstep(age, 0.9, 1.8));
+        for (const shard of burst.shards) {
+          shard.velocity.y -= 5.5 * dt;
+          shard.mesh.position.addScaledVector(shard.velocity, dt);
+          shard.mesh.rotation.x += shard.spin.x * dt;
+          shard.mesh.rotation.y += shard.spin.y * dt;
+          shard.mesh.rotation.z += shard.spin.z * dt;
+        }
+        if (age > 1.8) {
+          burst.shards.forEach(({ mesh }) => {
+            scene.remove(mesh);
+            mesh.geometry.dispose();
+          });
+          burst.material.dispose();
+          bursts.splice(i, 1);
+        }
+      }
+
       renderer.render(scene, camera);
+    },
+    hit(x, y) {
+      return Boolean(paneAt(x, y));
+    },
+    shatter(x, y) {
+      const found = paneAt(x, y);
+      if (!found) return false;
+      const { pane, point } = found;
+      pane.mesh.updateMatrixWorld();
+      const impact = pane.mesh.worldToLocal(point.clone());
+      const shardMaterial = new ShaderMaterial({
+        vertexShader: shardVertexShader,
+        fragmentShader,
+        uniforms: {
+          uOpacity: { value: material.uniforms.uOpacity!.value },
+          uViewport: material.uniforms.uViewport!,
+          uTextRight: material.uniforms.uTextRight!,
+        },
+        transparent: true,
+        depthWrite: false,
+        blending: AdditiveBlending,
+        side: DoubleSide,
+      });
+      const shards = fracture(new Vector2(impact.x, impact.y)).map(({ geometry: piece, center }) => {
+        const mesh = new Mesh(piece, shardMaterial);
+        new Matrix4()
+          .multiplyMatrices(pane.mesh.matrixWorld, new Matrix4().makeTranslation(center.x, center.y, 0))
+          .decompose(mesh.position, mesh.quaternion, mesh.scale);
+        scene.add(mesh);
+        // Outward from the impact, nearer shards faster, a little toward the viewer.
+        const out = mesh.position.clone().sub(point).setZ(0);
+        const near = 1 - Math.min(out.length() / pane.size, 1);
+        out.normalize();
+        return {
+          mesh,
+          velocity: out
+            .multiplyScalar(0.7 + Math.random() * 1.2 + near * 0.8)
+            .add(new Vector3((Math.random() - 0.5) * 0.5, 0.4 + Math.random() * 1.2, 0.5 + Math.random() * 1.4)),
+          spin: new Vector3((Math.random() - 0.5) * 7, (Math.random() - 0.5) * 7, (Math.random() - 0.5) * 4),
+        };
+      });
+      bursts.push({ shards, material: shardMaterial, born: lastTime });
+      pane.mesh.visible = false;
+      pane.regrowAt = lastTime + 2.4;
+      return true;
     },
     setProgress(value) {
       progress = value;
@@ -332,6 +598,11 @@ export function createGlassScene(host: HTMLElement, { compact, onLost }: Options
       destroyed = true;
       ro.disconnect();
       canvas.removeEventListener("webglcontextlost", onContextLost);
+      bursts.forEach((burst) => {
+        burst.shards.forEach(({ mesh }) => mesh.geometry.dispose());
+        burst.material.dispose();
+      });
+      bursts.length = 0;
       geometry.dispose();
       material.dispose();
       renderer.dispose();

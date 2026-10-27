@@ -13,8 +13,9 @@ type StudioStatementProps = {
 /**
  * The night chapter's opening: how MTC works, told as one large paragraph
  * whose words light up as it scrolls through, with the four stages set
- * small underneath. Thin glass squares drift and turn behind it in a
- * screen-high layer that holds still while the section passes.
+ * small underneath. Glass squares drift and turn behind it in a
+ * screen-high layer that holds still while the section passes; a click or
+ * tap breaks one (see GlassSquares).
  */
 export function StudioStatement({ label, statement, stages }: StudioStatementProps) {
   return (

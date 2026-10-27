@@ -8,6 +8,8 @@ const COMPACT_QUERY = "(max-width: 767px)";
 const FINE_POINTER = "(hover: hover) and (pointer: fine)";
 /** The text the glass passes behind: the lit paragraph and the stages. */
 const TEXT_SELECTOR = '[data-reveal="ink"], ol';
+/** Clicks on these are for reading or following, never for breaking glass. */
+const NOT_GLASS = 'a, button, p, h2, h3, li';
 
 /**
  * The glass squares behind the night chapter's paragraph. Fills its parent
@@ -16,7 +18,8 @@ const TEXT_SELECTOR = '[data-reveal="ink"], ol';
  * The WebGL scene (glass-scene.ts, with three.js) is only fetched as the
  * section comes near, and only draws on GSAP's ticker while the section is
  * on screen and the tab visible. Scroll progress comes from ScrollTrigger,
- * so it follows Lenis. With reduced motion, without JavaScript, or when
+ * so it follows Lenis. A click or tap on a pane (anywhere in the section but
+ * its text) breaks it, and a mouse shows a pointer over one. With reduced motion, without JavaScript, or when
  * WebGL is missing or its context is lost, a still of the same scene shows
  * instead and no canvas exists.
  */
@@ -91,6 +94,29 @@ export function GlassSquares({ poster }: { poster: string }) {
       scene?.setPointer((e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1);
     const onVisibility = () => setDrawing(Boolean(trigger?.isActive));
     window.addEventListener("resize", measureText);
+
+    const inCanvas = (e: MouseEvent) => {
+      const box = host.getBoundingClientRect();
+      return [e.clientX - box.left, e.clientY - box.top] as const;
+    };
+    const overText = (e: Event) => Boolean((e.target as Element | null)?.closest(NOT_GLASS));
+    const onClick = (e: MouseEvent) => {
+      if (!scene || overText(e) || window.getSelection()?.toString()) return;
+      const [x, y] = inCanvas(e);
+      if (scene.shatter(x, y)) section.style.removeProperty("cursor");
+    };
+    let hover = 0;
+    const onHover = (e: PointerEvent) => {
+      cancelAnimationFrame(hover);
+      hover = requestAnimationFrame(() => {
+        const [x, y] = inCanvas(e);
+        const breakable = Boolean(scene) && !overText(e) && scene!.hit(x, y);
+        if (breakable) section.style.cursor = "pointer";
+        else section.style.removeProperty("cursor");
+      });
+    };
+    section.addEventListener("click", onClick);
+    if (fine) section.addEventListener("pointermove", onHover, { passive: true });
     if (fine) window.addEventListener("pointermove", onPointer, { passive: true });
     document.addEventListener("visibilitychange", onVisibility);
 
@@ -104,6 +130,10 @@ export function GlassSquares({ poster }: { poster: string }) {
       if (fine) window.removeEventListener("pointermove", onPointer);
       document.removeEventListener("visibilitychange", onVisibility);
       window.removeEventListener("resize", measureText);
+      cancelAnimationFrame(hover);
+      section.removeEventListener("click", onClick);
+      section.removeEventListener("pointermove", onHover);
+      section.style.removeProperty("cursor");
       delete host.dataset.state;
     };
   }, []);

@@ -78,7 +78,7 @@ function CaseStudyItem({ section, projectTitle }: { section: CaseStudySection; p
   return (
     <figure className={cn(ratio !== undefined && ratio < 0.95 && "mx-auto w-full max-w-2xl")}>
       <Reveal variant="media" className="media-rim overflow-hidden rounded-[22px] bg-mist sm:rounded-[28px]">
-        <div data-zoom>
+        <div data-zoom data-lens className="relative">
           {/* eslint-disable-next-line @next/next/no-img-element -- CMS-uploaded image, not a static import */}
           <img
             src={image.src}

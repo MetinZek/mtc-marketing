@@ -22,6 +22,23 @@ bright edges and only a faint cool tint. On touch screens the letter effect
 plays by itself as a slow drift. The footer's "Let's talk." gets the hero's
 treatment, like Dovv's "SAY HELLO".
 
+**Iteration 4** (2026-10-26): to move further from Dovv, "Made in Kosovo" (too
+close to Dovv's "Made in Argentina") and the disciplines sticker become
+"Say hi!" and "Ready when you are". Projects are presented with their own
+description in calm, larger text, with "View case study" and "View live
+site", on the homepage and the case studies. Two playful ideas of MTC's own:
+a glass lens that follows the pointer over project pictures, and glass
+squares that break when tapped and grow back. Fixed: the stickers' shine
+leaking at their corners, and panes that could pass through each other.
+
+**Iteration 5** (2026-10-27, getting ready to launch): the lens becomes very
+small (a loupe of 56 to 84px) and works on every picture on the site: the
+work tiles, the case-study cover, gallery and next-project pictures, and the
+journal's covers. The homepage tiles drop the description again (it stays on
+the case studies). The footer's speech-bubble emoji becomes a "hey!" bubble
+sticker in MTC's amber. A full phone pass found no page wider than a 360px
+screen.
+
 ## What was taken from the references
 
 - **dovvstudio.com**, high-level traits only: a centred, heavy, all-caps
@@ -40,6 +57,11 @@ treatment, like Dovv's "SAY HELLO".
   with light inside it and bright bevelled edges), with a much fainter tint.
 - **MTC's Scroll Craft redesign** (the owner's own earlier build): the
   journal's ruled list with the four-colour line on hover.
+- **Dovv's case-study overview**: the calm way a project is described (a
+  plain paragraph a step above body size, then "View Live Site").
+- **A work grid with an ink hover** (a recording the owner shared): only the
+  idea that the work should answer the pointer. Here it is a glass lens, in
+  the same glass as the night chapter.
 
 ## Visual thesis
 
@@ -57,8 +79,8 @@ wrap and the longest word spans it). Each letter is its own box; with a mouse
 or trackpad the letters near the pointer drop toward weight 200 and fill back
 in as it moves on; on touch screens an invisible point drifts through the
 text in a slow figure of eight instead. Four stickers sit on its corners:
-"Made in Kosovo" (red to pink), a 3D eyes emoji (for "impossible to
-ignore"), a 3D rocket (launches) and the four disciplines (blue to violet).
+"Say hi!" (red to pink), a 3D eyes emoji (for "impossible to ignore"), a
+3D rocket (launches) and "Ready when you are" (blue to violet).
 The pill above names the agency and its three languages. Static first frame:
 everything in place at full weight.
 
@@ -99,10 +121,14 @@ through all four. Errors use `#d70015`.
    client logos on a slow loop. Fills the first screen.
 2. **Showroom** (the peak): featured projects as very large tiles, alternating
    a black full-width tile and pairs on mist; each unveils as it arrives.
+   Under each picture: the name, discipline and year, "View case study" and,
+   when there is one, "View live site". A tiny glass lens follows the pointer
+   over the pictures (on phones it drifts over the picture in view).
 3. **Night chapter**: "How we work" as one large paragraph whose words light
    up as it scrolls through, the four stages set small beneath it; thin glass
    squares drift and turn behind it in a layer that holds still while the
-   section passes. Then the four disciplines as ruled rows.
+   section passes; click or tap one and it breaks into shards that fall away,
+   then a new one grows in its place. Then the four disciplines as ruled rows.
 4. **Client words**: one quote at a time, set large, its words going from grey
    to ink; beside it a line that fills over eight seconds, arrows and the
    count. Only shows real, published quotes (see Content below).
@@ -110,8 +136,8 @@ through all four. Errors use `#d70015`.
    list; hover draws the four-colour line and fills the arrow.
 6. **Sign-off** (site-wide footer): "LET'S TALK." in the hero's fitted
    capitals as the link to the brief (letters thinning near the pointer, the
-   drift on phones), with a 3D speech bubble, a waving hand and "Open for new
-   projects" around it; then email, phone and the studio's local time.
+   drift on phones), with a "hey!" speech bubble, a waving hand and "Open for
+   new projects" around it; then email, phone and the studio's local time.
 
 Tell-someone sentence: *it's the site where the headline thins out under your
 mouse and you can pick the stickers up and move them.*
@@ -126,7 +152,9 @@ squares' scroll progress, and server-split headings that rise in word by
 word with the unsplit text kept for assistive technology. The letter weights
 (`FitLetters.tsx`) follow the pointer in a small requestAnimationFrame loop
 that stops as soon as every letter has settled; on touch screens the same
-loop follows a slow drifting point, only while the text is on screen. **Lenis** is the sole smooth-scroll engine
+loop follows a slow drifting point, only while the text is on screen. The
+glass lens and the breaking panes run on GSAP's ticker too, and only while
+they are in use or on screen. **Lenis** is the sole smooth-scroll engine
 (chosen over Locomotive Scroll: already in the stack, native scrolling for
 sticky and touch, and Locomotive v5 is itself built on Lenis), driven from
 GSAP's ticker and feeding ScrollTrigger. CSS handles hover, focus and tap
@@ -137,30 +165,42 @@ in its final state, and the glass squares are a still image.
 
 ## Three.js
 
-Used once, for the glass squares (`src/components/sections/glass-scene.ts`):
+Used for the glass squares (`src/components/sections/glass-scene.ts`):
 twelve squares with small rounded corners (seven on phones), thin bevelled
 slabs at different depths, one shared geometry and one small shader. It
 treats them as clear glass in a small studio: the faces show its light bent
 through them, split a little by colour, with a soft band of light that slides
 across as each pane turns; the bevels and edges catch it brightly; the cast is
 only faintly cool. Faces that pass behind the paragraph are held to a faint
-sheen so white text stays readable over them. Scroll lifts and turns them, a pointer tilts the
-group. It earns its place by giving the night chapter depth without adding
-colour or competing with the work. three.js is fetched only as the section
+sheen so white text stays readable over them, and no two panes can ever pass
+through each other. Scroll lifts and turns them, a pointer tilts the group.
+A click or tap breaks a pane at that point: cracks run out to its edge and a
+ring crack splits each wedge, the shards fly apart, spin, fall and fade, and
+a new pane grows back after a pause. It earns its place by giving the night
+chapter depth without adding colour or competing with the work. three.js is fetched only as the section
 comes near; the scene draws on GSAP's ticker only while the section is on
 screen and the tab visible, caps the pixel ratio (1.5, 1.25 on phones), and
 disposes everything on navigation. With reduced motion, without JavaScript,
 without WebGL or after a lost context, a still of the same scene shows
 instead (`public/media/glass/squares.webp`, rendered from the scene itself).
 
+The glass lens (`src/components/sections/work-lens.ts`, `WorkLens.tsx`) is a
+second canvas the size of the lens (very small, 56 to 84px), moved to any
+picture marked `data-lens` across the site: it samples that picture's own
+playing film or still, magnifies it a little, bends it
+outward toward the rim and splits it by colour there, under a hairline of
+light and a soft shadow. It loads on first use, renders only while shown,
+and is absent with reduced motion or without WebGL.
+
 ## Assets and provenance
 
 All imagery is MTC's own: project stills and cover films (copied from the live
 site into `public/media/` on the earlier redesign branch), the seven client
 logos from the live site's client strip, and the MTC logo from `public/brand/`.
-The glass still is a frame of the site's own WebGL scene. The four sticker
-emojis are Microsoft's Fluent Emoji 3D (MIT licence, `public/media/emoji/`
-with its LICENSE.txt), converted to small WebP files. No generated or stock
+The glass still is a frame of the site's own WebGL scene. The three sticker
+emojis (eyes, rocket, waving hand) are Microsoft's Fluent Emoji 3D (MIT
+licence, `public/media/emoji/` with its LICENSE.txt), converted to small WebP
+files; the "hey!" bubble is Solar's round chat icon filled with MTC's amber. No generated or stock
 imagery, no drawn illustrations. Interface icons are Solar (480 Design,
 CC BY 4.0) taken from the Iconify set by `scripts/build-icons.mjs`. No people
 are shown.

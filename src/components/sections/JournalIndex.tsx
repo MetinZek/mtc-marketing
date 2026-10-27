@@ -70,6 +70,7 @@ function FeaturedArticle({ post, dict, locale }: { post: Post; dict: Dictionary;
         className="group/post grid items-center gap-6 rounded-[28px] bg-mist p-2.5 focus-visible:outline-offset-4 sm:rounded-[36px] sm:p-3.5 lg:grid-cols-12 lg:gap-10"
       >
         <div
+          data-lens
           className="media-rim relative overflow-hidden rounded-[20px] bg-canvas sm:rounded-[26px] lg:col-span-7"
           style={{ aspectRatio: ratioOf(post, "16 / 9") }}
         >
@@ -79,7 +80,7 @@ function FeaturedArticle({ post, dict, locale }: { post: Post; dict: Dictionary;
               src={post.coverImage.src}
               alt={post.coverImage.alt}
               fetchPriority="high"
-              className="h-full w-full object-cover transition-transform duration-[900ms] ease-[var(--ease-out-soft)] group-hover/post:scale-[1.03]"
+              className="h-full w-full object-cover"
             />
           )}
         </div>
@@ -107,6 +108,7 @@ function ArticleCard({ post, delay, dict, locale }: { post: Post; delay: number;
         className="group/post block rounded-[22px] focus-visible:outline-offset-4"
       >
         <div
+          data-lens
           className="media-rim relative overflow-hidden rounded-[22px] bg-mist"
           style={{ aspectRatio: ratioOf(post, "16 / 9") }}
         >
@@ -116,7 +118,7 @@ function ArticleCard({ post, delay, dict, locale }: { post: Post; delay: number;
               src={post.coverImage.src}
               alt={post.coverImage.alt}
               loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-[900ms] ease-[var(--ease-out-soft)] group-hover/post:scale-[1.03]"
+              className="h-full w-full object-cover"
             />
           )}
         </div>

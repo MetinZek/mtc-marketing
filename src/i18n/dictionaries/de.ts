@@ -39,6 +39,7 @@ export const de: Dictionary = {
     backToTop: "Nach oben",
     localTime: "Ortszeit in Mitrovica",
     openForProjects: "Offen für neue Projekte",
+    hey: "hallo!",
   },
   contactForm: {
     nameRequired: "Bitte geben Sie Ihren Namen ein.",
@@ -81,8 +82,8 @@ export const de: Dictionary = {
     statement:
       "Wir beginnen mit Zuhören: Ihr Geschäft, Ihr Publikum und wie Erfolg aussehen soll. Dann legen wir die Strategie fest, gestalten und bauen die Marke, die Website und die Inhalte und bringen alles an den Start. Danach bleiben wir dabei, messen, was wirkt, und verbessern es weiter.",
     stickers: {
-      made: "Made in Kosovo",
-      disciplines: "Branding · Web · Social · Content",
+      hello: "Hallo sagen!",
+      ready: "Bereit, wenn Sie es sind",
       languages: "EN · DE · SV",
     },
     wordsPrevious: "Vorheriges Zitat",
@@ -96,6 +97,7 @@ export const de: Dictionary = {
     projectCountOne: "Projekt",
     projectCountOther: "Projekte",
     viewCaseStudy: "Fallstudie ansehen",
+    viewLiveSite: "Website ansehen",
     viewCaseStudyAriaLabel: "Fallstudie ansehen: {title}",
     metaTitle: "Arbeiten | MTC",
     metaDescription:

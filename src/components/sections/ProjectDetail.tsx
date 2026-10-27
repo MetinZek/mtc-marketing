@@ -55,8 +55,9 @@ function displayUrl(url: string) {
 
 /**
  * /work/[slug]: one case study, presented like a product page. The name
- * set very large, one paragraph on what was made beside the facts
- * (client, year, services, website), then the cover film (or still) in a
+ * set very large, one calm paragraph on what was made (with the live site
+ * under it, when there is one) beside the facts (client, year, services,
+ * website), then the cover film (or still) in a
  * large frame, the project's images at their own proportions, outcomes
  * when there are real ones, and the next project as a full-width tile
  * with the rest of the work beneath it.
@@ -93,9 +94,23 @@ export function ProjectDetail({ project, moreProjects, dict, locale }: ProjectDe
           <SplitWords as="h1" text={project.title} className="text-display-hero mt-3 text-ink" />
 
           <div className="mt-10 grid gap-10 sm:mt-14 lg:grid-cols-12 lg:gap-8">
-            {project.description.trim() && (
-              <Reveal as="p" delay={0.1} className="text-lead max-w-2xl text-ink-muted lg:col-span-7">
-                {project.description}
+            {(project.description.trim() || website) && (
+              <Reveal delay={0.1} className="lg:col-span-7">
+                {project.description.trim() && <p className="text-calm max-w-[46ch] text-ink">{project.description}</p>}
+                {website && (
+                  <a
+                    href={website}
+                    {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                    className="group/live mt-6 inline-flex items-center gap-1.5 rounded-xs text-[1rem] font-medium tracking-[-0.01em] text-ink underline-offset-[0.3em] hover:underline sm:mt-8"
+                  >
+                    {dict.work.viewLiveSite}
+                    <Icon
+                      name="arrow-up-right"
+                      strokeWidth={1.9}
+                      className="transition-transform duration-[var(--duration-base)] group-hover/live:-translate-y-0.5 group-hover/live:translate-x-0.5"
+                    />
+                  </a>
+                )}
               </Reveal>
             )}
 
@@ -116,14 +131,7 @@ export function ProjectDetail({ project, moreProjects, dict, locale }: ProjectDe
                 )}
                 {website && (
                   <Fact term={dict.projectDetail.website}>
-                    <a
-                      href={website}
-                      {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                      className="inline-flex items-center gap-1 rounded-xs font-medium text-blue hover:underline hover:underline-offset-[0.25em]"
-                    >
-                      {displayUrl(website)}
-                      {external && <Icon name="arrow-up-right" />}
-                    </a>
+                    <span className="font-medium text-ink">{displayUrl(website)}</span>
                   </Fact>
                 )}
               </dl>
@@ -140,7 +148,7 @@ export function ProjectDetail({ project, moreProjects, dict, locale }: ProjectDe
             className="media-rim relative overflow-hidden rounded-[22px] bg-mist sm:rounded-[36px]"
             style={{ aspectRatio: `${w} / ${h}` }}
           >
-            <div data-zoom className="absolute inset-0" {...(video ? VIDEO_BOX : {})}>
+            <div data-zoom data-lens className="absolute inset-0" {...(video ? VIDEO_BOX : {})}>
               {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven media */}
               <img
                 src={cover.src}
@@ -254,14 +262,9 @@ function NextProject({ project, dict, locale }: { project: RelatedProject; dict:
           className="media-rim-dark relative order-1 overflow-hidden rounded-[20px] bg-night-soft sm:rounded-[26px] lg:order-2 lg:col-span-7"
           style={{ aspectRatio: ratioOf(project.heroImage, "16 / 10") }}
         >
-          <div data-zoom className="absolute inset-0">
+          <div data-zoom data-lens className="absolute inset-0">
             {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven media */}
-            <img
-              src={project.heroImage.src}
-              alt={project.heroImage.alt}
-              loading="lazy"
-              className="h-full w-full object-cover transition-transform duration-[900ms] ease-[var(--ease-out-soft)] group-hover/next:scale-[1.03]"
-            />
+            <img src={project.heroImage.src} alt={project.heroImage.alt} loading="lazy" className="h-full w-full object-cover" />
           </div>
         </Reveal>
       </div>
@@ -276,14 +279,9 @@ function RelatedProjectCard({ project, dict, locale }: { project: RelatedProject
       aria-label={interpolate(dict.work.viewCaseStudyAriaLabel, { title: project.title })}
       className="group/rel block rounded-[22px] focus-visible:outline-offset-4"
     >
-      <div className="media-rim relative aspect-[4/3] overflow-hidden rounded-[18px] bg-mist sm:rounded-[22px]">
+      <div data-lens className="media-rim relative aspect-[4/3] overflow-hidden rounded-[18px] bg-mist sm:rounded-[22px]">
         {/* eslint-disable-next-line @next/next/no-img-element -- CMS-driven media */}
-        <img
-          src={project.heroImage.src}
-          alt={project.heroImage.alt}
-          loading="lazy"
-          className="h-full w-full object-cover transition-transform duration-[900ms] ease-[var(--ease-out-soft)] group-hover/rel:scale-[1.04]"
-        />
+        <img src={project.heroImage.src} alt={project.heroImage.alt} loading="lazy" className="h-full w-full object-cover" />
       </div>
       <h3 className="mt-4 text-[1.0625rem] font-semibold tracking-[-0.015em] text-ink">{project.title}</h3>
       <p className="mt-0.5 text-meta text-ink-muted">
