@@ -3,7 +3,6 @@
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { gsap, motionDisabled } from "@/lib/gsap";
-import { mountGlassRefraction } from "./glass-refraction";
 import type { WorkLens as Lens } from "./work-lens";
 
 const FINE_POINTER = "(hover: hover) and (pointer: fine)";
@@ -47,12 +46,9 @@ type GlassCursor = {
  *
  * - With a mouse or trackpad, a small square of glass stands in for the
  *   pointer everywhere (the glass cursor: 36px, 48px over anything that can
- *   be clicked, a touch smaller while pressed). In Chromium it magnifies
- *   and bends what is under it like the lens does (glass-refraction.ts);
- *   other browsers can't filter what lies behind an element that way, so
- *   there it is clear glass. In text fields it gives way to the usual
- *   caret. The native pointer stays until the mouse first moves, so the
- *   page never shows no cursor at all.
+ *   be clicked, a touch smaller while pressed). In text fields it gives way
+ *   to the usual caret. The native pointer stays until the mouse first
+ *   moves, so the page never shows no cursor at all.
  * - Over every picture marked `data-lens` (work tiles, case studies, the
  *   journal), the cursor hands over to the lens, the same square of glass
  *   magnifying the film or still under it, easing in as it arrives and out
@@ -81,10 +77,6 @@ export function WorkLens() {
     pane.className = "glass-cursor-pane";
     el.append(pane);
     document.body.append(el);
-    // Only Chromium has navigator.userAgentData, and only it applies an SVG
-    // filter to what lies behind an element.
-    const unmountRefraction = "userAgentData" in navigator ? mountGlassRefraction() : null;
-    if (unmountRefraction) el.dataset.refract = "";
 
     const point = { x: 0, y: 0 };
     let frame = 0;
@@ -145,7 +137,6 @@ export function WorkLens() {
       window.removeEventListener("scroll", refresh);
       root.classList.remove("has-glass-cursor");
       el.remove();
-      unmountRefraction?.();
       cursor.current = null;
     };
   }, []);

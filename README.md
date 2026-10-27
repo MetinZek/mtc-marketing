@@ -90,11 +90,8 @@ Homepage (`src/app/[locale]/(site)/page.tsx`):
 2. **Showroom**: featured projects as large night and mist tiles, each with
    "View case study" and "View live site" (`ProjectTile`). With a mouse, a
    small square of glass replaces the pointer everywhere (36px, 48px over
-   anything that can be clicked; the text caret in fields). In Chrome and
-   Edge it magnifies and bends whatever is under it (an SVG filter on its
-   backdrop, `glass-refraction.ts`); Safari and Firefox can't filter the
-   backdrop that way, so there it is clear glass. Over every picture it
-   becomes the WebGL lens that magnifies it in every browser (`WorkLens`,
+   anything that can be clicked; the text caret in fields), and over every
+   picture it becomes the glass lens that magnifies it (`WorkLens`,
    `work-lens.ts`, on any `[data-lens]` box). On phones the lens drifts over
    the picture in view.
 3. **Night chapter**: "How we work" lit word by word over glass squares that
