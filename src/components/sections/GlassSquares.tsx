@@ -100,19 +100,27 @@ export function GlassSquares({ poster }: { poster: string }) {
       return [e.clientX - box.left, e.clientY - box.top] as const;
     };
     const overText = (e: Event) => Boolean((e.target as Element | null)?.closest(NOT_GLASS));
+    // A hand over glass that can break; the glass cursor grows instead.
+    const markBreakable = (on: boolean) => {
+      if (on) {
+        section.style.cursor = "pointer";
+        section.dataset.cursor = "grow";
+      } else {
+        section.style.removeProperty("cursor");
+        delete section.dataset.cursor;
+      }
+    };
     const onClick = (e: MouseEvent) => {
       if (!scene || overText(e) || window.getSelection()?.toString()) return;
       const [x, y] = inCanvas(e);
-      if (scene.shatter(x, y)) section.style.removeProperty("cursor");
+      if (scene.shatter(x, y)) markBreakable(false);
     };
     let hover = 0;
     const onHover = (e: PointerEvent) => {
       cancelAnimationFrame(hover);
       hover = requestAnimationFrame(() => {
         const [x, y] = inCanvas(e);
-        const breakable = Boolean(scene) && !overText(e) && scene!.hit(x, y);
-        if (breakable) section.style.cursor = "pointer";
-        else section.style.removeProperty("cursor");
+        markBreakable(Boolean(scene) && !overText(e) && scene!.hit(x, y));
       });
     };
     section.addEventListener("click", onClick);
@@ -133,7 +141,7 @@ export function GlassSquares({ poster }: { poster: string }) {
       cancelAnimationFrame(hover);
       section.removeEventListener("click", onClick);
       section.removeEventListener("pointermove", onHover);
-      section.style.removeProperty("cursor");
+      markBreakable(false);
       delete host.dataset.state;
     };
   }, []);

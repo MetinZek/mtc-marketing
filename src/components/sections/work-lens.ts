@@ -12,9 +12,9 @@ import {
 } from "three";
 
 /**
- * The glass lens over the work (see WorkLens.tsx): a very small square of glass,
- * with the same rounded corners as the night chapter's panes, that sits
- * over a project's picture. It draws only its own square (one small canvas
+ * The glass lens over the work (see WorkLens.tsx): the glass cursor's small
+ * square of glass, with the same rounded corners as the night chapter's
+ * panes, sitting over a project's picture. It draws only its own square (one small canvas
  * that moves with it): the picture under it comes from the tile's own
  * playing film or still, magnified a little, bent outward toward the rim
  * and split by colour there, under a hairline of light, a soft sheen and a
@@ -33,6 +33,12 @@ export type WorkLens = {
   destroy(): void;
 };
 
+/**
+ * The side of the glass (CSS px): the glass cursor's size over anything
+ * that can be clicked (globals.css), so the cursor hands over to the lens
+ * without a jump.
+ */
+const SIZE = 48;
 /** Room around the glass for its shadow (CSS px). */
 const PAD = 12;
 
@@ -128,7 +134,7 @@ export function createWorkLens(): WorkLens | null {
       uMapSize: { value: new Vector2(1, 1) },
       uBox: { value: new Vector2(1, 1) },
       uCenter: { value: new Vector2(0, 0) },
-      uLens: { value: 72 },
+      uLens: { value: SIZE },
       uPad: { value: PAD },
       uStrength: { value: 0 },
     },
@@ -158,12 +164,12 @@ export function createWorkLens(): WorkLens | null {
 
   let box: HTMLElement | null = null;
   let media: HTMLImageElement | HTMLVideoElement | null = null;
-  let size = 72;
+  const span = SIZE + PAD * 2;
+  renderer.setSize(span, span);
   const target = { x: 0, y: 0 };
   const shown = { x: 0, y: 0 };
 
   const place = () => {
-    const span = size + PAD * 2;
     canvas.style.transform = `translate3d(${(shown.x - span / 2).toFixed(1)}px, ${(shown.y - span / 2).toFixed(1)}px, 0)`;
     material.uniforms.uCenter!.value.set(shown.x, shown.y);
   };
@@ -182,15 +188,8 @@ export function createWorkLens(): WorkLens | null {
       if (!picture) return false;
       box = next;
       media = picture;
-      const width = next.offsetWidth;
-      const height = next.offsetHeight;
-      // Very small: a jeweller's loupe, not a window.
-      size = Math.round(Math.min(84, Math.max(56, width * 0.09)));
-      const span = size + PAD * 2;
-      renderer.setSize(span, span);
       material.uniforms.uMap!.value = textureFor(picture);
-      material.uniforms.uBox!.value.set(width, height);
-      material.uniforms.uLens!.value = size;
+      material.uniforms.uBox!.value.set(next.offsetWidth, next.offsetHeight);
       box.appendChild(canvas);
       return true;
     },

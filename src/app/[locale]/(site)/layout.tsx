@@ -13,8 +13,8 @@ import { getDictionary } from "@/i18n/get-dictionary";
  * around every marketing route. Only the routed content inside <main>
  * fades in between routes (PageTransition) and gets a fresh scroll
  * choreography per page (MotionRoot, remounted with it); the navigation
- * and footer stay put, and so do the glass lens over project pictures
- * (WorkLens), the cookie banner (early in the tab order, just after the
+ * and footer stay put, and so do the glass cursor and the lens over
+ * project pictures (WorkLens), the cookie banner (early in the tab order, just after the
  * skip link) and the measurement tools it switches on (Trackers). `dict`
  * is fetched once here (Navbar is a Client Component and can't call
  * next/root-params itself) and passed down.

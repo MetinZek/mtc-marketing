@@ -53,6 +53,14 @@ consent, or without its ID), a 16+ / Privacy Policy tick on the contact form,
 deletion of messages in /admin, and darker greys wherever the faint ones were
 used for text.
 
+**Iteration 7** (2026-10-27): the lens becomes the mouse pointer. With a mouse
+or trackpad a small square of the lens's glass replaces the pointer on every
+page: 36px, growing to 48px over anything that can be clicked (and over the
+breakable glass squares), a touch smaller while pressed, and the usual caret
+in text fields. Over a picture it turns into the magnifying lens, now 48px
+everywhere (it was 56 to 84px). Phones, reduced motion and forced colours
+keep their usual pointer.
+
 ## What was taken from the references
 
 - **dovvstudio.com**, high-level traits only: a centred, heavy, all-caps
@@ -136,8 +144,9 @@ through all four. Errors use `#d70015`.
 2. **Showroom** (the peak): featured projects as very large tiles, alternating
    a black full-width tile and pairs on mist; each unveils as it arrives.
    Under each picture: the name, discipline and year, "View case study" and,
-   when there is one, "View live site". A tiny glass lens follows the pointer
-   over the pictures (on phones it drifts over the picture in view).
+   when there is one, "View live site". The glass cursor turns into a small
+   lens over the pictures (on phones the lens drifts over the picture in
+   view).
 3. **Night chapter**: "How we work" as one large paragraph whose words light
    up as it scrolls through, the four stages set small beneath it; thin glass
    squares drift and turn behind it in a layer that holds still while the
@@ -200,12 +209,14 @@ without WebGL or after a lost context, a still of the same scene shows
 instead (`public/media/glass/squares.webp`, rendered from the scene itself).
 
 The glass lens (`src/components/sections/work-lens.ts`, `WorkLens.tsx`) is a
-second canvas the size of the lens (very small, 56 to 84px), moved to any
-picture marked `data-lens` across the site: it samples that picture's own
-playing film or still, magnifies it a little, bends it
-outward toward the rim and splits it by colour there, under a hairline of
-light and a soft shadow. It loads on first use, renders only while shown,
-and is absent with reduced motion or without WebGL.
+second canvas the size of the lens (48px), moved to any picture marked
+`data-lens` across the site: it samples that picture's own playing film or
+still, magnifies it a little, bends it outward toward the rim and splits it
+by colour there, under a hairline of light and a soft shadow. It loads on
+first use, renders only while shown, and is absent with reduced motion or
+without WebGL. Everywhere else the same glass is the cursor, drawn in CSS
+(the lens's corners, rim, sheen and halo, without the magnifying), which
+fades out as the lens fades in over a picture.
 
 ## Assets and provenance
 

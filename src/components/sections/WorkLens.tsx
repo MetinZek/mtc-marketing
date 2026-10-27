@@ -1,27 +1,152 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { gsap, motionDisabled } from "@/lib/gsap";
 import type { WorkLens as Lens } from "./work-lens";
 
 const FINE_POINTER = "(hover: hover) and (pointer: fine)";
 
 /**
- * Brings the glass lens to every picture marked `data-lens` across the site
- * (work tiles, case studies, the journal). Renders nothing itself.
+ * What the glass cursor grows over: anything that can be clicked or picked
+ * up, and the pictures (where the lens takes over at that size).
+ * GlassSquares marks a breakable pane with `data-cursor="grow"`.
+ */
+const GROW_OVER = [
+  "a[href]",
+  "button:not(:disabled)",
+  '[role="button"]',
+  '[role="switch"]',
+  "label",
+  "summary",
+  "select",
+  'input:is([type="checkbox"], [type="radio"], [type="submit"], [type="button"])',
+  ".sticker",
+  "[data-lens]",
+  '[data-cursor="grow"]',
+].join(", ");
+
+/** Where it gives way to the text caret (kept in step with globals.css). */
+const TEXT_FIELDS = [
+  'input:not([type="checkbox"], [type="radio"], [type="submit"], [type="button"], [type="reset"], [type="range"], [type="color"], [type="file"])',
+  "textarea",
+  '[contenteditable="true"]',
+  '[contenteditable=""]',
+].join(", ");
+
+type GlassCursor = {
+  /** Fades the cursor out while the lens (0 to 1) is over a picture. */
+  setLens(strength: number): void;
+  /** Looks again at what is under a pointer that hasn't moved. */
+  refresh(): void;
+};
+
+/**
+ * The glass on the site, both parts of it. Renders nothing itself.
  *
- * - With a mouse or trackpad the lens follows the pointer over a picture,
- *   easing in as it arrives and out as it leaves, and stands in for the
- *   cursor there. One lens for the whole page, moved from tile to tile.
- * - On touch screens it drifts slowly over the picture nearest the middle
- *   of the screen, while that picture is mostly in view.
+ * - With a mouse or trackpad, a small square of glass stands in for the
+ *   pointer everywhere (the glass cursor: 36px, 48px over anything that can
+ *   be clicked, a touch smaller while pressed). In text fields it gives way
+ *   to the usual caret. The native pointer stays until the mouse first
+ *   moves, so the page never shows no cursor at all.
+ * - Over every picture marked `data-lens` (work tiles, case studies, the
+ *   journal), the cursor hands over to the lens, the same square of glass
+ *   magnifying the film or still under it, easing in as it arrives and out
+ *   as it leaves. One lens for the whole page, moved from picture to
+ *   picture.
+ * - On touch screens there is no cursor; the lens drifts slowly over the
+ *   picture nearest the middle of the screen, while that picture is mostly
+ *   in view.
  * - The lens module (and three.js) loads on first use; without WebGL there
- *   is simply no lens. With reduced motion there is none either.
+ *   is simply no lens, and the cursor stays over the pictures too. With
+ *   reduced motion there is neither, and with forced colours no cursor.
  */
 export function WorkLens() {
   const pathname = usePathname();
+  const cursor = useRef<GlassCursor | null>(null);
 
+  // The glass cursor.
+  useEffect(() => {
+    if (motionDisabled() || !window.matchMedia(FINE_POINTER).matches) return;
+    if (window.matchMedia("(forced-colors: active)").matches) return;
+    const root = document.documentElement;
+    const el = document.createElement("div");
+    el.className = "glass-cursor";
+    el.setAttribute("aria-hidden", "true");
+    const pane = document.createElement("span");
+    pane.className = "glass-cursor-pane";
+    el.append(pane);
+    document.body.append(el);
+
+    const point = { x: 0, y: 0 };
+    let frame = 0;
+
+    const classify = (target: Element | null) => {
+      el.dataset.mode = target?.closest(TEXT_FIELDS) ? "text" : target?.closest(GROW_OVER) ? "grow" : "";
+    };
+    const hide = () => {
+      delete el.dataset.shown;
+      delete el.dataset.down;
+    };
+    const onMove = (e: PointerEvent) => {
+      if (e.pointerType === "touch") return hide();
+      point.x = e.clientX;
+      point.y = e.clientY;
+      el.style.transform = `translate3d(${point.x}px, ${point.y}px, 0)`;
+      classify(e.target instanceof Element ? e.target : null);
+      if (el.dataset.shown === undefined) {
+        el.dataset.shown = "";
+        root.classList.add("has-glass-cursor");
+      }
+    };
+    const onDown = (e: PointerEvent) => {
+      if (e.pointerType !== "touch") el.dataset.down = "";
+    };
+    const onUp = () => {
+      delete el.dataset.down;
+    };
+    const refresh = () => {
+      if (el.dataset.shown === undefined) return;
+      cancelAnimationFrame(frame);
+      frame = requestAnimationFrame(() => classify(document.elementFromPoint(point.x, point.y)));
+    };
+
+    cursor.current = {
+      setLens(strength) {
+        el.style.setProperty("--lens", strength.toFixed(3));
+      },
+      refresh,
+    };
+
+    document.addEventListener("pointermove", onMove, { passive: true });
+    document.addEventListener("pointerdown", onDown, { passive: true });
+    document.addEventListener("pointerup", onUp, { passive: true });
+    document.addEventListener("pointercancel", onUp, { passive: true });
+    root.addEventListener("pointerleave", hide);
+    window.addEventListener("blur", onUp);
+    window.addEventListener("scroll", refresh, { passive: true });
+
+    return () => {
+      cancelAnimationFrame(frame);
+      document.removeEventListener("pointermove", onMove);
+      document.removeEventListener("pointerdown", onDown);
+      document.removeEventListener("pointerup", onUp);
+      document.removeEventListener("pointercancel", onUp);
+      root.removeEventListener("pointerleave", hide);
+      window.removeEventListener("blur", onUp);
+      window.removeEventListener("scroll", refresh);
+      root.classList.remove("has-glass-cursor");
+      el.remove();
+      cursor.current = null;
+    };
+  }, []);
+
+  // A new page under a pointer that hasn't moved.
+  useEffect(() => {
+    cursor.current?.refresh();
+  }, [pathname]);
+
+  // The lens over the pictures.
   useEffect(() => {
     if (motionDisabled()) return;
     const fine = window.matchMedia(FINE_POINTER).matches;
@@ -71,6 +196,7 @@ export function WorkLens() {
       aim();
       lens.setStrength(strength);
       lens.render();
+      cursor.current?.setLens(strength);
       if (strength === 0 && wanted === 0) release();
     };
     const run = () => {
@@ -81,6 +207,7 @@ export function WorkLens() {
     const release = () => {
       if (box) box.style.removeProperty("cursor");
       lens?.detach();
+      cursor.current?.setLens(0);
       box = null;
       ticking = false;
       gsap.ticker.remove(tick);
@@ -118,20 +245,39 @@ export function WorkLens() {
 
     const cleanups: (() => void)[] = [];
     if (fine) {
+      let inside = false;
+      let frame = 0;
       const onMove = (e: PointerEvent) => {
+        if (e.pointerType === "touch") return;
+        inside = true;
         pointer.x = e.clientX;
         pointer.y = e.clientY;
         const over = (e.target as Element | null)?.closest<HTMLElement>("[data-lens]") ?? null;
         show(over);
       };
-      const onLeave = () => show(null);
+      const onLeave = () => {
+        inside = false;
+        show(null);
+      };
+      // Scrolling slides pictures under a pointer that stays put.
+      const onScroll = () => {
+        if (!inside) return;
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => {
+          const at = document.elementFromPoint(pointer.x, pointer.y);
+          show(at?.closest<HTMLElement>("[data-lens]") ?? null);
+        });
+      };
       document.addEventListener("pointermove", onMove, { passive: true });
       document.documentElement.addEventListener("pointerleave", onLeave);
       window.addEventListener("blur", onLeave);
+      window.addEventListener("scroll", onScroll, { passive: true });
       cleanups.push(
+        () => cancelAnimationFrame(frame),
         () => document.removeEventListener("pointermove", onMove),
         () => document.documentElement.removeEventListener("pointerleave", onLeave),
         () => window.removeEventListener("blur", onLeave),
+        () => window.removeEventListener("scroll", onScroll),
       );
     } else {
       // The picture nearest the middle of the screen, if most of it shows.

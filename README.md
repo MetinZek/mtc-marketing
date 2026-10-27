@@ -88,9 +88,12 @@ Homepage (`src/app/[locale]/(site)/page.tsx`):
    and can be dragged (`ui/Sticker`); the two actions; the real client logos
    on a slow loop (`TrustedBy`).
 2. **Showroom**: featured projects as large night and mist tiles, each with
-   "View case study" and "View live site" (`ProjectTile`). A tiny glass lens
-   follows the pointer over every picture on the site (`WorkLens`,
-   `work-lens.ts`, on any `[data-lens]` box).
+   "View case study" and "View live site" (`ProjectTile`). With a mouse, a
+   small square of glass replaces the pointer everywhere (36px, 48px over
+   anything that can be clicked; the text caret in fields), and over every
+   picture it becomes the glass lens that magnifies it (`WorkLens`,
+   `work-lens.ts`, on any `[data-lens]` box). On phones the lens drifts over
+   the picture in view.
 3. **Night chapter**: "How we work" lit word by word over glass squares that
    break when clicked or tapped and grow back (`StudioStatement`,
    `GlassSquares`, `glass-scene.ts`), then the four services with where each
