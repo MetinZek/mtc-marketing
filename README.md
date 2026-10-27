@@ -89,8 +89,10 @@ Homepage (`src/app/[locale]/(site)/page.tsx`):
    on a slow loop (`TrustedBy`).
 2. **Showroom**: featured projects as large night and mist tiles, each with
    "View case study" and "View live site" (`ProjectTile`). With a mouse, a
-   small square of glass replaces the pointer everywhere (36px, 48px over
-   anything that can be clicked; the text caret in fields), and over every
+   small square of glass replaces the pointer everywhere (24px, 32px over
+   anything that can be clicked; the text caret in fields). In Chrome and
+   Edge it zooms what is under it very slightly (`glass-refraction.ts`);
+   elsewhere it is clear glass. Over every
    picture it becomes the glass lens that magnifies it (`WorkLens`,
    `work-lens.ts`, on any `[data-lens]` box). On phones the lens drifts over
    the picture in view.

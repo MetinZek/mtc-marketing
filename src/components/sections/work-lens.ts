@@ -38,9 +38,9 @@ export type WorkLens = {
  * that can be clicked (globals.css), so the cursor hands over to the lens
  * without a jump.
  */
-const SIZE = 48;
+const SIZE = 32;
 /** Room around the glass for its shadow (CSS px). */
-const PAD = 12;
+const PAD = 8;
 
 const vertexShader = /* glsl */ `
   varying vec2 vUv;

@@ -55,14 +55,15 @@ used for text.
 
 **Iteration 7** (2026-10-27): the lens becomes the mouse pointer. With a mouse
 or trackpad a small square of the lens's glass replaces the pointer on every
-page: 36px, growing to 48px over anything that can be clicked (and over the
+page: 24px, growing to 32px over anything that can be clicked (and over the
 breakable glass squares), a touch smaller while pressed, and the usual caret
-in text fields. Over a picture it turns into the magnifying lens, now 48px
+in text fields. Over a picture it turns into the magnifying lens, now 32px
 everywhere (it was 56 to 84px). Phones, reduced motion and forced colours
 keep their usual pointer. A zooming version of the cursor (an SVG
-displacement filter on its backdrop, Chromium only) was tried and taken
-out: at this size the resampled page showed stretched, coloured pixels, so
-the cursor stays clear glass and only the pictures are magnified.
+displacement filter on its backdrop, Chromium only) was tried at 1.25x
+with a colour split: at this size the resampled page showed stretched,
+coloured pixels. It came back as a very slight zoom only (about 1.05x, no
+bend, no colour split, `glass-refraction.ts`).
 
 ## What was taken from the references
 
@@ -212,7 +213,7 @@ without WebGL or after a lost context, a still of the same scene shows
 instead (`public/media/glass/squares.webp`, rendered from the scene itself).
 
 The glass lens (`src/components/sections/work-lens.ts`, `WorkLens.tsx`) is a
-second canvas the size of the lens (48px), moved to any picture marked
+second canvas the size of the lens (32px), moved to any picture marked
 `data-lens` across the site: it samples that picture's own playing film or
 still, magnifies it a little, bends it outward toward the rim and splits it
 by colour there, under a hairline of light and a soft shadow. It loads on
