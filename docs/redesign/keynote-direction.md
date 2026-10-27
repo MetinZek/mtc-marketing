@@ -59,7 +59,12 @@ page: 36px, growing to 48px over anything that can be clicked (and over the
 breakable glass squares), a touch smaller while pressed, and the usual caret
 in text fields. Over a picture it turns into the magnifying lens, now 48px
 everywhere (it was 56 to 84px). Phones, reduced motion and forced colours
-keep their usual pointer.
+keep their usual pointer. Then the cursor learns the lens's zoom: in Chrome
+and Edge an SVG filter on its backdrop (`glass-refraction.ts`, a
+displacement map drawn from the lens shader's own numbers) magnifies the
+page under it 1.25x, bends it toward the rim and splits the colours there
+by about a pixel, so text, stickers and buttons look through the same
+glass as the pictures. Safari and Firefox keep the clear glass.
 
 ## What was taken from the references
 
@@ -215,8 +220,10 @@ still, magnifies it a little, bends it outward toward the rim and splits it
 by colour there, under a hairline of light and a soft shadow. It loads on
 first use, renders only while shown, and is absent with reduced motion or
 without WebGL. Everywhere else the same glass is the cursor, drawn in CSS
-(the lens's corners, rim, sheen and halo, without the magnifying), which
-fades out as the lens fades in over a picture.
+(the lens's corners, rim, sheen and halo), which fades out as the lens fades
+in over a picture. In Chromium the cursor magnifies too, through an SVG
+filter on its backdrop (`glass-refraction.ts`), which Chromium applies
+correctly under the cursor's grow and press scaling.
 
 ## Assets and provenance
 

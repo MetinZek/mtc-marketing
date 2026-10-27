@@ -634,6 +634,11 @@
     opacity 160ms var(--ease-out-soft),
     transform 240ms var(--ease-out-soft);
 }
+/* Chromium: the glass magnifies and bends what is under it, like the lens
+   (glass-refraction.ts builds the filter). */
+.glass-cursor[data-refract] .glass-cursor-pane {
+  backdrop-filter: url(#glass-cursor-refraction) saturate(1.2) brightness(1.03);
+}
 .glass-cursor[data-shown]:not([data-mode="text"]) .glass-cursor-pane {
   opacity: calc(1 - var(--lens, 0));
 }
