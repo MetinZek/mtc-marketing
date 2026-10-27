@@ -31,6 +31,15 @@ export type NavItem = {
 };
 
 /**
+ * The /studio page is switched off for now: it is left out of every menu
+ * and the sitemap, and its address answers with the 404 page. Its content
+ * and code stay in place; set this to true to bring it back.
+ */
+export const studioPageEnabled: boolean = false;
+
+const studioLink: NavItem[] = studioPageEnabled ? [{ key: "studio", href: "/studio" }] : [];
+
+/**
  * Minimal primary navigation — deliberately short. "Services" has no
  * dedicated page: it points at the homepage Services section (id
  * "services"), so the navbar scrolls there instead of routing.
@@ -38,7 +47,7 @@ export type NavItem = {
 export const primaryNav: NavItem[] = [
   { key: "work", href: "/work" },
   { key: "services", href: "/#services" },
-  { key: "studio", href: "/studio" },
+  ...studioLink,
   { key: "journal", href: "/journal" },
 ];
 
@@ -54,7 +63,7 @@ export const footerNav: { titleKey: string; items: NavItem[] }[] = [
       // No standalone services page: point at the homepage section
       // (the live site linked to /services, which is a 404).
       { key: "services", href: "/#services" },
-      { key: "studio", href: "/studio" },
+      ...studioLink,
       { key: "journal", href: "/journal" },
       { key: "contact", href: "/contact" },
     ],
@@ -65,6 +74,9 @@ export const footerNav: { titleKey: string; items: NavItem[] }[] = [
       { key: "privacyPolicy", href: "/legal/privacy" },
       { key: "termsAndConditions", href: "/legal/terms" },
       { key: "cookiePolicy", href: "/legal/cookies" },
+      { key: "refundPolicy", href: "/legal/refunds" },
+      { key: "dataRequest", href: "/legal/data-request" },
+      { key: "legalNotice", href: "/legal/notice" },
     ],
   },
 ];
@@ -84,3 +96,36 @@ export const contactDefaults = {
     // there is one.
   ],
 } as const;
+
+export type BusinessDetails = {
+  /** Registered business name, e.g. "MTC Marketing L.L.C.". */
+  legalName: string;
+  /** Legal form, e.g. "Individual business (B.I.)" or "Limited liability company (SH.P.K.)". */
+  legalForm: string;
+  /** Registered address: street and number, postcode and town, country. */
+  address: string;
+  /** Business registration number (Kosovo Business Registration Agency, ARBK). */
+  registrationNumber: string;
+  /** Fiscal number (Tax Administration of Kosovo). */
+  fiscalNumber: string;
+  /** VAT number, only if registered for VAT. */
+  vatNumber: string;
+  /** Owner or authorised representative. */
+  representative: string;
+};
+
+/**
+ * The business's registered details, shown on the legal notice, in the
+ * legal pages' contact blocks and (the numbers) in the footer. Fill each in
+ * exactly as it reads on the business registration certificate; any left
+ * empty is simply not shown anywhere.
+ */
+export const businessDetails: BusinessDetails = {
+  legalName: "",
+  legalForm: "",
+  address: "",
+  registrationNumber: "",
+  fiscalNumber: "",
+  vatNumber: "",
+  representative: "",
+};

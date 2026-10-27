@@ -39,7 +39,7 @@ export function StudioStatement({ label, statement, stages }: StudioStatementPro
         <Reveal as="ol" variant="stagger" className="mt-16 grid max-w-5xl gap-x-12 gap-y-6 sm:mt-24 sm:grid-cols-2">
           {stages.map((stage) => (
             <li key={stage.id} className="grid grid-cols-[2.75rem_1fr] border-t border-night-line pt-5">
-              <span className="tabular text-meta text-snow-faint">{stage.number}</span>
+              <span className="tabular text-meta text-snow-muted">{stage.number}</span>
               <div>
                 <h3 className="text-[1.0625rem] font-semibold tracking-[-0.015em] text-snow">{stage.title}</h3>
                 <p className="mt-1 text-meta text-snow-muted">{stage.body}</p>

@@ -1,4 +1,5 @@
-import { updateSubmissionStatusAction } from "@/app/admin/_actions";
+import { deleteSubmissionAction, updateSubmissionStatusAction } from "@/app/admin/_actions";
+import { ConfirmSubmit } from "@/components/admin/ConfirmSubmit";
 import { submissionStatuses } from "@/content/schema";
 import { listSubmissions } from "@/lib/cms/admin";
 import { cn } from "@/lib/utils";
@@ -89,9 +90,21 @@ export async function SubmissionsTable() {
               {s.message}
             </p>
 
-            <p className="mt-4 text-meta text-ink-faint">
-              {formatDate(s.submittedAt)}
-            </p>
+            <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <p className="text-meta text-ink-faint">
+                {formatDate(s.submittedAt)}
+              </p>
+              {/* For deletion requests: removes the message for good. */}
+              <form action={deleteSubmissionAction}>
+                <input type="hidden" name="id" value={s.id} />
+                <ConfirmSubmit
+                  message={`Permanently delete the message from ${s.name}? This can't be undone.`}
+                  className="text-meta text-ink-muted transition-colors hover:text-danger"
+                >
+                  Delete forever
+                </ConfirmSubmit>
+              </form>
+            </div>
           </article>
         ))}
 

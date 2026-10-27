@@ -1,13 +1,13 @@
 import type { MetadataRoute } from "next";
-import { siteConfig } from "@/config/site";
+import { siteConfig, studioPageEnabled } from "@/config/site";
 import { locales } from "@/i18n/locales";
 import { withLocale } from "@/i18n/paths";
 import { cms } from "@/lib/cms";
 
 /**
  * Sitemap. Lists the routes that actually exist: the homepage, the
- * /work index and its per-project pages, /studio, the /journal index
- * and its published article pages, and /contact — once per locale
+ * /work index and its per-project pages, /studio (while it is switched
+ * on), the /journal index and its published article pages, and /contact — once per locale
  * (English unprefixed, /de and /sv prefixed). Slugs are locale-invariant
  * so a plain (non-overlay) CMS read is enough here.
  */
@@ -22,7 +22,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const staticEntries: { path: string; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"]; priority: number }[] = [
     { path: "/", changeFrequency: "weekly", priority: 1 },
     { path: "/work", changeFrequency: "weekly", priority: 0.8 },
-    { path: "/studio", changeFrequency: "monthly", priority: 0.7 },
+    ...(studioPageEnabled ? [{ path: "/studio", changeFrequency: "monthly" as const, priority: 0.7 }] : []),
     { path: "/journal", changeFrequency: "weekly", priority: 0.7 },
     { path: "/contact", changeFrequency: "yearly", priority: 0.9 },
   ];

@@ -20,7 +20,7 @@ export function TrustedBy({ clients, dict }: TrustedByProps) {
     <div className="container-mtc">
       <div className="flex items-center gap-4">
         <span aria-hidden="true" className="h-px flex-1 bg-line" />
-        <h2 className="text-meta text-ink-faint">{dict.home.trustedByLabel}</h2>
+        <h2 className="text-meta text-ink-muted">{dict.home.trustedByLabel}</h2>
         <span aria-hidden="true" className="h-px flex-1 bg-line" />
       </div>
       <Marquee label={dict.home.trustedClientsAriaLabel} seconds={36} className="mt-4 sm:mt-5">

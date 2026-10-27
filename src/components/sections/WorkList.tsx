@@ -144,7 +144,7 @@ export function WorkList({
                   "focus-visible:outline-offset-4",
                 )}
               >
-                <span className="col-span-2 self-start pt-2 text-[0.9375rem] font-medium tabular text-ink-faint transition-colors duration-[var(--duration-base)] group-hover/row:text-ink sm:col-span-1 lg:pt-4">
+                <span className="col-span-2 self-start pt-2 text-[0.9375rem] font-medium tabular text-ink-muted transition-colors duration-[var(--duration-base)] group-hover/row:text-ink sm:col-span-1 lg:pt-4">
                   {pad(number)}
                 </span>
 
@@ -162,7 +162,7 @@ export function WorkList({
                 </span>
 
                 <span className="hidden items-center justify-end gap-3 sm:col-span-1 sm:flex">
-                  <span className="text-[0.9375rem] tabular text-ink-faint">{project.year}</span>
+                  <span className="text-[0.9375rem] tabular text-ink-muted">{project.year}</span>
                 </span>
 
                 {/* Touch devices: no hover, so the cover sits inline. */}

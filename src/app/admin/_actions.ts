@@ -18,6 +18,7 @@ import { isDatabaseConfigured } from "@/lib/db/client";
 import {
   archiveEntry,
   deleteArchivedEntry,
+  deleteSubmission,
   moveEntry,
   rawEntry,
   restoreArchivedEntry,
@@ -386,4 +387,11 @@ export async function updateSubmissionStatusAction(
   const status = String(formData.get("status") ?? "") as SubmissionStatus;
   if (!id || !submissionStatuses.includes(status)) return;
   await setSubmissionStatus(id, status);
+}
+
+export async function deleteSubmissionAction(formData: FormData): Promise<void> {
+  await requireSession();
+  const id = String(formData.get("id") ?? "");
+  if (!id) return;
+  await deleteSubmission(id);
 }

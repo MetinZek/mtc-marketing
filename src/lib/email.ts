@@ -5,12 +5,14 @@ import { contactDefaults } from "@/config/site";
 import type { Submission } from "@/content/types";
 
 /**
- * Notifies the studio inbox of a new contact submission. Throws on any
- * failure (missing config, Resend error) — the caller decides how that
- * surfaces to the visitor. Never logs or exposes the API key.
+ * Notifies the studio inbox of a new contact submission (or, with its own
+ * subject line, a privacy request). Throws on any failure (missing config,
+ * Resend error) — the caller decides how that surfaces to the visitor.
+ * Never logs or exposes the API key.
  */
 export async function sendContactNotification(
   submission: Submission,
+  subject = `New contact form submission from ${submission.name}`,
 ): Promise<void> {
   const apiKey = process.env.RESEND_API_KEY;
   if (!apiKey) {
@@ -51,7 +53,7 @@ export async function sendContactNotification(
     from,
     to: contactDefaults.email,
     replyTo: submission.email,
-    subject: `New contact form submission from ${submission.name}`,
+    subject,
     text,
     html,
   });

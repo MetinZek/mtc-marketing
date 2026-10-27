@@ -4,13 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
 import { Letters, useFitLetters, useLetterWeights } from "@/components/motion/FitLetters";
-import { Button } from "@/components/ui/Button";
 import { CopyEmail } from "@/components/ui/CopyEmail";
-import { Icon } from "@/components/ui/Icon";
 import { Sticker, StickerBubble, StickerEmoji, StickerPill, useStickers } from "@/components/ui/Sticker";
 import { splitLocaleFromPathname } from "@/i18n/paths";
 import { gsap, motionDisabled, ScrollTrigger } from "@/lib/gsap";
-import { LocalTime } from "./LocalTime";
 
 type SignOffProps = {
   /** "Have a project in mind?" */
@@ -21,23 +18,20 @@ type SignOffProps = {
   openLabel: string;
   /** "hey!", in the speech bubble. */
   heyLabel: string;
-  ctaLabel: string;
   ctaHref: string;
   email: string;
   phone: string;
-  location: string;
   emailLabel: string;
   phoneLabel: string;
-  localTimeLabel: string;
   copyLabel: string;
   copiedLabel: string;
 };
 
 /**
- * The close of every page except /contact (which is the brief itself): a
+ * The close of the homepage (other pages end on the footer's index): a
  * quiet prompt, then the invitation in heavy capitals as wide as the page,
- * linking to the brief, then the direct lines: the one call to action,
- * email (one click to copy), phone, and the studio's local time.
+ * linking to the brief, then the direct lines: email (one click to copy)
+ * and phone.
  *
  * The big line behaves like the hero's headline: fitted to the width (its
  * words stack on phones), letters thinning near the pointer, a slow drift
@@ -50,7 +44,7 @@ type SignOffProps = {
 export function SignOff(props: SignOffProps) {
   const pathname = usePathname();
   const { path } = splitLocaleFromPathname(pathname);
-  if (path === "/contact") return null;
+  if (path !== "/") return null;
   return <SignOffInner {...props} />;
 }
 
@@ -59,19 +53,14 @@ function SignOffInner({
   line,
   openLabel,
   heyLabel,
-  ctaLabel,
   ctaHref,
   email,
   phone,
-  location,
   emailLabel,
   phoneLabel,
-  localTimeLabel,
   copyLabel,
   copiedLabel,
 }: SignOffProps) {
-  const pathname = usePathname();
-  const { locale } = splitLocaleFromPathname(pathname);
   const rootRef = useRef<HTMLElement>(null);
   const boxRef = useRef<HTMLDivElement>(null);
   const visualRef = useRef<HTMLSpanElement>(null);
@@ -142,14 +131,9 @@ function SignOffInner({
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-6 border-t border-line pt-8 sm:mt-20 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap items-center gap-3">
-            <Button href={ctaHref} size="lg" arrow>
-              {ctaLabel}
-            </Button>
-            <CopyEmail email={email} label={copyLabel} copiedLabel={copiedLabel} />
-          </div>
-          <dl className="grid grid-cols-1 gap-x-10 gap-y-3 text-[0.9375rem] sm:grid-cols-3 sm:gap-y-1">
+        <div className="mt-14 flex flex-col items-start gap-6 border-t border-line pt-8 sm:mt-20 sm:flex-row sm:items-center sm:justify-between">
+          <CopyEmail email={email} label={copyLabel} copiedLabel={copiedLabel} />
+          <dl className="grid grid-cols-1 gap-x-10 gap-y-3 text-[0.9375rem] sm:grid-cols-2 sm:gap-y-1">
             <div>
               <dt className="sr-only">{emailLabel}</dt>
               <dd>
@@ -164,15 +148,6 @@ function SignOffInner({
                 <a href={`tel:${phone.replace(/\s+/g, "")}`} className="font-medium text-ink transition-colors hover:text-blue">
                   {phone}
                 </a>
-              </dd>
-            </div>
-            <div className="flex items-center gap-2 text-ink-muted">
-              <dt className="sr-only">{localTimeLabel}</dt>
-              <dd className="flex items-center gap-2">
-                <Icon name="clock" className="text-[1.05rem]" />
-                <span>
-                  {location} · <LocalTime locale={locale} className="tabular font-medium text-ink" />
-                </span>
               </dd>
             </div>
           </dl>

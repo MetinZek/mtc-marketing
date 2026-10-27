@@ -9,6 +9,7 @@ import { Logo } from "@/components/ui/Logo";
 import { navCta, primaryNav } from "@/config/site";
 import type { Dictionary } from "@/i18n/get-dictionary";
 import { splitLocaleFromPathname, withLocale } from "@/i18n/paths";
+import { useConsentPanelOpen } from "@/lib/consent";
 import { getLenis } from "@/lib/smooth-scroll";
 import { cn } from "@/lib/utils";
 import { LanguageSwitcher } from "./LanguageSwitcher";
@@ -18,14 +19,15 @@ import { MobileMenu } from "./MobileMenu";
  * Site navigation in two parts.
  *
  * - The top bar sits at the head of every page and scrolls away with it:
- *   logo, the four pages, the language switch and the one call to action
- *   (a Menu button on phones).
+ *   logo, the pages (centred on the page, whatever the two sides hold),
+ *   the language switch and the one call to action (a Menu button on
+ *   phones).
  * - Once the opening section has gone (`[data-dock-after]`, else most of a
  *   screen), a dark floating dock rises at the bottom of the screen with
  *   the same pages and the call to action, within reach of a thumb. It
- *   steps aside once the footer (`[data-dock-hide]`, which opens with the
- *   sign-off and its own call to action) comes into view, and while the
- *   menu is open. Hidden, it is out of the tab order.
+ *   steps aside once the footer (`[data-dock-hide]`) comes into view, and
+ *   while the menu or the cookie banner is open. Hidden, it is out of the
+ *   tab order.
  */
 export function Navbar({ dict }: { dict: Dictionary }) {
   const pathname = usePathname();
@@ -33,6 +35,7 @@ export function Navbar({ dict }: { dict: Dictionary }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [pastOpener, setPastOpener] = useState(false);
   const [atFooter, setAtFooter] = useState(false);
+  const consentOpen = useConsentPanelOpen();
   const menuReturn = useRef<HTMLElement | null>(null);
 
   const navLabels: Record<string, string> = {
@@ -123,17 +126,17 @@ export function Navbar({ dict }: { dict: Dictionary }) {
     return true;
   };
 
-  const dockVisible = pastOpener && !atFooter && !menuOpen;
+  const dockVisible = pastOpener && !atFooter && !menuOpen && !consentOpen;
   const ctaHref = withLocale(navCta.href, locale);
 
   return (
     <>
       <header className="relative z-40">
-        <div className="container-mtc flex h-16 items-center justify-between gap-6 sm:h-[4.5rem]">
+        <div className="container-mtc flex h-16 items-center justify-between gap-6 sm:h-[4.5rem] md:grid md:grid-cols-[1fr_auto_1fr]">
           <Link
             href={withLocale("/", locale)}
             aria-label={dict.nav.logoAriaLabel}
-            className="shrink-0 rounded-xs focus-visible:outline-offset-4"
+            className="shrink-0 justify-self-start rounded-xs focus-visible:outline-offset-4"
           >
             <Logo height={20} />
           </Link>
@@ -151,7 +154,7 @@ export function Navbar({ dict }: { dict: Dictionary }) {
                   aria-current={active ? "page" : undefined}
                   className={cn(
                     "rounded-pill px-3.5 py-2 text-[0.9375rem] font-medium tracking-[-0.012em] transition-colors duration-[var(--duration-fast)]",
-                    active ? "text-ink" : "text-ink/60 hover:text-ink",
+                    active ? "text-ink" : "text-ink/70 hover:text-ink",
                   )}
                 >
                   {navLabels[item.key]}
@@ -160,7 +163,7 @@ export function Navbar({ dict }: { dict: Dictionary }) {
             })}
           </nav>
 
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center justify-end gap-3 md:flex">
             <LanguageSwitcher ariaLabel={dict.nav.languageSwitcherAriaLabel} compact />
             <Button href={ctaHref} size="sm">
               {dict.nav.startAProject}

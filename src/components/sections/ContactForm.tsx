@@ -6,7 +6,7 @@ import { submitContactAction } from "@/app/[locale]/(site)/contact/_action";
 import { Button } from "@/components/ui/Button";
 import { Icon } from "@/components/ui/Icon";
 import type { Dictionary } from "@/i18n/get-dictionary";
-import { splitLocaleFromPathname } from "@/i18n/paths";
+import { splitLocaleFromPathname, withLocale } from "@/i18n/paths";
 import { cn } from "@/lib/utils";
 
 type FieldKey = "name" | "email" | "company" | "phone" | "message";
@@ -19,7 +19,7 @@ const EMPTY: Record<FieldKey, string> = {
   message: "",
 };
 
-const FIELD_ORDER: FieldKey[] = ["name", "email", "company", "phone", "message"];
+const FIELD_ORDER: (FieldKey | "consent")[] = ["name", "email", "company", "phone", "message", "consent"];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_RE = /^[+(]?\d[\d\s()+-]{5,}$/;
@@ -27,33 +27,50 @@ const PHONE_RE = /^[+(]?\d[\d\s()+-]{5,}$/;
 const MESSAGE_MIN_LENGTH = 20;
 const SERVICE_MAX_LENGTH = 120;
 
-type Errors = Partial<Record<FieldKey, string>>;
+type Errors = Partial<Record<FieldKey | "consent", string>>;
 
-function validate(values: Record<FieldKey, string>, cf: Dictionary["contactForm"]): Errors {
+function validate(values: Record<FieldKey, string>, agreed: boolean, cf: Dictionary["contactForm"]): Errors {
   const errors: Errors = {};
   if (!values.name.trim()) errors.name = cf.nameRequired;
   if (!values.email.trim()) errors.email = cf.emailRequired;
   else if (!EMAIL_RE.test(values.email.trim())) errors.email = cf.emailInvalid;
   if (values.phone.trim() && !PHONE_RE.test(values.phone.trim())) errors.phone = cf.phoneInvalid;
   if (values.message.trim().length < MESSAGE_MIN_LENGTH) errors.message = cf.messageRequired;
+  if (!agreed) errors.consent = cf.consentRequired;
   return errors;
 }
 
-const fieldClass = (invalid: boolean) =>
+/** Text boxes on the site's forms; an ink edge and soft ring on focus. */
+export const fieldClass = (invalid: boolean) =>
   cn(
     "mt-2 w-full rounded-sm border bg-canvas px-4 py-3.5 text-body text-ink",
     "transition-[border-color,box-shadow] duration-[var(--duration-fast)] ease-[var(--ease-out-soft)]",
-    "placeholder:text-ink-faint focus:border-blue focus:shadow-[0_0_0_4px_rgb(11_69_255/0.14)] focus:outline-none",
+    "placeholder:text-ink-muted focus:border-ink focus:shadow-[0_0_0_4px_rgb(29_29_31/0.07)] focus:outline-none",
     invalid ? "border-danger" : "border-line-strong hover:border-ink-faint",
   );
 
 /**
+ * Each discipline's colour on its chip, keyed by the services collection's
+ * stable `id`; a service added later in the CMS takes the colour at its
+ * position. The tones are styled in globals.css (`.brief-chip`).
+ */
+const CHIP_TONES: Record<string, string> = {
+  branding: "red",
+  "web-app": "blue",
+  "social-marketing": "amber",
+  "content-advertising": "green",
+};
+const TONE_ORDER = ["red", "blue", "amber", "green"];
+
+/**
  * Contact form, built from the site's own tokens. "What do you need?" is a
- * row of discipline chips; a link can pre-select them through
- * `?services=…`, so the brief is already begun. Validates on submit (and re-checks a field on blur afterwards),
- * then swaps to a confirmation. Submits through the existing
- * submitContactAction Server Action, unchanged: the chosen disciplines
- * are sent as one readable `service` line.
+ * row of discipline chips, each in its own colour; a link can pre-select
+ * them through `?services=…`, so the brief is already begun. Before sending,
+ * the visitor ticks that they are 16 or older and have read the Privacy
+ * Policy (never pre-ticked; the server checks it too). Validates on submit (and re-checks a field on blur afterwards),
+ * then swaps to a confirmation. Submits through the
+ * submitContactAction Server Action: the chosen disciplines are sent as
+ * one readable `service` line.
  */
 export function ContactForm({
   services,
@@ -69,6 +86,7 @@ export function ContactForm({
   const formRef = useRef<HTMLFormElement>(null);
   const [values, setValues] = useState<Record<FieldKey, string>>(EMPTY);
   const [selected, setSelected] = useState<string[]>([]);
+  const [agreed, setAgreed] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [attempted, setAttempted] = useState(false);
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
@@ -92,8 +110,13 @@ export function ContactForm({
 
   const handleBlur = (key: FieldKey) => {
     if (!attempted) return;
-    const next = validate(values, cf);
+    const next = validate(values, agreed, cf);
     setErrors((e) => ({ ...e, [key]: next[key] }));
+  };
+
+  const setAgreement = (on: boolean) => {
+    setAgreed(on);
+    if (attempted) setErrors((e) => ({ ...e, consent: on ? undefined : cf.consentRequired }));
   };
 
   const toggle = (id: string) =>
@@ -110,7 +133,7 @@ export function ContactForm({
     event.preventDefault();
     if (status === "submitting") return;
 
-    const next = validate(values, cf);
+    const next = validate(values, agreed, cf);
     setAttempted(true);
 
     if (Object.keys(next).length > 0) {
@@ -130,6 +153,7 @@ export function ContactForm({
       phone: values.phone,
       service: serviceLine(),
       message: values.message,
+      consent: agreed,
       locale,
     });
 
@@ -160,28 +184,22 @@ export function ContactForm({
         <legend className="text-title text-ink">{cf.servicesLabel}</legend>
         <p className="mt-1 text-meta text-ink-muted">{cf.servicesHint}</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          {services.map((service) => {
+          {services.map((service, i) => {
             const on = selected.includes(service.id);
             return (
               <button
                 key={service.id}
                 type="button"
                 aria-pressed={on}
+                data-tone={CHIP_TONES[service.id] ?? TONE_ORDER[i % TONE_ORDER.length]}
                 onClick={() => toggle(service.id)}
                 className={cn(
-                  "inline-flex min-h-11 items-center gap-2 rounded-pill border px-4 py-2 text-[0.9375rem] font-medium",
-                  "transition-[background-color,border-color,color,transform] duration-[var(--duration-fast)] active:scale-[0.97]",
-                  on ? "border-ink bg-ink text-white" : "border-line-strong bg-canvas text-ink hover:border-ink-faint",
+                  "brief-chip inline-flex min-h-11 items-center gap-2 rounded-pill border px-4 py-2 text-[0.9375rem] font-medium text-ink",
+                  "transition-[background-color,border-color,transform] duration-[var(--duration-fast)] active:scale-[0.97] focus-visible:outline-ink",
                 )}
               >
-                <span
-                  aria-hidden="true"
-                  className={cn(
-                    "flex size-4.5 items-center justify-center rounded-full",
-                    on ? "bg-white text-ink" : "border border-line-strong",
-                  )}
-                >
-                  {on && <Icon name="check" className="text-[0.75rem]" strokeWidth={2.4} />}
+                <span aria-hidden="true" className="brief-chip-mark flex size-5 items-center justify-center rounded-full">
+                  {on && <Icon name="check" className="text-[0.8rem]" strokeWidth={2.6} />}
                 </span>
                 {service.title}
               </button>
@@ -263,6 +281,40 @@ export function ContactForm({
             </p>
           )}
         </div>
+      </div>
+
+      <div className="mt-8">
+        <div className="flex items-start gap-3">
+          <input
+            id={`${uid}-consent`}
+            name="consent"
+            type="checkbox"
+            checked={agreed}
+            required
+            aria-invalid={errors.consent ? true : undefined}
+            aria-describedby={errors.consent ? `${uid}-consent-error` : undefined}
+            onChange={(e) => setAgreement(e.target.checked)}
+            className="mt-0.5 size-5 shrink-0 cursor-pointer accent-ink focus-visible:outline-ink"
+          />
+          <label htmlFor={`${uid}-consent`} className="cursor-pointer text-[0.9375rem] leading-[1.45] text-ink">
+            {cf.consentBefore}
+            {/* A new tab, so the brief typed so far stays put. */}
+            <a
+              href={withLocale("/legal/privacy", locale)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="rounded-xs font-medium underline decoration-ink/30 underline-offset-2 transition-colors hover:decoration-ink"
+            >
+              {cf.consentLink}
+            </a>
+            {cf.consentAfter}
+          </label>
+        </div>
+        {errors.consent && (
+          <p id={`${uid}-consent-error`} role="alert" className="mt-1.5 pl-8 text-meta text-danger">
+            {errors.consent}
+          </p>
+        )}
       </div>
 
       <Button type="submit" size="lg" arrow className="mt-8" disabled={status === "submitting"}>

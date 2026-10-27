@@ -128,7 +128,7 @@ export function ClientWords({ heading, items, labels }: ClientWordsProps) {
                   <Icon name="arrow-right" className="text-[1.1rem]" strokeWidth={1.8} />
                 </button>
               </div>
-              <p aria-live="polite" aria-atomic="true" className="tabular text-meta text-ink-faint">
+              <p aria-live="polite" aria-atomic="true" className="tabular text-meta text-ink-muted">
                 <span className="text-ink">{pad(index + 1)}</span>/{pad(count)}
               </p>
             </div>

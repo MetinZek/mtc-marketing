@@ -19,7 +19,10 @@
   --color-paper: #f5f5f7;
   --color-paper-deep: #e8e8ed;
 
-  /* ---- Ink --------------------------------------------------- */
+  /* ---- Ink ---------------------------------------------------
+     Text is ink or ink-muted (5:1 on white, 4.7:1 on mist). The
+     faint greys (here and snow-faint) are for icons, markers and
+     hairlines only: they are too light for reading. */
   --color-ink: #1d1d1f;
   --color-ink-muted: #6e6e73;
   --color-ink-faint: #86868b;
@@ -209,7 +212,7 @@
   }
 
   ::placeholder {
-    color: var(--color-ink-faint);
+    color: var(--color-ink-muted);
   }
 
   img,
@@ -507,6 +510,66 @@
   height: 6rem;
   filter: drop-shadow(3px 0 0 #ffffff) drop-shadow(-3px 0 0 #ffffff) drop-shadow(0 3px 0 #ffffff)
     drop-shadow(0 -3px 0 #ffffff) drop-shadow(0 14px 16px rgb(0 0 0 / 0.2));
+}
+
+/* ============================================================
+   Cookie banner (ConsentBanner.tsx): rises in a moment after the
+   page, so it doesn't land on top of the opening.
+   ============================================================ */
+@media (prefers-reduced-motion: no-preference) {
+  .consent-card {
+    animation: consent-in 600ms var(--ease-out-expo) both;
+  }
+  .consent-card[data-first] {
+    animation-delay: 500ms;
+  }
+}
+@keyframes consent-in {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+}
+
+/* ============================================================
+   Brief chips (ContactForm.tsx): "What do you need?" with each
+   discipline in its own colour, a tinted ring before it is
+   chosen, a tinted pill with a filled tick once it is. Text
+   stays ink on every tone.
+   ============================================================ */
+.brief-chip {
+  --chip-hue: var(--color-hue-blue);
+  --chip-tick: #ffffff;
+  border-color: var(--color-line-strong);
+  background-color: var(--color-canvas);
+}
+.brief-chip[data-tone="red"] {
+  --chip-hue: var(--color-hue-red);
+}
+.brief-chip[data-tone="amber"] {
+  --chip-hue: var(--color-hue-amber);
+  --chip-tick: var(--color-ink);
+}
+.brief-chip[data-tone="green"] {
+  --chip-hue: var(--color-hue-green);
+}
+.brief-chip[aria-pressed="true"] {
+  border-color: var(--chip-hue);
+  background-color: color-mix(in srgb, var(--chip-hue) 16%, var(--color-canvas));
+}
+@media (hover: hover) and (pointer: fine) {
+  .brief-chip:hover {
+    border-color: var(--chip-hue);
+  }
+}
+.brief-chip-mark {
+  border: 2px solid var(--chip-hue);
+  background-color: color-mix(in srgb, var(--chip-hue) 18%, var(--color-canvas));
+  color: var(--chip-tick);
+  transition: background-color var(--duration-fast) var(--ease-out-soft);
+}
+.brief-chip[aria-pressed="true"] .brief-chip-mark {
+  background-color: var(--chip-hue);
 }
 
 /* ============================================================

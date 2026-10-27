@@ -423,3 +423,13 @@ export async function setSubmissionStatus(
   );
   revalidatePath("/admin/contact");
 }
+
+/**
+ * Removes one message for good (no archive copy), e.g. when its sender
+ * asks for their data to be deleted.
+ */
+export async function deleteSubmission(id: string): Promise<void> {
+  await mutateRows("submissions", (rows) => rows.filter((row) => idOf(row) !== id));
+  revalidatePath("/admin");
+  revalidatePath("/admin/contact");
+}

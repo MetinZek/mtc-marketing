@@ -24,9 +24,8 @@ export async function generateMetadata(): Promise<Metadata> {
 
 /**
  * /contact: the invitation set large, the form (discipline chips first,
- * then the details) on a mist panel, and the studio's direct lines beside
- * it, with its local time. The form's server action and validation are
- * unchanged. The footer leaves its sign-off out on this page.
+ * then the details and the 16+ / Privacy Policy tick) on a mist panel, and
+ * the studio's direct lines beside it, with its local time.
  */
 export default async function ContactPage() {
   const [services, settings, dict, locale] = await Promise.all([

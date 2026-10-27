@@ -56,7 +56,7 @@ export function Disciplines({
               key={discipline.id}
               className="group/row grid gap-x-6 gap-y-4 border-t border-night-line py-9 sm:py-12 lg:grid-cols-12"
             >
-              <span className="text-[0.9375rem] font-medium text-snow-faint tabular lg:col-span-1 lg:pt-2">{discipline.number}</span>
+              <span className="text-[0.9375rem] font-medium text-snow-muted tabular lg:col-span-1 lg:pt-2">{discipline.number}</span>
               <h3 className="text-display-3 text-snow transition-transform duration-[var(--duration-slow)] ease-[var(--ease-out-soft)] lg:col-span-4 lg:group-hover/row:translate-x-1.5">
                 {discipline.title}
               </h3>
@@ -75,7 +75,7 @@ export function Disciplines({
                   </>
                 )}
                 {discipline.related.length > 0 && (
-                  <p className="mt-6 text-[0.9375rem] text-snow-faint">
+                  <p className="mt-6 text-[0.9375rem] text-snow-muted">
                     {dict.home.servicesSeenIn}{" "}
                     {discipline.related.map((project, i) => (
                       <Fragment key={project.slug}>

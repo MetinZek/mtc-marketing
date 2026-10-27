@@ -47,12 +47,17 @@ function translateFieldError(field: string, rawMessage: string, dict: Dictionary
  * and the submission stays visible in /admin/contact either way.
  * `locale` (sent by the client, since Server Actions can't read
  * next/root-params themselves) selects which dictionary translates any
- * server-side error message.
+ * server-side error message. Nothing is saved unless the sender confirmed
+ * being 16 or older and having read the Privacy Policy (`consent: true`).
  */
 export async function submitContactAction(
   input: Record<string, unknown> & { locale?: string },
 ): Promise<ContactActionResult> {
   const dict = dictionaryFor(typeof input.locale === "string" ? input.locale : "en");
+
+  if (input.consent !== true) {
+    return { ok: false, errors: { consent: dict.contactForm.consentRequired } };
+  }
 
   const result = await createSubmission(input);
   if (!result.ok) {

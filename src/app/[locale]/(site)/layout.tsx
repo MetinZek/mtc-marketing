@@ -1,3 +1,5 @@
+import { ConsentBanner } from "@/components/consent/ConsentBanner";
+import { Trackers } from "@/components/consent/Trackers";
 import { Footer } from "@/components/layout/Footer";
 import { Navbar } from "@/components/layout/Navbar";
 import { MotionRoot } from "@/components/motion/MotionRoot";
@@ -11,9 +13,11 @@ import { getDictionary } from "@/i18n/get-dictionary";
  * around every marketing route. Only the routed content inside <main>
  * fades in between routes (PageTransition) and gets a fresh scroll
  * choreography per page (MotionRoot, remounted with it); the navigation
- * and footer stay put, and so does the glass lens over project pictures
- * (WorkLens). `dict` is fetched once here (Navbar is a Client Component
- * and can't call next/root-params itself) and passed down.
+ * and footer stay put, and so do the glass lens over project pictures
+ * (WorkLens), the cookie banner (early in the tab order, just after the
+ * skip link) and the measurement tools it switches on (Trackers). `dict`
+ * is fetched once here (Navbar is a Client Component and can't call
+ * next/root-params itself) and passed down.
  */
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const dict = await getDictionary();
@@ -25,6 +29,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       >
         {dict.misc.skipToContent}
       </a>
+      <ConsentBanner dict={dict} />
       <Navbar dict={dict} />
       <main id="main" tabIndex={-1} className="outline-none">
         <PageTransition>
@@ -34,6 +39,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <Footer />
       <SmoothScroll />
       <WorkLens />
+      <Trackers />
     </>
   );
 }

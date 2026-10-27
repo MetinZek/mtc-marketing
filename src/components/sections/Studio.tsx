@@ -97,7 +97,7 @@ function StudioCapabilities({
               key={service.id}
               className="grid gap-x-6 gap-y-4 border-t border-line py-9 sm:py-11 lg:grid-cols-12"
             >
-              <span className="text-[0.9375rem] font-medium text-ink-faint tabular lg:col-span-1 lg:pt-1.5">{service.number}</span>
+              <span className="text-[0.9375rem] font-medium text-ink-muted tabular lg:col-span-1 lg:pt-1.5">{service.number}</span>
               <h3 className="text-title text-ink lg:col-span-4">{service.title}</h3>
               <p className="text-[1.0625rem] text-ink-muted lg:col-span-3">{service.summary}</p>
               <div className="lg:col-span-4">

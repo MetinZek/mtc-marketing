@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import {
+  LegalContact,
   LegalDocument,
   LegalLink,
   LegalList,
   LegalSection,
   LEGAL_ENTITY_NAME,
 } from "@/components/sections/LegalDocument";
-import { contactDefaults } from "@/config/site";
 import { getLocale } from "@/i18n/get-locale";
+import { withLocale } from "@/i18n/paths";
 import { buildMetadata } from "@/lib/seo";
 
-const LAST_UPDATED = "September 13, 2026";
+const LAST_UPDATED = "October 27, 2026";
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
@@ -23,7 +24,10 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 /** /legal/terms — static, English-only legal content. */
-export default function TermsOfUsePage() {
+export default async function TermsOfUsePage() {
+  const locale = await getLocale();
+  const refundsHref = withLocale("/legal/refunds", locale);
+
   return (
     <LegalDocument
       title="Terms of Use"
@@ -89,6 +93,11 @@ export default function TermsOfUsePage() {
           terms of such an agreement conflict with these Terms, the separate agreement will govern
           for that engagement.
         </p>
+        <p>
+          Prices are always agreed in writing before work starts, and nothing is charged through
+          this website. How payments, cancellations, and refunds work is explained in our{" "}
+          <LegalLink href={refundsHref}>Refund Policy</LegalLink>.
+        </p>
       </LegalSection>
 
       <LegalSection heading="5. User responsibilities">
@@ -145,13 +154,7 @@ export default function TermsOfUsePage() {
 
       <LegalSection heading="10. Contact us">
         <p>Questions about these Terms of Use can be sent to:</p>
-        <p>
-          {LEGAL_ENTITY_NAME}
-          <br />
-          <LegalLink href={`mailto:${contactDefaults.email}`}>{contactDefaults.email}</LegalLink>
-          <br />
-          {contactDefaults.location}
-        </p>
+        <LegalContact />
       </LegalSection>
     </LegalDocument>
   );

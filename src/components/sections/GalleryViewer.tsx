@@ -121,6 +121,7 @@ export function GalleryViewer({
               <video
                 key={current.id}
                 src={current.videoUrl}
+                aria-label={current.image.alt}
                 poster={slowId === current.id ? current.image.src : undefined}
                 onError={() => setFailedId(current.id)}
                 autoPlay

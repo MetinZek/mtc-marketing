@@ -1,7 +1,9 @@
 import Link from "next/link";
+import { CookieSettingsButton } from "@/components/consent/CookieSettingsButton";
 import { Icon } from "@/components/ui/Icon";
 import { Logo } from "@/components/ui/Logo";
-import { footerNav, navCta, siteConfig } from "@/config/site";
+import { businessDetails, footerNav, navCta, siteConfig } from "@/config/site";
+import { consentCategories } from "@/config/tracking";
 import { getDictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
 import { withLocale } from "@/i18n/paths";
@@ -11,8 +13,10 @@ import { SignOff } from "./SignOff";
 
 /**
  * Site footer: the sign-off (the invitation set across the full width, on
- * every page but /contact), then a quiet index: the studio, the pages,
- * legal, direct contact and social, and a base row with the language
+ * the homepage only), then a quiet index: the studio, the pages, legal
+ * (with "Cookie settings" once there is a cookie choice to change), direct
+ * contact and social, and a base row with the business's name and
+ * registration numbers (those filled in, src/config/site.ts), the language
  * switch and a way back to the top.
  */
 export async function Footer() {
@@ -23,6 +27,12 @@ export async function Footer() {
     getLocale(),
   ]);
   const year = new Date().getFullYear();
+  const entity = businessDetails.legalName || siteConfig.legalName;
+  const numbers = [
+    businessDetails.registrationNumber && `${dict.footer.registrationNumber} ${businessDetails.registrationNumber}`,
+    businessDetails.fiscalNumber && `${dict.footer.fiscalNumber} ${businessDetails.fiscalNumber}`,
+    businessDetails.vatNumber && `${dict.footer.vatNumber} ${businessDetails.vatNumber}`,
+  ].filter(Boolean);
 
   const itemLabels: Record<string, string> = {
     work: dict.nav.work,
@@ -33,6 +43,9 @@ export async function Footer() {
     privacyPolicy: dict.footer.privacyPolicy,
     termsAndConditions: dict.footer.termsAndConditions,
     cookiePolicy: dict.footer.cookiePolicy,
+    refundPolicy: dict.footer.refundPolicy,
+    dataRequest: dict.footer.dataRequest,
+    legalNotice: dict.footer.legalNotice,
   };
   const groupTitles: Record<string, string> = {
     exploreHeading: dict.footer.exploreHeading,
@@ -48,14 +61,11 @@ export async function Footer() {
         line={dict.contactPage.title}
         openLabel={dict.footer.openForProjects}
         heyLabel={dict.footer.hey}
-        ctaLabel={dict.nav.startAProject}
         ctaHref={withLocale(navCta.href, locale)}
         email={settings.email}
         phone={settings.phone}
-        location={settings.location}
         emailLabel={dict.contactPage.emailLabel}
         phoneLabel={dict.contactPage.phoneLabel}
-        localTimeLabel={dict.footer.localTime}
         copyLabel={dict.home.copyEmail}
         copiedLabel={dict.home.copied}
       />
@@ -79,6 +89,11 @@ export async function Footer() {
                       </Link>
                     </li>
                   ))}
+                  {group.titleKey === "legalHeading" && consentCategories.length > 0 && (
+                    <li>
+                      <CookieSettingsButton label={dict.footer.cookieSettings} className={`${link} text-left`} />
+                    </li>
+                  )}
                 </ul>
               </nav>
             ))}
@@ -96,7 +111,6 @@ export async function Footer() {
                     {settings.phone}
                   </a>
                 </li>
-                <li className="text-[0.9375rem] text-ink-muted">{settings.location}</li>
               </ul>
               {settings.social.length > 0 && (
                 <ul className="mt-6 flex flex-wrap gap-x-5 gap-y-2">
@@ -119,9 +133,12 @@ export async function Footer() {
           </div>
 
           <div className="mt-12 flex flex-col gap-5 border-t border-line-strong/70 pt-6 text-meta text-ink-muted sm:flex-row sm:items-center sm:justify-between">
-            <p>
-              © {year} {siteConfig.legalName}. {dict.footer.allRightsReserved}
-            </p>
+            <div>
+              <p>
+                © {year} {entity}. {dict.footer.allRightsReserved}
+              </p>
+              {numbers.length > 0 && <p className="mt-1">{numbers.join(" · ")}</p>}
+            </div>
             <div className="flex items-center gap-4">
               <LanguageSwitcher ariaLabel={dict.nav.languageSwitcherAriaLabel} />
               <a

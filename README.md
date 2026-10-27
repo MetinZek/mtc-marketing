@@ -99,12 +99,44 @@ Homepage (`src/app/[locale]/(site)/page.tsx`):
    arrows and the count; only real, published quotes.
 5. **Journal**: the five newest notes as a ruled list.
 
-Every page closes with the footer's sign-off: "LET'S TALK." in the hero's
+The homepage closes with the footer's sign-off: "LET'S TALK." in the hero's
 fitted capitals with the same letter effect and three stickers (a "hey!"
-bubble, a waving hand, "Open for new projects"), then the call
-to action, email, phone and the studio's local time (`SignOff`, hidden on
-/contact). Navigation is a top bar plus a dark floating
-dock that appears once the opener has gone (`Navbar`).
+bubble, a waving hand, "Open for new projects"), then the email copy, email
+and phone (`SignOff`, on the homepage only). Navigation is a top bar, its
+pages centred, plus a dark floating dock that appears once the opener has
+gone (`Navbar`). The Studio page is switched off for now (`studioPageEnabled`
+in `src/config/site.ts`): it answers 404 and is left out of every menu and the
+sitemap.
+
+## Legal and privacy
+
+- Legal pages (English in every language, `src/app/[locale]/(site)/legal/`):
+  Privacy Policy, Terms of Use, Cookie Policy, Refund Policy ("the signed
+  agreement comes first") and Legal notice (business details, then credits
+  and licences for Inter, Solar, Fluent Emoji and the code libraries). "Your
+  data" (`/legal/data-request`, translated) takes requests for a copy,
+  correction or deletion of personal data; they land in /admin/contact,
+  where any message can now be deleted for good.
+- **Business details**: `businessDetails` in `src/config/site.ts` (registered
+  name, legal form, address, registration, fiscal and VAT numbers,
+  representative). Each one appears on the legal notice, the legal pages'
+  contact blocks and (the numbers) the footer once it is filled in.
+- **Google Analytics and the Meta Pixel** are set up by their IDs alone:
+  `NEXT_PUBLIC_GA_MEASUREMENT_ID` and `NEXT_PUBLIC_META_PIXEL_ID`
+  (`src/config/tracking.ts`). With an ID set, a cookie banner asks first
+  (`ConsentBanner`): "Reject all" and "Accept all" side by side, or one switch
+  per kind; the choice is kept six months in `mtc_consent` and can be changed
+  under "Cookie settings" in the footer. Nothing loads before consent
+  (`Trackers`); withdrawing it clears their cookies and reloads the page. The
+  privacy and cookie policies describe each tool only while its ID is set.
+  Without IDs there is no banner in production; `next dev` shows it anyway
+  so it can be tried.
+- The contact form asks the sender to confirm they are 16 or older and have
+  read the Privacy Policy (never pre-ticked; checked on the server too).
+- The site sends no email to visitors (only notifications to the studio
+  inbox), so it has no mailing list to unsubscribe from. A newsletter would
+  need its own opt-in and an unsubscribe link in every email.
+- Text is ink or ink-muted; the faint greys are kept for icons and hairlines.
 
 ## Content
 

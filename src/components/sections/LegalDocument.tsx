@@ -1,14 +1,30 @@
 import { type ReactNode } from "react";
 import { SplitWords } from "@/components/motion/SplitWords";
 import { Reveal } from "@/components/motion/Reveal";
+import { businessDetails, contactDefaults } from "@/config/site";
 import { cn } from "@/lib/utils";
 
 /**
- * The legal pages (Privacy Policy, Terms of Use, Cookies Policy) refer to
- * the company by its trading name, independent of `siteConfig.legalName`
- * (used elsewhere for the footer copyright line + SEO metadata).
+ * The legal pages refer to the business by its registered name once it is
+ * filled in (`businessDetails` in src/config/site.ts), and by its trading
+ * name until then, independent of `siteConfig.legalName` (SEO metadata).
  */
-export const LEGAL_ENTITY_NAME = "MTC Marketing";
+export const LEGAL_ENTITY_NAME = businessDetails.legalName || "MTC Marketing";
+
+/** The legal pages' "Contact us" block: who we are and how to reach us. */
+export function LegalContact() {
+  return (
+    <p>
+      {LEGAL_ENTITY_NAME}
+      <br />
+      {businessDetails.address || contactDefaults.location}
+      <br />
+      <LegalLink href={`mailto:${contactDefaults.email}`}>{contactDefaults.email}</LegalLink>
+      <br />
+      <LegalLink href={`tel:${contactDefaults.phone.replace(/\s+/g, "")}`}>{contactDefaults.phone}</LegalLink>
+    </p>
+  );
+}
 
 const legalLinkClass =
   "text-blue underline decoration-blue/30 underline-offset-2 transition-colors hover:decoration-blue";

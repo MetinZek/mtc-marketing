@@ -39,6 +39,20 @@ the case studies). The footer's speech-bubble emoji becomes a "hey!" bubble
 sticker in MTC's amber. A full phone pass found no page wider than a 360px
 screen.
 
+**Iteration 6** (2026-10-27, launch checklist): the header's pages sit exactly
+in the middle of the bar. "LET'S TALK." closes the homepage only, and its row
+keeps just the email copy, email and phone (no second call to action, no
+place and time). The Studio page is switched off (`studioPageEnabled` in
+`src/config/site.ts`; it answers 404 and leaves every menu and the sitemap).
+The brief's "What do you need?" chips take the four discipline colours, and
+the form's fields focus with an ink edge instead of blue. Legal and privacy:
+a refund policy, a legal notice with the business details and credits, a
+"Your data" request page, a rewritten privacy policy and cookie policy, a
+cookie banner for Google Analytics and the Meta Pixel (neither loads without
+consent, or without its ID), a 16+ / Privacy Policy tick on the contact form,
+deletion of messages in /admin, and darker greys wherever the faint ones were
+used for text.
+
 ## What was taken from the references
 
 - **dovvstudio.com**, high-level traits only: a centred, heavy, all-caps
@@ -134,10 +148,11 @@ through all four. Errors use `#d70015`.
    count. Only shows real, published quotes (see Content below).
 5. **Journal**: "Notes from the studio." and the five newest notes as a ruled
    list; hover draws the four-colour line and fills the arrow.
-6. **Sign-off** (site-wide footer): "LET'S TALK." in the hero's fitted
-   capitals as the link to the brief (letters thinning near the pointer, the
-   drift on phones), with a "hey!" speech bubble, a waving hand and "Open for
-   new projects" around it; then email, phone and the studio's local time.
+6. **Sign-off** (the homepage's footer only): "LET'S TALK." in the hero's
+   fitted capitals as the link to the brief (letters thinning near the
+   pointer, the drift on phones), with a "hey!" speech bubble, a waving hand
+   and "Open for new projects" around it; then the email copy, email and
+   phone.
 
 Tell-someone sentence: *it's the site where the headline thins out under your
 mouse and you can pick the stickers up and move them.*
