@@ -23,12 +23,13 @@ type HeroProps = {
  * set in heavy capitals across the whole column, one line, the two
  * actions and the client logos.
  *
- * - The headline is fitted to the column (whole lines from 768px up, words
- *   wrapping below). Its letters thin out near the pointer and fill back in
- *   as it moves on; on touch screens a slow drift plays the same effect.
+ * - The headline is fitted to the column (whole lines from 768px up; below
+ *   that the words wrap, in three lines at most). Its letters thin out near
+ *   the pointer and fill back in as it moves on; on touch screens a slow
+ *   drift plays the same effect.
  * - Four stickers sit on its corners: two short, upbeat pills in MTC's
- *   colours with a shine, and two 3D emojis (eyes, for "impossible to
- *   ignore", and a rocket, for launches). They pop in after the headline, straighten and
+ *   colours with a shine, and two 3D emojis (eyes, for "Oh look", and a
+ *   rocket, for launches). They pop in after the headline, straighten and
  *   grow on hover, and can be picked up and moved with a mouse.
  * - The intro: pill, letters in turn, line and actions, stickers, logos.
  *
@@ -41,7 +42,7 @@ export function Hero({ label, headline, supporting, primary, secondary, stickers
   const titleRef = useRef<HTMLHeadingElement>(null);
   const visualRef = useRef<HTMLSpanElement>(null);
 
-  const size = useFitLetters(titleRef, visualRef, { maxWide: 168, maxNarrow: 96 });
+  const size = useFitLetters(titleRef, visualRef, { maxWide: 168, maxNarrow: 96, narrowLines: 3 });
   useLetterWeights(rootRef, visualRef, size);
   useStickers(rootRef);
 

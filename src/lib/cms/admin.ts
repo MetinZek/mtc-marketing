@@ -216,7 +216,7 @@ export type ArchivedEntry = {
 };
 
 function titleOf(row: Record<string, unknown>): string {
-  const name = row.title ?? row.name ?? row.person ?? row.id;
+  const name = row.title ?? row.name ?? (row.person || row.company) ?? row.id;
   return typeof name === "string" && name ? name : "Untitled";
 }
 

@@ -65,6 +65,17 @@ with a colour split: at this size the resampled page showed stretched,
 coloured pixels. It came back as a very slight zoom only (about 1.05x, no
 bend, no colour split, `glass-refraction.ts`).
 
+**Iteration 8** (2026-10-29, owner's words): the headline becomes "Oh look,
+you found us" (German "Oh, Sie haben uns gefunden", Swedish "Åh titta, du
+hittade oss"). On phones its words take the largest size at which they wrap
+into three lines at most ("OH LOOK, / YOU / FOUND US"), because one short
+word per line ran five lines tall and pushed the actions off the first
+screen. The glass is now for the mouse only: on touch screens the lens no
+longer drifts over the pictures (the owner found a lone square of glass
+over a photo odd without a pointer to follow). Client words carry the
+clients' real quotes, the company leading with the service under it until
+their names are in.
+
 ## What was taken from the references
 
 - **dovvstudio.com**, high-level traits only: a centred, heavy, all-caps
@@ -99,13 +110,13 @@ the page plays: the stickers and the journal's hover line.
 
 ## Hero focal asset
 
-The **headline itself**: "WE MAKE BRANDS / IMPOSSIBLE TO IGNORE." in Inter at
-weight 900, fitted so its widest line spans the column (on phones the words
-wrap and the longest word spans it). Each letter is its own box; with a mouse
-or trackpad the letters near the pointer drop toward weight 200 and fill back
-in as it moves on; on touch screens an invisible point drifts through the
+The **headline itself**: "OH LOOK, / YOU FOUND US" in Inter at weight 900,
+fitted so its widest line spans the column (on phones the words wrap, at the
+largest size that keeps them to three lines). Each letter is its own box;
+with a mouse or trackpad the letters near the pointer drop toward weight 200
+and fill back in as it moves on; on touch screens an invisible point drifts through the
 text in a slow figure of eight instead. Four stickers sit on its corners:
-"Say hi!" (red to pink), a 3D eyes emoji (for "impossible to ignore"), a
+"Say hi!" (red to pink), a 3D eyes emoji (for "Oh look"), a
 3D rocket (launches) and "Ready when you are" (blue to violet).
 The pill above names the agency and its three languages. Static first frame:
 everything in place at full weight.
@@ -149,8 +160,7 @@ through all four. Errors use `#d70015`.
    a black full-width tile and pairs on mist; each unveils as it arrives.
    Under each picture: the name, discipline and year, "View case study" and,
    when there is one, "View live site". The glass cursor turns into a small
-   lens over the pictures (on phones the lens drifts over the picture in
-   view).
+   lens over the pictures (phones have neither).
 3. **Night chapter**: "How we work" as one large paragraph whose words light
    up as it scrolls through, the four stages set small beneath it; thin glass
    squares drift and turn behind it in a layer that holds still while the
@@ -217,8 +227,8 @@ second canvas the size of the lens (32px), moved to any picture marked
 `data-lens` across the site: it samples that picture's own playing film or
 still, magnifies it a little, bends it outward toward the rim and splits it
 by colour there, under a hairline of light and a soft shadow. It loads on
-first use, renders only while shown, and is absent with reduced motion or
-without WebGL. Everywhere else the same glass is the cursor, drawn in CSS
+first use, renders only while shown, and is absent on touch screens, with
+reduced motion or without WebGL. Everywhere else the same glass is the cursor, drawn in CSS
 (the lens's corners, rim, sheen and halo, without the magnifying), which
 fades out as the lens fades in over a picture.
 
@@ -238,8 +248,9 @@ are shown.
 ## Content
 
 Client words come from the CMS and only published ones appear on the site. The
-local seed holds five **drafts** (one per client project, with the client's
-logo standing in for a photo) whose quotes, names and roles are placeholders
-written by MTC for the owner to replace with each client's real words. They
-are unpublished, show on a development server only (marked "Draft"), and a
-production build never reads them.
+local seed holds the four real quotes the owner sent (Balkan Bee, AS-MED, Leo
+Malerbetrieb GmbH, Pixel Print), with the client's logo standing in for a
+photo. Until a client's name is in, the company leads and the service sits
+under it; with a name, the name leads over "Role, Company". The live site
+reads them from its database, where they are entered in /admin. Unpublished
+entries show on a development server only (marked "Draft").

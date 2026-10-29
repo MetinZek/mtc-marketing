@@ -98,7 +98,7 @@ export const sv: LocaleOverlay = {
   homepage: {
     hero: {
       label: "Kreativ digitalbyrå",
-      headline: ["Vi gör varumärken", "omöjliga att ignorera."],
+      headline: ["Åh titta,", "du hittade oss"],
       supporting:
         "Varumärke, webbplatser, sociala medier och innehåll från ett kreativt team, från första idé till lanseringsdagen.",
       primaryCta: { label: "Starta ett projekt", href: "/contact" },

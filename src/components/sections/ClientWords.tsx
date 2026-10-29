@@ -203,11 +203,12 @@ export function ClientWords({ heading, items, labels }: ClientWordsProps) {
                       />
                     </span>
                   )}
-                  {/* A draft's name and role are placeholders until the
-                      client's are in: only the company shows. */}
+                  {/* Until the client's name is in, the company leads with
+                      the role (or service) under it. A draft's name and
+                      role are placeholders: only the company shows. */}
                   <span>
                     <span className="flex items-center gap-2 text-[0.9375rem] font-semibold text-ink">
-                      {item.draft ? item.company : item.person}
+                      {item.draft || !item.person ? item.company : item.person}
                       {item.draft && (
                         <span className="rounded-pill bg-mist px-2 py-0.5 text-[0.75rem] font-medium text-ink-muted">
                           {labels.draft}
@@ -216,7 +217,7 @@ export function ClientWords({ heading, items, labels }: ClientWordsProps) {
                     </span>
                     {!item.draft && (
                       <span className="block text-meta text-ink-muted">
-                        {item.role}, {item.company}
+                        {item.person ? `${item.role}, ${item.company}` : item.role}
                       </span>
                     )}
                   </span>

@@ -221,7 +221,8 @@ export const workPageSchema = z.object({
 export const testimonialSchema = z.object({
   id: z.string().min(1),
   quote: z.string().min(1),
-  person: z.string().min(1), // client name
+  /** The client's name; may stay empty until they give it (the company shows instead). */
+  person: z.string().default(""),
   role: z.string().min(1),
   company: z.string().min(1),
   portrait: imageSchema.optional(),

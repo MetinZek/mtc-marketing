@@ -104,7 +104,7 @@ export const de: LocaleOverlay = {
   homepage: {
     hero: {
       label: "Kreative Digitalagentur",
-      headline: ["Wir machen Marken", "unübersehbar."],
+      headline: ["Oh, Sie haben", "uns gefunden"],
       supporting:
         "Branding, Websites, Social Media und Content aus einem kreativen Team, von der ersten Idee bis zum Launch.",
       primaryCta: { label: "Projekt starten", href: "/contact" },

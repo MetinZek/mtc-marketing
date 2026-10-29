@@ -372,15 +372,27 @@ export const COLLECTION_DEFS: Record<CmsCollection, CollectionDef> = {
     canCreate: true,
     canDelete: true,
     publishLabel: "Active",
+    // The company leads: the client's name may still be empty.
     listColumns: [
-      { key: "person", label: "Client name" },
       { key: "company", label: "Company" },
+      { key: "person", label: "Client name" },
       { key: "order", label: "Order" },
     ],
     fields: [
-      { key: "person", label: "Client name", type: "text", required: true },
+      {
+        key: "person",
+        label: "Client name",
+        type: "text",
+        help: "Optional. Until it is filled in, the site shows the company with the role under it.",
+      },
       { key: "company", label: "Company", type: "text", required: true },
-      { key: "role", label: "Role", type: "text", required: true },
+      {
+        key: "role",
+        label: "Role",
+        type: "text",
+        required: true,
+        help: "The client's role, e.g. Founder. Without a client name, the service, e.g. Branding.",
+      },
       { key: "quote", label: "Testimonial", type: "textarea", rows: 4, required: true },
       { key: "portrait", label: "Image", type: "image" },
       { key: "featured", label: "Featured", type: "boolean" },

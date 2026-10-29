@@ -38,15 +38,18 @@ export function Letters({ lines }: { lines: string[] }) {
 
 /**
  * Fits `Letters` to the width of `box`: the widest line spans it from 768px
- * up; below that, where words wrap, the longest word does. Measured at rest
- * weight and a 100px size, then scaled; re-fitted when the box's width
- * changes, the breakpoint is crossed or the fonts arrive. The CSS size is
- * the first frame without scripts. Returns the fitted size in px.
+ * up; below that, where words wrap, the longest word does. With
+ * `narrowLines`, the words below 768px instead take the largest size at
+ * which they wrap into that many lines or fewer, so a short headline of
+ * short words doesn't stack one word per line. Measured at rest weight and
+ * a 100px size, then scaled; re-fitted when the box's width changes, the
+ * breakpoint is crossed or the fonts arrive. The CSS size is the first
+ * frame without scripts. Returns the fitted size in px.
  */
 export function useFitLetters(
   box: RefObject<HTMLElement | null>,
   visual: RefObject<HTMLElement | null>,
-  { maxWide, maxNarrow }: { maxWide: number; maxNarrow: number },
+  { maxWide, maxNarrow, narrowLines }: { maxWide: number; maxNarrow: number; narrowLines?: number },
 ) {
   const size = useRef(0);
 
@@ -59,6 +62,23 @@ export function useFitLetters(
     const words = Array.from(el.querySelectorAll<HTMLElement>(".fit-word"));
     const chars = Array.from(el.querySelectorAll<HTMLElement>(".fit-char"));
 
+    /** The largest size up to `upper` at which the words wrap into `count` lines or fewer. */
+    const withinLines = (upper: number, count: number) => {
+      const fits = (px: number) => {
+        el.style.fontSize = `${px}px`;
+        return new Set(words.map((w) => w.offsetTop)).size <= count;
+      };
+      if (fits(upper)) return upper;
+      let low = 0;
+      let high = upper;
+      for (let i = 0; i < 12; i++) {
+        const mid = (low + high) / 2;
+        if (fits(mid)) low = mid;
+        else high = mid;
+      }
+      return low;
+    };
+
     const fit = () => {
       const available = boxEl.clientWidth;
       if (!available) return;
@@ -69,7 +89,9 @@ export function useFitLetters(
         el.style.removeProperty("font-size");
         return;
       }
-      size.current = Math.min((100 * available) / widest, wide.matches ? maxWide : maxNarrow) * 0.995;
+      let fitted = Math.min((100 * available) / widest, wide.matches ? maxWide : maxNarrow);
+      if (!wide.matches && narrowLines) fitted = withinLines(fitted, narrowLines);
+      size.current = fitted * 0.995;
       el.style.fontSize = `${size.current.toFixed(2)}px`;
     };
 
@@ -90,7 +112,7 @@ export function useFitLetters(
       wide.removeEventListener("change", fit);
       el.style.removeProperty("font-size");
     };
-  }, [box, visual, maxWide, maxNarrow]);
+  }, [box, visual, maxWide, maxNarrow, narrowLines]);
 
   return size;
 }

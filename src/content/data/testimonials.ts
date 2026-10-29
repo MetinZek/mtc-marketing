@@ -5,56 +5,55 @@ import type { testimonialSchema } from "../schema";
 type Testimonial = z.input<typeof testimonialSchema>;
 
 /**
- * DRAFTS, one per client project, waiting for each client's real words.
- * The quotes, names and roles are placeholders written by MTC, not said by
- * anyone: replace them in /admin with what the client actually said, then
- * tick "Published". Unpublished, they show on a development server only
- * (marked "Draft") and never on the live site. The company names match the
- * client logos, which stand in as avatars until there is a real photo.
+ * The clients' own words, as the owner sent them (2026-10-29). Their names
+ * are still to come: until a name is in, the company leads and the role
+ * line names the service. The company names match the client logos, which
+ * stand in as avatars until there is a real photo. The live site reads
+ * testimonials from its database, so they are entered in /admin there too.
  */
 export const testimonials: Testimonial[] = [
   {
     id: "t-balkan-bee",
     quote:
-      "MTC took our idea and turned it into a complete brand, from the logo to the billboards. It finally looks as big as the marketplace we are building.",
-    person: "Name Surname",
-    role: "Role",
+      "We had the idea, but needed a brand that could bring it all together. Now, everything from our logo to our campaign visuals feels like part of the same story.",
+    person: "",
+    role: "Branding",
     company: "Balkan Bee",
     featured: true,
     order: 1,
-    published: false, // draft: never publish as is
+    published: true,
   },
   {
     id: "t-as-med",
     quote:
-      "MTC designed and built our healthcare management system around the way our team really works. Clear, reliable and easy to use from the first day.",
-    person: "Name Surname",
-    role: "Role",
+      "Our work has its own processes, and we needed a system that understood that. Now, our team has a solution built around the way we actually work, not the other way around.",
+    person: "",
+    role: "Software Development",
     company: "AS-MED",
     featured: false,
     order: 2,
-    published: false, // draft: never publish as is
+    published: true,
   },
   {
     id: "t-leo-gmbh",
     quote:
-      "MTC built our website and still looks after it. Changes happen quickly, the site is fast and it shows our work the way it deserves.",
-    person: "Name Surname",
-    role: "Role",
+      "Customers can now see what we do before they even contact us. The website is fast, easy to navigate, and finally gives our work the online presence it deserves.",
+    person: "",
+    role: "Website Development",
     company: "Leo Malerbetrieb GmbH",
     featured: false,
     order: 3,
-    published: false, // draft: never publish as is
+    published: true,
   },
   {
     id: "t-pixel-print",
     quote:
-      "From the first sketches to the final files, MTC made our rebrand simple. The new identity works on everything we print.",
-    person: "Name Surname",
-    role: "Role",
+      "We wanted a fresh identity without losing what makes us recognizable. The result feels modern, works across our printed materials, and gives our brand a much more consistent look.",
+    person: "",
+    role: "Branding",
     company: "Pixel Print",
     featured: false,
-    order: 5,
-    published: false, // draft: never publish as is
+    order: 4,
+    published: true,
   },
 ];

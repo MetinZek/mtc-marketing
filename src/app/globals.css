@@ -340,7 +340,7 @@
   text-transform: uppercase;
 }
 .hero-title {
-  font-size: 12.4vw;
+  font-size: 18.6vw;
   line-height: 0.9;
 }
 .signoff-line {
@@ -357,7 +357,7 @@
 }
 @media (min-width: 768px) {
   .hero-title {
-    font-size: clamp(3rem, 6.5vw, 9rem);
+    font-size: clamp(3rem, 13vw, 10.5rem);
   }
   .signoff-line {
     font-size: clamp(3rem, 12vw, 11rem);

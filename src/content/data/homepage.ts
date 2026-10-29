@@ -9,7 +9,7 @@ import type { HomepageContent } from "../types";
 export const homepageContent: HomepageContent = {
   hero: {
     label: "Creative digital agency",
-    headline: ["We make brands", "impossible to ignore."],
+    headline: ["Oh look,", "you found us"],
     supporting:
       "Branding, websites, social media and content from one creative team, from the first idea to launch day.",
     primaryCta: { label: "Start a project", href: "/contact" },

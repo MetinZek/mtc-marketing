@@ -11,7 +11,8 @@ const nextConfig: NextConfig = {
   // "only the header/footer render" since everything client-animated
   // stays at its server-rendered initial (invisible) state. Harmless in
   // production — `next build`/`next start` don't run this dev-only check.
-  allowedDevOrigins: ["192.168.1.11"],
+  // The wildcard covers whichever address the router gives this machine.
+  allowedDevOrigins: ["192.168.1.*"],
   experimental: {
     serverActions: {
       // Default is 1MB; admin image uploads go up to 5MB (projects) plus

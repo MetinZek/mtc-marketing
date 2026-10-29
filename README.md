@@ -82,8 +82,9 @@ starts.
 
 Homepage (`src/app/[locale]/(site)/page.tsx`):
 
-1. **Opener** (`Hero`): the headline in heavy capitals fitted to the column,
-   its letters thinning out near the pointer (a slow drift on touch screens;
+1. **Opener** (`Hero`): the headline, "Oh look, you found us", in heavy
+   capitals fitted to the column (three lines at most on phones), its
+   letters thinning out near the pointer (a slow drift on touch screens;
    `FitLetters`); four colourful stickers, two of them 3D emojis, that pop in
    and can be dragged (`ui/Sticker`); the two actions; the real client logos
    on a slow loop (`TrustedBy`).
@@ -94,8 +95,8 @@ Homepage (`src/app/[locale]/(site)/page.tsx`):
    Edge it zooms what is under it very slightly (`glass-refraction.ts`);
    elsewhere it is clear glass. Over every
    picture it becomes the glass lens that magnifies it (`WorkLens`,
-   `work-lens.ts`, on any `[data-lens]` box). On phones the lens drifts over
-   the picture in view.
+   `work-lens.ts`, on any `[data-lens]` box). Phones and tablets have no
+   glass at all: no cursor and no lens.
 3. **Night chapter**: "How we work" lit word by word over glass squares that
    break when clicked or tapped and grow back (`StudioStatement`,
    `GlassSquares`, `glass-scene.ts`), then the four services with where each
@@ -161,13 +162,15 @@ src/i18n/dictionaries/  UI strings (en is the source of truth, de/sv typed again
   in /admin to appear on the live site.**
 - Team members and statistics are not published anywhere because none exist
   yet; their sections stay hidden until real ones are published in /admin.
-- Client words ("In Our Clients' Words."): the seed holds four **drafts**
-  (placeholder quotes, names and roles for Balkan Bee, AS-MED, Leo
-  Malerbetrieb and Pixel Print) so the section can be judged on a
-  development server, where they show marked "Draft" with the company only
-  (the placeholder name and role are hidden). They are unpublished and never
-  reach a production build. Replace each with the client's real words,
-  name and role in /admin and tick "Published".
+- Client words ("In Our Clients' Words."): the seed holds the four real
+  quotes (Balkan Bee, AS-MED, Leo Malerbetrieb GmbH and Pixel Print), each
+  with the service under the company; the clients' names are still to
+  come. **The live site reads them from its database**, so enter each in
+  /admin → Testimonials: Company, Role (the service, e.g. "Branding"),
+  the quote, Client name left empty, and tick "Active". Once a name is
+  in, it leads and the line under it reads "Role, Company" (put the
+  person's role in Role then). Unpublished entries show on a development
+  server only, marked "Draft".
 - Portfolio media (images, cover videos, client logos, journal covers) was
   copied from the live site into `public/media/`.
 
