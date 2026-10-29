@@ -101,7 +101,7 @@ export function StickerEmoji({ src }: { src: string }) {
  * can be picked up and moved within `root`, leaning with the drag and
  * springing upright when let go, and their shine follows the pointer
  * across `root` (`--shine`). On touch screens they stay put, so a drag
- * never fights scrolling, and the shine drifts by itself (CSS).
+ * never fights scrolling, and the shine rests in the middle.
  */
 export function useStickers(root: RefObject<HTMLElement | null>) {
   useEffect(() => {

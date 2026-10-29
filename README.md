@@ -72,8 +72,10 @@ utilities. Token names the admin panel uses are kept.
 content and turns attributes into GSAP choreography, reverting everything on
 navigation: `data-split` headings (split into words on the server by
 `SplitWords`, with the full text kept for assistive technology) rise in word by
-word; `data-reveal="up" | "fade" | "stagger"` reveal once; `"media"` unveils a
-frame under scroll; `"sheet"` widens the night chapter; `"ink"` (`InkText`)
+word; `data-reveal="up" | "fade" | "stagger"` reveal once; `"media"` grows a
+frame to full size under scroll (transforms only, and only with a mouse or
+trackpad: on touch screens the frames hold still); `"sheet"` widens the
+night chapter; `"ink"` (`InkText`)
 lights a paragraph up word by word as it scrolls through. An inline script
 marks `<html class="motion">` before first paint, and only then do these
 elements start hidden; with reduced motion, without JavaScript, or if the
@@ -84,8 +86,9 @@ Homepage (`src/app/[locale]/(site)/page.tsx`):
 
 1. **Opener** (`Hero`): the headline, "Oh look, you found us", in heavy
    capitals fitted to the column (three lines at most on phones), its
-   letters thinning out near the pointer (a slow drift on touch screens;
-   `FitLetters`); four colourful stickers, two of them 3D emojis, that pop in
+   letters thinning out near the pointer, each in a box of fixed width so
+   nothing shifts (still on touch screens; `FitLetters`); four colourful
+   stickers, two of them 3D emojis, that pop in
    and can be dragged (`ui/Sticker`); the two actions; the real client logos
    on a slow loop (`TrustedBy`).
 2. **Showroom**: featured projects as large night and mist tiles, each with

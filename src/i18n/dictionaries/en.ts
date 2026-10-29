@@ -109,12 +109,13 @@ export const en = {
   work: {
     eyebrow: "Selected work",
     title: "Recent work",
-    intro: "Brand identities, websites and web apps for businesses from Kosovo to Vienna.",
+    intro: "A few things we’ve been busy making.",
     projectCountOne: "project",
     projectCountOther: "projects",
     viewCaseStudy: "View case study",
     viewLiveSite: "View live site",
     viewCaseStudyAriaLabel: "View case study: {title}",
+    viewLiveSiteAriaLabel: "View live site: {title}",
     metaTitle: "Work | MTC",
     metaDescription:
       "Selected projects from MTC: brand identities, websites and web apps for businesses from Kosovo to Vienna.",

@@ -299,8 +299,11 @@
 .motion [data-split]:not(.is-in) .split-word > span {
   transform: translate3d(0, 105%, 0);
 }
-.motion [data-reveal="media"]:not(.is-in) {
-  clip-path: inset(6% 5% 0% 5% round 36px);
+@media (hover: hover) and (pointer: fine) {
+  .motion [data-reveal="media"]:not(.is-in) {
+    transform: scale(0.92);
+    transform-origin: 50% 100%;
+  }
 }
 
 .motion [data-hero-fade]:not(.is-in) {
@@ -322,8 +325,10 @@
 .motion [data-reveal="sheet"]:not(.is-in) {
   transform: scaleX(0.95);
 }
+/* 0.4 keeps the unlit words at 3.4:1 on the night ground, enough for
+   text this large to be read before it lights up. */
 .motion [data-reveal="ink"]:not(.is-in) .ink-word {
-  opacity: 0.16;
+  opacity: 0.4;
 }
 
 /* ============================================================
@@ -354,6 +359,9 @@
 }
 .fit-char {
   display: inline-block;
+  /* The script fixes each letter's width at rest weight; a thinner letter
+     stays centred in it. */
+  text-align: center;
 }
 @media (min-width: 768px) {
   .hero-title {
@@ -375,8 +383,10 @@
    the middle one pops in and leans, the face is tilted and
    answers the hover. Pills and badges take one of MTC's four
    colours, blended toward a brighter neighbour, under a white
-   edge and a shine that follows the pointer (--shine) or drifts
-   on its own on touch screens. Emojis get a cut-out white edge.
+   edge and a shine that follows the pointer (--shine); on touch
+   screens it rests in the middle (a shine drifting by itself there
+   repainted the pills on every frame). Emojis get a cut-out white
+   edge.
    ============================================================ */
 .sticker {
   position: absolute;
@@ -463,23 +473,6 @@
   background-origin: padding-box;
   background-clip: padding-box;
   transition: background-position 600ms var(--ease-out-soft);
-}
-@media (hover: none) {
-  .sticker-shine {
-    animation: sticker-shine 7s ease-in-out infinite alternate;
-  }
-}
-@keyframes sticker-shine {
-  from {
-    background-position:
-      20% 0,
-      0 0;
-  }
-  to {
-    background-position:
-      80% 0,
-      0 0;
-  }
 }
 .sticker-bubble {
   position: relative;

@@ -27,6 +27,11 @@ const nextConfig: NextConfig = {
     // prefetched as the homepage of a "contact" locale and 404'd. With
     // prediction off, the router asks the server for unknown routes.
     optimisticRouting: false,
+    // The stylesheet arrives inside the HTML instead of as a second,
+    // render-blocking request (about half a second on a slow phone
+    // connection). The Tailwind CSS is small enough to carry on each page.
+    // Production builds only.
+    inlineCss: true,
   },
   images: {
     formats: ["image/avif", "image/webp"],

@@ -7,10 +7,11 @@ import { SLOW_VIDEO_MS } from "@/lib/video-fallback";
  * Muted, looping background video whose loading and playback are
  * driven entirely by the viewport — for the Selected Work thumbnails.
  *
- * - Nothing is downloaded until the video is within ~one viewport of
- *   the screen (the element renders with no `src`, `preload="none"`),
- *   and the source is released again once it scrolls that far away, so
- *   a long list never holds every video in memory.
+ * - Nothing is downloaded until the page itself has loaded (see
+ *   waitForPage) and the video is within ~one viewport of the screen (the
+ *   element renders with no `src`, `preload="none"`), and the source is
+ *   released again once it scrolls that far away, so a long list never
+ *   holds every video in memory.
  * - Every video at least MIN_VISIBLE_RATIO on screen plays (at most
  *   MAX_PLAYING, largest visible area first, so a big tile always
  *   plays); the rest are paused. Coordinated by one shared pair of
@@ -35,7 +36,7 @@ import { SLOW_VIDEO_MS } from "@/lib/video-fallback";
  * Used by ViewportVideo and by plain <video> elements (e.g. the /work
  * hover preview).
  */
-export function trackVideo(video: HTMLVideoElement): () => void {
+export function trackVideo(video: HTMLVideoElement, keepCover = false): () => void {
   const box = video.parentElement;
   if (!box) return () => {};
   const set = (state: string) => {
@@ -46,10 +47,14 @@ export function trackVideo(video: HTMLVideoElement): () => void {
     set("ready");
     return () => {};
   }
-  set("loading");
-  const timer = window.setTimeout(() => {
-    if (video.readyState < 2) set("slow");
-  }, SLOW_VIDEO_MS);
+  // A cover image already on show stays until the first frame, instead of
+  // blinking out while the video loads ("slow" keeps it up).
+  set(keepCover ? "slow" : "loading");
+  const timer = keepCover
+    ? 0
+    : window.setTimeout(() => {
+        if (video.readyState < 2) set("slow");
+      }, SLOW_VIDEO_MS);
   const onReady = () => {
     window.clearTimeout(timer);
     set("ready");
@@ -104,7 +109,36 @@ function sourceFor(entry: Entry): string | undefined {
     : entry.desktop || entry.mobile;
 }
 
+/**
+ * Videos wait for the page itself: none is fetched before the load event
+ * and a moment of idle after it, so on a slow connection they never
+ * compete with the scripts, styles and fonts the page needs first. The
+ * cover images stand in until then.
+ */
+let pageReady = false;
+let waiting = false;
+
+function waitForPage() {
+  if (pageReady || waiting) return;
+  waiting = true;
+  const go = () => {
+    pageReady = true;
+    for (const [video, entry] of entries) {
+      if (entry.near && !reducedMq?.matches) attach(video, entry);
+    }
+    reconcile();
+  };
+  const idle = () => {
+    // Older Safari has no requestIdleCallback.
+    if (typeof window.requestIdleCallback === "function") window.requestIdleCallback(go, { timeout: 1500 });
+    else setTimeout(go, 300);
+  };
+  if (document.readyState === "complete") idle();
+  else window.addEventListener("load", idle, { once: true });
+}
+
 function attach(video: HTMLVideoElement, entry: Entry) {
+  if (!pageReady) return;
   const src = sourceFor(entry);
   if (!src || video.getAttribute("src") === src) return;
   // Set as properties *and* attributes before `src`: iOS/Chrome only
@@ -115,8 +149,11 @@ function attach(video: HTMLVideoElement, entry: Entry) {
   video.preload = "auto";
   delete video.dataset.ready;
   entry.untrack?.();
+  // The cover image fades in by itself (CSS) once the box has waited
+  // SLOW_VIDEO_MS; if it is up already, it stays until the first frame.
+  const coverUp = video.parentElement?.dataset.video === "pending" && performance.now() > SLOW_VIDEO_MS;
   video.src = src;
-  entry.untrack = trackVideo(video);
+  entry.untrack = trackVideo(video, coverUp);
 }
 
 function detach(video: HTMLVideoElement) {
@@ -146,7 +183,7 @@ function reconcile() {
   for (const [video, entry] of entries) {
     if (playing.has(video)) {
       attach(video, entry);
-      if (video.paused) {
+      if (video.paused && video.hasAttribute("src")) {
         // Rejected when autoplay is blocked or a pause interrupts it —
         // the poster simply stays visible.
         video.play().catch(() => {});
@@ -197,6 +234,7 @@ function start() {
   mobileMq.addEventListener("change", onBreakpointChange);
   reducedMq.addEventListener("change", reconcile);
   document.addEventListener("visibilitychange", reconcile);
+  waitForPage();
 }
 
 function stop() {

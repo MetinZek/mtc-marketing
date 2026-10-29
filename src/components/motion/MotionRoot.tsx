@@ -6,6 +6,7 @@ import { gsap, motionDisabled, ScrollTrigger } from "@/lib/gsap";
 /** Where a reveal fires: the element's top crossing 88% of the viewport. */
 const START = "top 88%";
 const SELECTOR = "[data-reveal], [data-split]";
+const FINE_POINTER = "(hover: hover) and (pointer: fine)";
 
 /** Final state: the element no longer matches the hidden start state in
  * globals.css, and GSAP's inline styles can be cleared without a jump. */
@@ -26,9 +27,10 @@ function settle(el: Element, targets: gsap.TweenTarget = el) {
  * - `data-reveal="up" | "fade"`: a rise and fade, or a fade, once.
  * - `data-reveal="stagger"`: the direct children rise in turn
  *   (`data-stagger` seconds apart).
- * - `data-reveal="media"`: a scrubbed unveil: the frame opens from a
- *   slightly inset, rounder window to its full size as it scrolls in, and a
- *   `[data-zoom]` child settles from a gentle zoom. Reverses on the way up.
+ * - `data-reveal="media"`: a scrubbed unveil: the frame grows from a
+ *   touch smaller to its full size as it scrolls in, and a `[data-zoom]`
+ *   child settles from a gentle zoom. Reverses on the way up. With a mouse
+ *   or trackpad only; on touch screens the frames simply hold still.
  * - `data-reveal="sheet"`: a background layer widens to its full size as
  *   it rises (the night chapter). Scrubbed.
  * - `data-reveal="ink"` (see InkText): the paragraph's words light up one
@@ -55,6 +57,7 @@ export function MotionRoot({ children }: { children: ReactNode }) {
 
     const ctx = gsap.context(() => {}, root);
     const seen = new WeakSet<Element>();
+    const fine = window.matchMedia(FINE_POINTER).matches;
 
     const reveal = (el: HTMLElement) => {
       const delay = Number(el.dataset.delay ?? 0) || 0;
@@ -103,11 +106,19 @@ export function MotionRoot({ children }: { children: ReactNode }) {
           break;
         }
         case "media": {
+          // Transforms only, which the compositor moves without repainting
+          // (the clip-path this replaced repainted the whole frame, film and
+          // all, on every frame of the scroll). Touch screens skip it: the
+          // frames hold still there and scrolling stays native and light.
+          if (!fine) {
+            settle(el);
+            break;
+          }
           gsap.fromTo(
             el,
-            { clipPath: "inset(6% 5% 0% 5% round 36px)" },
+            { scale: 0.92, transformOrigin: "50% 100%" },
             {
-              clipPath: "inset(0% 0% 0% 0% round 0px)",
+              scale: 1,
               ease: "none",
               scrollTrigger: { trigger: el, start: "top 98%", end: "top 42%", scrub: 0.6 },
             },
@@ -136,7 +147,7 @@ export function MotionRoot({ children }: { children: ReactNode }) {
         case "ink":
           gsap.fromTo(
             el.querySelectorAll(".ink-word"),
-            { opacity: 0.16 },
+            { opacity: 0.4 },
             {
               opacity: 1,
               duration: 0.6,

@@ -109,7 +109,13 @@ export function ProjectTile({ project, dict, locale, tone = "mist", shape = "car
             />
           </Link>
           {website && (
-            <a href={website} target="_blank" rel="noopener noreferrer" className={link}>
+            <a
+              href={website}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={interpolate(dict.work.viewLiveSiteAriaLabel, { title: project.title })}
+              className={link}
+            >
               {dict.work.viewLiveSite}
               <Icon
                 name="arrow-up-right"

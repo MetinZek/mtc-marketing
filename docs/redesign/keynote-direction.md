@@ -79,6 +79,21 @@ words: the hero line under the headline ("Creative thinking. Digital
 doing."), the work and journal headings, the "How we work" paragraph and
 its four stages, and the four service summaries.
 
+**Iteration 9** (2026-10-29, the site's health, measured with PageSpeed on
+the live site: mobile performance 80, accessibility 96). Phones were doing
+5.3 s of style and layout work in the test, nearly all of it the letter
+drift restyling the headline on every frame; it also looked jittery, as a
+thinner Inter letter is a narrower one and the centred lines slid about. So
+the letters hold still on touch screens, and every letter now keeps a box
+of fixed width, which keeps the lines still under the pointer too. The
+work tiles' unveil was a clip-path, repainting the frame (film and all) on
+every frame of the scroll: it is a transform now, with a mouse only. The
+stickers' shine no longer drifts by itself on touch screens (a non-
+composited background animation), cover films wait for the page's load
+event, the stylesheet is inlined into the HTML (`inlineCss`), the unlit
+words of the night chapter's paragraph rise from 16% to 40% (3.4:1, enough
+for text that size), and each "View live site" link names its project.
+
 ## What was taken from the references
 
 - **dovvstudio.com**, high-level traits only: a centred, heavy, all-caps
@@ -117,8 +132,9 @@ The **headline itself**: "OH LOOK, / YOU FOUND US" in Inter at weight 900,
 fitted so its widest line spans the column (on phones the words wrap, at the
 largest size that keeps them to three lines). Each letter is its own box;
 with a mouse or trackpad the letters near the pointer drop toward weight 200
-and fill back in as it moves on; on touch screens an invisible point drifts through the
-text in a slow figure of eight instead. Four stickers sit on its corners:
+and fill back in as it moves on, each in a box of fixed width so the line
+never shifts; on touch screens the letters hold still. Four stickers sit on
+its corners:
 "Say hi!" (red to pink), a 3D eyes emoji (for "Oh look", tilted 20° so
 its leftward gaze falls on that word), a 3D rocket (launches) and "Ready
 when you are" (blue to violet).
@@ -152,7 +168,7 @@ faint, `#d2d2d7` hairline, `#000000` night. Accent: the logo blue `#0b45ff` on
 light, `#2997ff` on dark. The four discipline colours (`#ff5b47`, `#ffb21e`,
 `#12b886`, `#1764ff`) are the `hue-*` tokens: each sticker blends one toward a
 brighter neighbour under a white edge and a soft rainbow shine that follows
-the pointer (or drifts on touch screens), and the journal's hover line runs
+the pointer (and rests in the middle on touch screens), and the journal's hover line runs
 through all four. Errors use `#d70015`.
 
 ## Sequence (homepage)
@@ -161,7 +177,8 @@ through all four. Errors use `#d70015`.
    then "Brands we've worked with" between hairlines over the seven real
    client logos on a slow loop. Fills the first screen.
 2. **Showroom** (the peak): featured projects as very large tiles, alternating
-   a black full-width tile and pairs on mist; each unveils as it arrives.
+   a black full-width tile and pairs on mist; with a mouse, each grows to
+   full size as it arrives.
    Under each picture: the name, discipline and year, "View case study" and,
    when there is one, "View live site". The glass cursor turns into a small
    lens over the pictures (phones have neither).
@@ -177,7 +194,7 @@ through all four. Errors use `#d70015`.
    hover draws the four-colour line and fills the arrow.
 6. **Sign-off** (the homepage's footer only): "LET'S TALK." in the hero's
    fitted capitals as the link to the brief (letters thinning near the
-   pointer, the drift on phones), with a "hey!" speech bubble, a waving hand
+   pointer), with a "hey!" speech bubble, a waving hand
    and "Open for new projects" around it; then the email copy, email and
    phone.
 
@@ -193,8 +210,8 @@ ScrollTrigger for the night chapter's ground, the lit paragraph and the glass
 squares' scroll progress, and server-split headings that rise in word by
 word with the unsplit text kept for assistive technology. The letter weights
 (`FitLetters.tsx`) follow the pointer in a small requestAnimationFrame loop
-that stops as soon as every letter has settled; on touch screens the same
-loop follows a slow drifting point, only while the text is on screen. The
+that stops as soon as every letter has settled; on touch screens there is
+no loop at all. The
 glass lens and the breaking panes run on GSAP's ticker too, and only while
 they are in use or on screen. **Lenis** is the sole smooth-scroll engine
 (chosen over Locomotive Scroll: already in the stack, native scrolling for

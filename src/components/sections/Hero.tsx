@@ -25,8 +25,8 @@ type HeroProps = {
  *
  * - The headline is fitted to the column (whole lines from 768px up; below
  *   that the words wrap, in three lines at most). Its letters thin out near
- *   the pointer and fill back in as it moves on; on touch screens a slow
- *   drift plays the same effect.
+ *   the pointer and fill back in as it moves on; on touch screens they
+ *   hold still.
  * - Four stickers sit on its corners: two short, upbeat pills in MTC's
  *   colours with a shine, and two 3D emojis (eyes, for "Oh look", tilted
  *   to look down at that word, and a rocket, for launches). They pop in

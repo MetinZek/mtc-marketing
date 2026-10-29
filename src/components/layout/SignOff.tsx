@@ -34,8 +34,8 @@ type SignOffProps = {
  * and phone.
  *
  * The big line behaves like the hero's headline: fitted to the width (its
- * words stack on phones), letters thinning near the pointer, a slow drift
- * on touch screens. Three stickers sit around it (a "hey!" speech bubble,
+ * words stack on phones), letters thinning near the pointer (still on
+ * touch screens). Three stickers sit around it (a "hey!" speech bubble,
  * a waving hand and "Open for new projects") and can be moved with a mouse.
  * When it first reaches the screen its letters rise in and the stickers
  * pop on. The link's name is the plain line; its letters are hidden from
@@ -66,7 +66,7 @@ function SignOffInner({
   const visualRef = useRef<HTMLSpanElement>(null);
 
   const size = useFitLetters(boxRef, visualRef, { maxWide: 260, maxNarrow: 150 });
-  useLetterWeights(rootRef, visualRef, size, { reach: 2.3, driftReach: 1.9 });
+  useLetterWeights(rootRef, visualRef, size, { reach: 2.3 });
   useStickers(rootRef);
 
   // Letters rise in and the stickers pop on, once, as it reaches the screen.

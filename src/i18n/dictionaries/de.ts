@@ -103,12 +103,13 @@ export const de: Dictionary = {
   work: {
     eyebrow: "Ausgewählte Arbeiten",
     title: "Aktuelle Arbeiten",
-    intro: "Markenidentitäten, Websites und Web-Apps für Unternehmen vom Kosovo bis nach Wien.",
+    intro: "Ein paar Dinge, an denen wir fleißig gearbeitet haben.",
     projectCountOne: "Projekt",
     projectCountOther: "Projekte",
     viewCaseStudy: "Fallstudie ansehen",
     viewLiveSite: "Website ansehen",
     viewCaseStudyAriaLabel: "Fallstudie ansehen: {title}",
+    viewLiveSiteAriaLabel: "Website ansehen: {title}",
     metaTitle: "Arbeiten | MTC",
     metaDescription:
       "Ausgewählte Projekte von MTC: Markenidentitäten, Websites und Web-Apps für Unternehmen vom Kosovo bis nach Wien.",
