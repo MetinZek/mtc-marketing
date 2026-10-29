@@ -137,6 +137,22 @@ function waitForPage() {
   else window.addEventListener("load", idle, { once: true });
 }
 
+/**
+ * Supabase Storage, where the admin's uploads live, answers CORS requests
+ * ("*"), so its films are fetched with CORS and the glass lens can read
+ * their frames; without it WebGL refuses them and the lens shows black.
+ * Films from any other host are left as they were, so a host without CORS
+ * can never stop one from playing (the lens just leaves those alone).
+ */
+function corsFor(src: string): "anonymous" | null {
+  try {
+    const url = new URL(src, window.location.href);
+    return url.origin !== window.location.origin && url.hostname.endsWith(".supabase.co") ? "anonymous" : null;
+  } catch {
+    return null;
+  }
+}
+
 function attach(video: HTMLVideoElement, entry: Entry) {
   if (!pageReady) return;
   const src = sourceFor(entry);
@@ -147,6 +163,7 @@ function attach(video: HTMLVideoElement, entry: Entry) {
   video.defaultMuted = true;
   video.playsInline = true;
   video.preload = "auto";
+  video.crossOrigin = corsFor(src);
   delete video.dataset.ready;
   entry.untrack?.();
   // The cover image fades in by itself (CSS) once the box has waited

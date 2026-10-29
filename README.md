@@ -98,8 +98,11 @@ Homepage (`src/app/[locale]/(site)/page.tsx`):
    Edge it zooms what is under it very slightly (`glass-refraction.ts`);
    elsewhere it is clear glass. Over every
    picture it becomes the glass lens that magnifies it (`WorkLens`,
-   `work-lens.ts`, on any `[data-lens]` box). Phones and tablets have no
-   glass at all: no cursor and no lens.
+   `work-lens.ts`, on any `[data-lens]` box). WebGL can only read pictures
+   from this site or ones fetched with CORS, so the cover films from
+   Supabase Storage load with `crossorigin` (it allows any origin); over a
+   picture the lens can't read, the glass cursor simply carries on. Phones
+   and tablets have no glass at all: no cursor and no lens.
 3. **Night chapter**: "How we work" lit word by word over glass squares that
    break when clicked or tapped and grow back (`StudioStatement`,
    `GlassSquares`, `glass-scene.ts`), then the four services with where each

@@ -190,7 +190,12 @@ export function WorkLens() {
       if (Math.abs(wanted - strength) < 0.004) strength = wanted;
       aim();
       lens.setStrength(strength);
-      lens.render();
+      // A picture it couldn't read: back to the glass cursor at once.
+      if (!lens.render()) {
+        strength = wanted = 0;
+        release();
+        return;
+      }
       cursor.current?.setLens(strength);
       if (strength === 0 && wanted === 0) release();
     };

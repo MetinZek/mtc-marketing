@@ -251,7 +251,11 @@ by colour there, under a hairline of light and a soft shadow. It loads on
 first use, renders only while shown, and is absent on touch screens, with
 reduced motion or without WebGL. Everywhere else the same glass is the cursor, drawn in CSS
 (the lens's corners, rim, sheen and halo, without the magnifying), which
-fades out as the lens fades in over a picture.
+fades out as the lens fades in over a picture. WebGL reads only pictures
+from the site itself or fetched with CORS: on the live site the cover
+films come from Supabase Storage, so they load with `crossorigin`
+(Supabase answers "*"); without it the lens drew a black square there.
+Over any picture it can't read the lens stays off and the cursor stays.
 
 ## Assets and provenance
 

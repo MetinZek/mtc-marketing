@@ -22,14 +22,17 @@ import {
  */
 
 export type WorkLens = {
-  /** Puts the lens on a `[data-lens]` box; false when its picture isn't ready. */
+  /** Puts the lens on a `[data-lens]` box; false when its picture isn't
+   * ready, or isn't one the lens can read. */
   attach(box: HTMLElement): boolean;
   detach(): void;
   /** Lens centre inside the box, in the box's own (unscaled) CSS pixels. */
   moveTo(x: number, y: number, immediate?: boolean): void;
   /** 0 (gone) to 1 (fully there). */
   setStrength(strength: number): void;
-  render(): void;
+  /** Draws a frame; false if the picture couldn't be read (the lens then
+   * leaves it alone for good). */
+  render(): boolean;
   destroy(): void;
 };
 
@@ -104,6 +107,20 @@ const fragmentShader = /* glsl */ `
   }
 `;
 
+/**
+ * Whether WebGL may read `media`: from this site, or fetched with CORS
+ * (crossorigin set, and loaded, so its host allowed it). Another site's
+ * picture without CORS would upload as black.
+ */
+function readable(media: HTMLImageElement | HTMLVideoElement): boolean {
+  if (media.crossOrigin !== null) return true;
+  try {
+    return new URL(media.currentSrc, window.location.href).origin === window.location.origin;
+  } catch {
+    return false;
+  }
+}
+
 export function createWorkLens(): WorkLens | null {
   let renderer: WebGLRenderer;
   try {
@@ -147,6 +164,8 @@ export function createWorkLens(): WorkLens | null {
 
   // Uploaded pictures are kept for a few tiles, so going back to one is instant.
   const textures = new Map<HTMLImageElement | HTMLVideoElement, Texture>();
+  // Pictures WebGL refused once; the lens stays off them.
+  const failed = new WeakSet<HTMLImageElement | HTMLVideoElement>();
   const textureFor = (media: HTMLImageElement | HTMLVideoElement) => {
     let texture = textures.get(media);
     if (!texture) {
@@ -176,16 +195,15 @@ export function createWorkLens(): WorkLens | null {
 
   return {
     attach(next) {
-      // The playing film when there is one, else the still.
+      // The playing film when there is one, else the still. One the lens
+      // may not read (or that failed before) keeps it off: the glass
+      // cursor carries on over that picture instead of a black square.
       const video = next.querySelector<HTMLVideoElement>("video[data-ready]");
       const image = next.querySelector<HTMLImageElement>("img");
-      const picture =
-        video && video.readyState >= 2 && video.videoWidth > 0
-          ? video
-          : image && image.complete && image.naturalWidth > 0
-            ? image
-            : null;
-      if (!picture) return false;
+      const film = video && video.readyState >= 2 && video.videoWidth > 0 ? video : null;
+      const still = image && image.complete && image.naturalWidth > 0 ? image : null;
+      const picture = film ?? still;
+      if (!picture || !readable(picture) || failed.has(picture)) return false;
       box = next;
       media = picture;
       material.uniforms.uMap!.value = textureFor(picture);
@@ -210,14 +228,22 @@ export function createWorkLens(): WorkLens | null {
       material.uniforms.uStrength!.value = strength;
     },
     render() {
-      if (!box || !media) return;
+      if (!box || !media) return true;
       shown.x += (target.x - shown.x) * 0.24;
       shown.y += (target.y - shown.y) * 0.24;
       place();
       const natural =
         media instanceof HTMLVideoElement ? [media.videoWidth, media.videoHeight] : [media.naturalWidth, media.naturalHeight];
       material.uniforms.uMapSize!.value.set(natural[0] || 1, natural[1] || 1);
-      renderer.render(scene, camera);
+      try {
+        renderer.render(scene, camera);
+        return true;
+      } catch {
+        // e.g. a SecurityError uploading a picture without CORS.
+        failed.add(media);
+        canvas.remove();
+        return false;
+      }
     },
     destroy() {
       canvas.remove();
