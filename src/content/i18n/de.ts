@@ -176,7 +176,7 @@ export const de: LocaleOverlay = {
     ],
     testimonialsIntro: {
       label: "Kundenstimmen",
-      headline: "Was unsere Kunden sagen.",
+      headline: "In den Worten unserer Kunden.",
     },
     finalCta: {
       headline: "Haben Sie ein Projekt im Kopf?",
@@ -184,7 +184,7 @@ export const de: LocaleOverlay = {
       primaryCta: { label: "Projekt starten", href: "/contact" },
     },
     seo: {
-      seoTitle: "MTC | Kreative Digitalagentur in Mitrovica, Kosovo",
+      seoTitle: "MTC | Kreative Digitalagentur",
       metaDescription:
         "MTC ist eine kreative Digitalagentur für Branding, Websites, Social Media und Content. Ein Team, von der ersten Idee bis zum Launch.",
       noindex: false,
@@ -231,7 +231,7 @@ export const de: LocaleOverlay = {
     seo: {
       seoTitle: "Studio | MTC",
       metaDescription:
-        "MTC ist ein kreatives und digitales Studio in Mitrovica, Kosovo: Branding, Web- und App-Entwicklung, Social Media und Content, als ein System gebaut.",
+        "MTC ist ein kreatives und digitales Studio: Branding, Web- und App-Entwicklung, Social Media und Content, als ein System gebaut.",
       noindex: false,
     },
   },

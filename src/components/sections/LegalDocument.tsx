@@ -17,8 +17,12 @@ export function LegalContact() {
     <p>
       {LEGAL_ENTITY_NAME}
       <br />
-      {businessDetails.address || contactDefaults.location}
-      <br />
+      {businessDetails.address && (
+        <>
+          {businessDetails.address}
+          <br />
+        </>
+      )}
       <LegalLink href={`mailto:${contactDefaults.email}`}>{contactDefaults.email}</LegalLink>
       <br />
       <LegalLink href={`tel:${contactDefaults.phone.replace(/\s+/g, "")}`}>{contactDefaults.phone}</LegalLink>

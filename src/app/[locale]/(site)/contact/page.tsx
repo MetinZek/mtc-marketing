@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { LocalTime } from "@/components/layout/LocalTime";
 import { SplitWords } from "@/components/motion/SplitWords";
 import { Reveal } from "@/components/motion/Reveal";
 import { ContactForm } from "@/components/sections/ContactForm";
@@ -8,7 +7,6 @@ import { Icon } from "@/components/ui/Icon";
 import type { SiteSettings } from "@/content/types";
 import { getDictionary, type Dictionary } from "@/i18n/get-dictionary";
 import { getLocale } from "@/i18n/get-locale";
-import type { Locale } from "@/i18n/locales";
 import { getServices, getSiteSettings } from "@/lib/cms/localized";
 import { buildMetadata } from "@/lib/seo";
 
@@ -25,15 +23,10 @@ export async function generateMetadata(): Promise<Metadata> {
 /**
  * /contact: the invitation set large, the form (discipline chips first,
  * then the details and the 16+ / Privacy Policy tick) on a mist panel, and
- * the studio's direct lines beside it, with its local time.
+ * the studio's direct lines beside it.
  */
 export default async function ContactPage() {
-  const [services, settings, dict, locale] = await Promise.all([
-    getServices(),
-    getSiteSettings(),
-    getDictionary(),
-    getLocale(),
-  ]);
+  const [services, settings, dict] = await Promise.all([getServices(), getSiteSettings(), getDictionary()]);
 
   return (
     <section id="contact" aria-labelledby="contact-title" className="pb-24 pt-6 sm:pb-32 sm:pt-10">
@@ -51,7 +44,7 @@ export default async function ContactPage() {
             <ContactForm services={services.map(({ id, title }) => ({ id, title }))} dict={dict} />
           </Reveal>
           <Reveal delay={0.08} className="lg:col-span-4">
-            <ContactDetails settings={settings} dict={dict} locale={locale} />
+            <ContactDetails settings={settings} dict={dict} />
           </Reveal>
         </div>
       </div>
@@ -59,7 +52,7 @@ export default async function ContactPage() {
   );
 }
 
-function ContactDetails({ settings, dict, locale }: { settings: SiteSettings; dict: Dictionary; locale: Locale }) {
+function ContactDetails({ settings, dict }: { settings: SiteSettings; dict: Dictionary }) {
   const value = "text-title text-ink transition-colors hover:text-blue";
   return (
     <div className="lg:sticky lg:top-8">
@@ -80,15 +73,6 @@ function ContactDetails({ settings, dict, locale }: { settings: SiteSettings; di
             <a href={`tel:${settings.phone.replace(/\s+/g, "")}`} className={`${value} rounded-xs`}>
               {settings.phone}
             </a>
-          </dd>
-        </div>
-        <div className="py-5">
-          <dt className="text-[0.9375rem] text-ink-muted">{dict.contactPage.locationLabel}</dt>
-          <dd className="mt-1.5 text-title text-ink">{settings.location}</dd>
-          <dd className="mt-2 flex items-center gap-2 text-[0.9375rem] text-ink-muted">
-            <Icon name="clock" />
-            <span className="sr-only">{dict.footer.localTime}:</span>
-            <LocalTime locale={locale} className="tabular" />
           </dd>
         </div>
         {settings.social.length > 0 && (

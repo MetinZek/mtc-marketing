@@ -5,7 +5,7 @@ export const sv: Dictionary = {
   meta: {
     titleSuffix: "Kreativ digitalbyrå",
     tagline:
-      "En kreativ digitalbyrå i Mitrovica, Kosovo. Varumärke, webbplatser, sociala medier och innehåll under ett tak.",
+      "En kreativ digitalbyrå. Varumärke, webbplatser, sociala medier och innehåll under ett tak.",
     description:
       "MTC är en kreativ digitalbyrå för varumärke, webbplatser, sociala medier och innehåll. Ett team, från första idé till lansering.",
     ogHeadline: "Vi gör varumärken omöjliga att ignorera.",
@@ -44,7 +44,6 @@ export const sv: Dictionary = {
     allRightsReserved: "Alla rättigheter förbehållna.",
     signOff: "Låt oss skapa något som spelar roll.",
     backToTop: "Till toppen",
-    localTime: "Lokal tid i Mitrovica",
     openForProjects: "Öppna för nya projekt",
     hey: "hej!",
   },
@@ -159,14 +158,13 @@ export const sv: Dictionary = {
   contactPage: {
     metaTitle: "Kontakt | MTC",
     metaDescription:
-      "Berätta om ditt projekt. MTC är en kreativ digitalbyrå i Mitrovica, Kosovo: varumärke, webbplatser, sociala medier och innehåll.",
+      "Berätta om ditt projekt. MTC är en kreativ digitalbyrå: varumärke, webbplatser, sociala medier och innehåll.",
     eyebrow: "Kontakt",
     title: "Låt oss prata.",
     supporting: "Berätta vad du arbetar med. Ju mer sammanhang, desto bättre.",
     direct: "Eller hör av dig direkt",
     emailLabel: "E-post",
     phoneLabel: "Telefon",
-    locationLabel: "Studio",
     followLabel: "Följ oss",
   },
   notFound: {

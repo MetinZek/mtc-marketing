@@ -1,7 +1,7 @@
 # MTC — website
 
-Premium light-mode website for **MTC**, a creative digital agency in
-Mitrovica, Kosovo (branding · web & app · social & marketing · content).
+Premium light-mode website for **MTC**, a creative digital agency
+(branding · web & app · social & marketing · content).
 Public site in English, German and Swedish, with a small CMS and admin panel.
 
 The current design is the **"Keynote"** redesign: the work presented like
@@ -161,12 +161,13 @@ src/i18n/dictionaries/  UI strings (en is the source of truth, de/sv typed again
   in /admin to appear on the live site.**
 - Team members and statistics are not published anywhere because none exist
   yet; their sections stay hidden until real ones are published in /admin.
-- Client words: the seed holds five **drafts** (placeholder quotes, names and
-  roles for Balkan Bee, AS-MED, Leo Malerbetrieb, Summit Balkans and Pixel
-  Print) so the section can be judged on a development server, where they
-  show marked "Draft". They are unpublished and never reach a production
-  build. Replace each with the client's real words in /admin and tick
-  "Published".
+- Client words ("In Our Clients' Words."): the seed holds four **drafts**
+  (placeholder quotes, names and roles for Balkan Bee, AS-MED, Leo
+  Malerbetrieb and Pixel Print) so the section can be judged on a
+  development server, where they show marked "Draft" with the company only
+  (the placeholder name and role are hidden). They are unpublished and never
+  reach a production build. Replace each with the client's real words,
+  name and role in /admin and tick "Published".
 - Portfolio media (images, cover videos, client logos, journal covers) was
   copied from the live site into `public/media/`.
 

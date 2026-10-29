@@ -83,7 +83,7 @@ export const homepageContent: HomepageContent = {
   stats: [],
   testimonialsIntro: {
     label: "Client words",
-    headline: "What our clients say.",
+    headline: "In Our Clients’ Words.",
   },
   finalCta: {
     headline: "Have a project in mind?",
@@ -91,7 +91,7 @@ export const homepageContent: HomepageContent = {
     primaryCta: { label: "Start a project", href: "/contact" },
   },
   seo: {
-    seoTitle: "MTC | Creative digital agency in Mitrovica, Kosovo",
+    seoTitle: "MTC | Creative digital agency",
     metaDescription:
       "MTC is a creative digital agency for branding, websites, social media and content. One team, from the first idea to launch day.",
     noindex: false,

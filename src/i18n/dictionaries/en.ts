@@ -11,7 +11,7 @@ export const en = {
     /** "MTC | {titleSuffix}" — the default <title>. */
     titleSuffix: "Creative digital agency",
     tagline:
-      "A creative digital agency in Mitrovica, Kosovo. Branding, websites, social media and content under one roof.",
+      "A creative digital agency. Branding, websites, social media and content under one roof.",
     description:
       "MTC is a creative digital agency for branding, websites, social media and content. One team, from the first idea to launch day.",
     ogHeadline: "We make brands impossible to ignore.",
@@ -50,7 +50,6 @@ export const en = {
     allRightsReserved: "All rights reserved.",
     signOff: "Let’s create something that matters.",
     backToTop: "Back to top",
-    localTime: "Local time in Mitrovica",
     openForProjects: "Open for new projects",
     hey: "hey!",
   },
@@ -166,14 +165,13 @@ export const en = {
   contactPage: {
     metaTitle: "Contact | MTC",
     metaDescription:
-      "Tell us about your project. MTC is a creative digital agency in Mitrovica, Kosovo: branding, websites, social media and content.",
+      "Tell us about your project. MTC is a creative digital agency: branding, websites, social media and content.",
     eyebrow: "Contact",
     title: "Let’s talk.",
     supporting: "Tell us what you’re working on. The more context, the better.",
     direct: "Or reach us directly",
     emailLabel: "Email",
     phoneLabel: "Phone",
-    locationLabel: "Studio",
     followLabel: "Follow",
   },
   notFound: {

@@ -50,7 +50,7 @@ export const studio: StudioContent = {
   seo: {
     seoTitle: "Studio | MTC",
     metaDescription:
-      "MTC is a creative and digital studio in Mitrovica, Kosovo: branding, web and app development, social media and content, built as one system.",
+      "MTC is a creative and digital studio: branding, web and app development, social media and content, built as one system.",
     noindex: false,
   },
 };

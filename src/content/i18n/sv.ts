@@ -169,7 +169,7 @@ export const sv: LocaleOverlay = {
     ],
     testimonialsIntro: {
       label: "Kundröster",
-      headline: "Vad våra kunder säger.",
+      headline: "Med våra kunders ord.",
     },
     finalCta: {
       headline: "Har du ett projekt i åtanke?",
@@ -177,7 +177,7 @@ export const sv: LocaleOverlay = {
       primaryCta: { label: "Starta ett projekt", href: "/contact" },
     },
     seo: {
-      seoTitle: "MTC | Kreativ digitalbyrå i Mitrovica, Kosovo",
+      seoTitle: "MTC | Kreativ digitalbyrå",
       metaDescription:
         "MTC är en kreativ digitalbyrå för varumärke, webbplatser, sociala medier och innehåll. Ett team, från första idé till lanseringsdagen.",
       noindex: false,
@@ -224,7 +224,7 @@ export const sv: LocaleOverlay = {
     seo: {
       seoTitle: "Studio | MTC",
       metaDescription:
-        "MTC är en kreativ och digital studio i Mitrovica, Kosovo: varumärke, webb- och apputveckling, sociala medier och innehåll, byggt som ett system.",
+        "MTC är en kreativ och digital studio: varumärke, webb- och apputveckling, sociala medier och innehåll, byggt som ett system.",
       noindex: false,
     },
   },

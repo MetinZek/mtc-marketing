@@ -5,7 +5,7 @@ export const de: Dictionary = {
   meta: {
     titleSuffix: "Kreative Digitalagentur",
     tagline:
-      "Eine kreative Digitalagentur in Mitrovica, Kosovo. Branding, Websites, Social Media und Content unter einem Dach.",
+      "Eine kreative Digitalagentur. Branding, Websites, Social Media und Content unter einem Dach.",
     description:
       "MTC ist eine kreative Digitalagentur für Branding, Websites, Social Media und Content. Ein Team, von der ersten Idee bis zum Launch.",
     ogHeadline: "Wir machen Marken unübersehbar.",
@@ -44,7 +44,6 @@ export const de: Dictionary = {
     allRightsReserved: "Alle Rechte vorbehalten.",
     signOff: "Lassen Sie uns etwas schaffen, das zählt.",
     backToTop: "Nach oben",
-    localTime: "Ortszeit in Mitrovica",
     openForProjects: "Offen für neue Projekte",
     hey: "hallo!",
   },
@@ -160,14 +159,13 @@ export const de: Dictionary = {
   contactPage: {
     metaTitle: "Kontakt | MTC",
     metaDescription:
-      "Erzählen Sie uns von Ihrem Projekt. MTC ist eine kreative Digitalagentur in Mitrovica, Kosovo: Branding, Websites, Social Media und Content.",
+      "Erzählen Sie uns von Ihrem Projekt. MTC ist eine kreative Digitalagentur: Branding, Websites, Social Media und Content.",
     eyebrow: "Kontakt",
     title: "Sprechen wir.",
     supporting: "Erzählen Sie uns, woran Sie arbeiten. Je mehr Kontext, desto besser.",
     direct: "Oder direkt",
     emailLabel: "E-Mail",
     phoneLabel: "Telefon",
-    locationLabel: "Studio",
     followLabel: "Folgen",
   },
   notFound: {

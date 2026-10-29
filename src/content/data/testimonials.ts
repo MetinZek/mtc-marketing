@@ -47,17 +47,6 @@ export const testimonials: Testimonial[] = [
     published: false, // draft: never publish as is
   },
   {
-    id: "t-summit-balkans",
-    quote:
-      "Our new identity feels like the places we take people to. MTC listened, moved quickly and explained every step along the way.",
-    person: "Name Surname",
-    role: "Role",
-    company: "Summit Balkans",
-    featured: false,
-    order: 4,
-    published: false, // draft: never publish as is
-  },
-  {
     id: "t-pixel-print",
     quote:
       "From the first sketches to the final files, MTC made our rebrand simple. The new identity works on everything we print.",

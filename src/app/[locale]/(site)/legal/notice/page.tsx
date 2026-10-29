@@ -35,7 +35,7 @@ export default function LegalNoticePage() {
     [
       ["Business name", LEGAL_ENTITY_NAME],
       ["Legal form", businessDetails.legalForm],
-      ["Address", businessDetails.address || contactDefaults.location],
+      ["Address", businessDetails.address],
       ["Registration number", businessDetails.registrationNumber],
       ["Fiscal number", businessDetails.fiscalNumber],
       ["VAT number", businessDetails.vatNumber],

@@ -9,7 +9,7 @@ export const siteConfig = {
   legalName: "MTC Digital Agency",
   /** One-line positioning used for metadata fallbacks + footer. */
   tagline:
-    "A creative digital agency in Mitrovica, Kosovo: branding, websites, social media and content under one roof.",
+    "A creative digital agency: branding, websites, social media and content under one roof.",
   description:
     "MTC is a creative digital agency for branding, websites, social media and content. One team, from the first idea to launch day.",
   url: process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
@@ -88,6 +88,8 @@ export const footerNav: { titleKey: string; items: NavItem[] }[] = [
 export const contactDefaults = {
   email: "info@mtcmarketing.co",
   phone: "+383 49 277 977",
+  // Not shown anywhere on the site (the owner asked for the town to go);
+  // the CMS settings record still requires it.
   location: "Mitrovica, Kosovo",
   social: [
     { label: "Instagram", href: "https://www.instagram.com/mtc.marketing/" },
