@@ -13,7 +13,7 @@ export const sv: LocaleOverlay = {
     branding: {
       title: "Varumärke & visuell identitet",
       summary:
-        "Vi tar reda på vad som gör dig annorlunda och ger det ett utseende, en röst och ett system som håller ihop överallt där det syns.",
+        "Vi bygger varumärken som folk känner igen och minns, från den första idén till en visuell identitet som fungerar överallt.",
       capabilities: [
         "Varumärkesstrategi & positionering",
         "Namngivning & budskap",
@@ -26,7 +26,7 @@ export const sv: LocaleOverlay = {
     "web-app": {
       title: "Webb- & apputveckling",
       summary:
-        "Webbplatser och webbappar som designas och byggs internt på en modern stack: snabba, tydliga och enkla för ditt team att hålla uppdaterade.",
+        "Webbplatser och webbappar byggda kring ditt företag, gjorda för att fungera smidigt för dina kunder och vara enkla att hantera när du växer.",
       capabilities: [
         "UX- & UI-design",
         "Next.js-/React-utveckling",
@@ -39,7 +39,7 @@ export const sv: LocaleOverlay = {
     "social-marketing": {
       title: "Sociala medier & digital marknadsföring",
       summary:
-        "Sociala och betalda kampanjer som planeras utifrån tydliga mål, så att varje inlägg och varje annons har en uppgift och en siffra att svara mot.",
+        "Innehåll och kampanjer som får ditt företag att synas, når rätt människor och ger dem en anledning att agera.",
       capabilities: [
         "Kanal- & innehållsstrategi",
         "Betald social & sök",
@@ -52,7 +52,7 @@ export const sv: LocaleOverlay = {
     "content-advertising": {
       title: "Innehållsproduktion & reklam",
       summary:
-        "Foto, film, motion och text som håller ditt varumärke och dina kampanjer försedda med material som får folk att stanna upp.",
+        "Från foto och film till motion och reklam skapar vi innehåll som väcker dina idéer till liv och ger människor en anledning att lägga märke till dem.",
       capabilities: ["Kreativa koncept", "Foto & film", "Motion & animation", "Copywriting", "Produktionsledning"],
       ctaLabel: "Utforska innehåll",
     },
@@ -99,14 +99,14 @@ export const sv: LocaleOverlay = {
     hero: {
       label: "Kreativ digitalbyrå",
       headline: ["Åh titta,", "du hittade oss"],
-      supporting:
-        "Varumärke, webbplatser, sociala medier och innehåll från ett kreativt team, från första idé till lanseringsdagen.",
+      supporting: "Kreativt tänkt. Digitalt gjort.",
       primaryCta: { label: "Starta ett projekt", href: "/contact" },
       secondaryCta: { label: "Se våra arbeten", href: "/work" },
     },
     intro: {
       label: "Varför ett team",
-      statement: "Ett team för hela uppdraget: varumärket, webbplatsen, innehållet och kampanjerna som bär det.",
+      statement:
+        "Från hur ditt företag ser ut till hur det fungerar och blir uppmärksammat, allt samlas under ett tak.",
       body: "Färre överlämningar, en standard och arbete som hänger ihop eftersom samma människor har gjort det.",
     },
     services: {
@@ -146,25 +146,25 @@ export const sv: LocaleOverlay = {
         id: "discover",
         number: "01",
         title: "Upptäck",
-        body: "Vi lär känna din verksamhet, din målgrupp och hur framgång ska se ut.",
+        body: "Vi lär känna ditt företag, dina mål och de människor du vill nå.",
       },
       {
         id: "define",
         number: "02",
         title: "Definiera",
-        body: "Vi sätter strategin, positioneringen och den kreativa riktningen, och kommer överens om en plan.",
+        body: "Vi tar fram riktningen, gör upp planen och ser till att alla är överens.",
       },
       {
         id: "create",
         number: "03",
         title: "Skapa",
-        body: "Vi designar, bygger och producerar varumärket, webbplatsen och innehållet.",
+        body: "Från det visuella till webbplatsen och innehållet för vi ihop alla delar.",
       },
       {
         id: "launch",
         number: "04",
         title: "Lansera",
-        body: "Vi lanserar, marknadsför och mäter arbetet, och fortsätter förbättra det som fungerar.",
+        body: "Vi släpper ut det, ser vad som fungerar och fortsätter att göra det bättre.",
       },
     ],
     testimonialsIntro: {

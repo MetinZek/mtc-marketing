@@ -81,7 +81,7 @@ export const en = {
   },
   home: {
     workHeadline: "Recent work",
-    workSupporting: "Brand identities, websites and web apps, from Kosovo to Vienna.",
+    workSupporting: "A few things we’ve been busy making.",
     workCountOne: "{count} case study",
     workCountOther: "{count} case studies",
     workAll: "See all work",
@@ -89,14 +89,14 @@ export const en = {
     servicesSeenIn: "Seen in",
     trustedClientsAriaLabel: "Clients",
     trustedByLabel: "Brands we’ve worked with",
-    journalHeadline: "Notes from the studio.",
+    journalHeadline: "Worth Knowing",
     journalLede:
       "Short reads on what is changing in advertising, search and social, and what it means for your brand.",
     journalAll: "All notes",
     copyEmail: "Copy email",
     copied: "Copied",
     statement:
-      "We start by listening to your business, your audience and what success should look like. Then we set the strategy, design and build the brand, the website and the content, and launch it. After launch we stay on, measure what works and keep improving it.",
+      "Work starts with understanding your business, your goals and the people you want to reach. From there, we plan the strategy, create your brand, website and content, and bring everything together for launch. And once you’re live, we keep an eye on what works and look for ways to make it even better.",
     stickers: {
       hello: "Say hi!",
       ready: "Ready when you are",

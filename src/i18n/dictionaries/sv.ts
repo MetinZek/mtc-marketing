@@ -74,7 +74,7 @@ export const sv: Dictionary = {
   },
   home: {
     workHeadline: "Senaste arbeten",
-    workSupporting: "Varumärkesidentiteter, webbplatser och webbappar, från Kosovo till Wien.",
+    workSupporting: "Några saker vi har haft fullt upp med att skapa.",
     workCountOne: "{count} fallstudie",
     workCountOther: "{count} fallstudier",
     workAll: "Se alla arbeten",
@@ -82,14 +82,14 @@ export const sv: Dictionary = {
     servicesSeenIn: "Syns i",
     trustedClientsAriaLabel: "Kunder",
     trustedByLabel: "Varumärken vi har arbetat med",
-    journalHeadline: "Anteckningar från studion.",
+    journalHeadline: "Värt att veta",
     journalLede:
       "Korta texter om vad som förändras inom reklam, sök och sociala medier, och vad det betyder för ditt varumärke.",
     journalAll: "Alla anteckningar",
     copyEmail: "Kopiera e-post",
     copied: "Kopierad",
     statement:
-      "Vi börjar med att lyssna: på ditt företag, din publik och hur framgång ska se ut. Sedan sätter vi strategin, formger och bygger varumärket, webbplatsen och innehållet och lanserar det. Efter lanseringen stannar vi kvar, mäter vad som fungerar och fortsätter att förbättra det.",
+      "Arbetet börjar med att förstå ditt företag, dina mål och de människor du vill nå. Därifrån planerar vi strategin, skapar ditt varumärke, din webbplats och ditt innehåll och för ihop allt inför lanseringen. Och när du väl är live håller vi koll på vad som fungerar och letar efter sätt att göra det ännu bättre.",
     stickers: {
       hello: "Säg hej!",
       ready: "Redo när du är det",

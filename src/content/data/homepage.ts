@@ -10,15 +10,14 @@ export const homepageContent: HomepageContent = {
   hero: {
     label: "Creative digital agency",
     headline: ["Oh look,", "you found us"],
-    supporting:
-      "Branding, websites, social media and content from one creative team, from the first idea to launch day.",
+    supporting: "Creative thinking. Digital doing.",
     primaryCta: { label: "Start a project", href: "/contact" },
     secondaryCta: { label: "See our work", href: "/work" },
   },
   intro: {
     label: "Why one team",
     statement:
-      "One team for the whole job: the brand, the website, the content and the campaigns that carry it.",
+      "From the way your business looks to the way it works and gets noticed, everything comes together under one roof.",
     body: "Fewer handoffs, one standard, and work that fits together because the same people made it.",
   },
   services: {
@@ -58,25 +57,25 @@ export const homepageContent: HomepageContent = {
       id: "discover",
       number: "01",
       title: "Discover",
-      body: "We learn your business, your audience and what success should look like.",
+      body: "We get to know your business, your goals and the people you want to reach.",
     },
     {
       id: "define",
       number: "02",
       title: "Define",
-      body: "We set the strategy, positioning and creative direction, and agree on a plan.",
+      body: "We figure out the direction, build the plan and get everyone on the same page.",
     },
     {
       id: "create",
       number: "03",
       title: "Create",
-      body: "We design, build and produce the brand, the website and the content.",
+      body: "From the visuals to the website and content, we bring the pieces together.",
     },
     {
       id: "launch",
       number: "04",
       title: "Launch",
-      body: "We launch, promote and measure the work, then keep improving what performs.",
+      body: "We put it out there, see what works and keep making it better.",
     },
   ],
   // No verified figures exist, so no statistics are published anywhere.

@@ -13,7 +13,7 @@ export const de: LocaleOverlay = {
     branding: {
       title: "Branding & visuelle Identität",
       summary:
-        "Wir finden heraus, was Sie unterscheidet, und geben dem einen Look, eine Stimme und ein System, das überall zusammenhält.",
+        "Wir schaffen Marken, die man erkennt und sich merkt, von der ersten Idee bis zu einer visuellen Identität, die überall funktioniert.",
       capabilities: [
         "Markenstrategie & Positionierung",
         "Naming & Botschaften",
@@ -26,7 +26,7 @@ export const de: LocaleOverlay = {
     "web-app": {
       title: "Web- & App-Entwicklung",
       summary:
-        "Websites und Web-Apps, im eigenen Haus gestaltet und entwickelt, auf einem modernen Stack: schnell, klar und für Ihr Team leicht aktuell zu halten.",
+        "Websites und Web-Apps, rund um Ihr Unternehmen gebaut: reibungslos für Ihre Kunden und leicht zu pflegen, während Sie wachsen.",
       capabilities: [
         "UX- & UI-Design",
         "Next.js-/React-Entwicklung",
@@ -39,7 +39,7 @@ export const de: LocaleOverlay = {
     "social-marketing": {
       title: "Social Media & digitales Marketing",
       summary:
-        "Social- und Paid-Kampagnen mit klaren Zielen, damit jeder Post und jede Anzeige eine Aufgabe hat und sich an einer Zahl messen lässt.",
+        "Inhalte und Kampagnen, die Ihr Unternehmen sichtbar machen, die richtigen Menschen erreichen und ihnen einen Grund zum Handeln geben.",
       capabilities: [
         "Kanal- & Content-Strategie",
         "Paid Social & Search",
@@ -52,7 +52,7 @@ export const de: LocaleOverlay = {
     "content-advertising": {
       title: "Content-Produktion & Werbung",
       summary:
-        "Fotografie, Film, Motion und Text, die Ihre Marke und Ihre Kampagnen mit Arbeit versorgen, bei der man hängen bleibt.",
+        "Von Fotografie und Film bis zu Motion und Werbung: Wir schaffen Inhalte, die Ihre Ideen lebendig machen und Menschen einen Grund geben, hinzusehen.",
       capabilities: [
         "Kreativkonzepte",
         "Fotografie & Film",
@@ -105,15 +105,14 @@ export const de: LocaleOverlay = {
     hero: {
       label: "Kreative Digitalagentur",
       headline: ["Oh, Sie haben", "uns gefunden"],
-      supporting:
-        "Branding, Websites, Social Media und Content aus einem kreativen Team, von der ersten Idee bis zum Launch.",
+      supporting: "Kreativ gedacht. Digital gemacht.",
       primaryCta: { label: "Projekt starten", href: "/contact" },
       secondaryCta: { label: "Unsere Arbeiten", href: "/work" },
     },
     intro: {
       label: "Warum ein Team",
       statement:
-        "Ein Team für den ganzen Auftrag: die Marke, die Website, den Content und die Kampagnen, die sie tragen.",
+        "Wie Ihr Unternehmen aussieht, wie es funktioniert und wie es wahrgenommen wird: Alles kommt unter einem Dach zusammen.",
       body: "Weniger Übergaben, ein Anspruch und Arbeit, die zusammenpasst, weil sie von denselben Menschen kommt.",
     },
     services: {
@@ -153,25 +152,25 @@ export const de: LocaleOverlay = {
         id: "discover",
         number: "01",
         title: "Entdecken",
-        body: "Wir lernen Ihr Unternehmen, Ihre Zielgruppe und Ihre Vorstellung von Erfolg kennen.",
+        body: "Wir lernen Ihr Unternehmen, Ihre Ziele und die Menschen kennen, die Sie erreichen möchten.",
       },
       {
         id: "define",
         number: "02",
         title: "Definieren",
-        body: "Wir legen Strategie, Positionierung und kreative Richtung fest und stimmen einen Plan ab.",
+        body: "Wir finden die Richtung, erstellen den Plan und bringen alle auf denselben Stand.",
       },
       {
         id: "create",
         number: "03",
         title: "Gestalten",
-        body: "Wir gestalten, entwickeln und produzieren die Marke, die Website und den Content.",
+        body: "Von den Visuals über die Website bis zum Content: Wir fügen alle Teile zusammen.",
       },
       {
         id: "launch",
         number: "04",
         title: "Launchen",
-        body: "Wir veröffentlichen, bewerben und messen die Arbeit und verbessern weiter, was wirkt.",
+        body: "Wir bringen es an den Start, sehen, was funktioniert, und machen es laufend besser.",
       },
     ],
     testimonialsIntro: {

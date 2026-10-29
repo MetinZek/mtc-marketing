@@ -74,7 +74,10 @@ screen. The glass is now for the mouse only: on touch screens the lens no
 longer drifts over the pictures (the owner found a lone square of glass
 over a photo odd without a pointer to follow). Client words carry the
 clients' real quotes, the company leading with the service under it until
-their names are in.
+their names are in. The owner then rewrote the page's copy in their own
+words: the hero line under the headline ("Creative thinking. Digital
+doing."), the work and journal headings, the "How we work" paragraph and
+its four stages, and the four service summaries.
 
 ## What was taken from the references
 
@@ -169,8 +172,8 @@ through all four. Errors use `#d70015`.
 4. **Client words**: one quote at a time, set large, its words going from grey
    to ink; beside it a line that fills over eight seconds, arrows and the
    count. Only shows real, published quotes (see Content below).
-5. **Journal**: "Notes from the studio." and the five newest notes as a ruled
-   list; hover draws the four-colour line and fills the arrow.
+5. **Journal**: "Worth Knowing" and the five newest notes as a ruled list;
+   hover draws the four-colour line and fills the arrow.
 6. **Sign-off** (the homepage's footer only): "LET'S TALK." in the hero's
    fitted capitals as the link to the brief (letters thinning near the
    pointer, the drift on phones), with a "hey!" speech bubble, a waving hand

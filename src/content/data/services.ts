@@ -6,7 +6,7 @@ type Service = z.input<typeof serviceSchema>;
 
 /**
  * The four disciplines. Titles and capabilities are the ones published on
- * mtcmarketing.co; summaries were rewritten for the redesign. In production
+ * mtcmarketing.co; the summaries are the owner's (2026-10-29). In production
  * these records live in the CMS database, so the new summaries only reach the
  * live site once they are entered in /admin → Services.
  */
@@ -17,7 +17,7 @@ export const services: Service[] = [
     title: "Branding & Visual Identity",
     slug: "branding-visual-identity",
     summary:
-      "We find what makes you different and give it a look, a voice and a system that holds together everywhere it appears.",
+      "We build brands people recognise and remember, from the first idea to a visual identity that works everywhere.",
     capabilities: [
       "Brand strategy & positioning",
       "Naming & messaging",
@@ -35,7 +35,7 @@ export const services: Service[] = [
     title: "Web & App Development",
     slug: "web-app-development",
     summary:
-      "Websites and web apps designed and built in-house on a modern stack: fast, clear and easy for your team to keep up to date.",
+      "Websites and web apps built around your business, designed to work smoothly for your customers and stay easy to manage as you grow.",
     capabilities: [
       "UX & UI design",
       "Next.js / React builds",
@@ -53,7 +53,7 @@ export const services: Service[] = [
     title: "Social Media & Digital Marketing",
     slug: "social-media-digital-marketing",
     summary:
-      "Social and paid campaigns planned around clear goals, so every post and every ad has a job to do and a number to answer to.",
+      "Content and campaigns that get your business noticed, reach the right people and give them a reason to take action.",
     capabilities: [
       "Channel & content strategy",
       "Paid social & search",
@@ -71,7 +71,7 @@ export const services: Service[] = [
     title: "Content Creation & Advertising",
     slug: "content-creation-advertising",
     summary:
-      "Photography, film, motion and copy that keep your brand and your campaigns supplied with work worth stopping for.",
+      "From photography and film to motion and advertising, we create content that brings your ideas to life and gives people a reason to pay attention.",
     capabilities: [
       "Creative concepts",
       "Photography & film",

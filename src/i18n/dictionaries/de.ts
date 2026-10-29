@@ -75,7 +75,7 @@ export const de: Dictionary = {
   },
   home: {
     workHeadline: "Aktuelle Arbeiten",
-    workSupporting: "Markenidentitäten, Websites und Web-Apps, vom Kosovo bis nach Wien.",
+    workSupporting: "Ein paar Dinge, an denen wir fleißig gearbeitet haben.",
     workCountOne: "{count} Fallstudie",
     workCountOther: "{count} Fallstudien",
     workAll: "Alle Arbeiten ansehen",
@@ -83,14 +83,14 @@ export const de: Dictionary = {
     servicesSeenIn: "Zu sehen bei",
     trustedClientsAriaLabel: "Kunden",
     trustedByLabel: "Marken, mit denen wir gearbeitet haben",
-    journalHeadline: "Notizen aus dem Studio.",
+    journalHeadline: "Wissenswertes",
     journalLede:
       "Kurze Texte darüber, was sich in Werbung, Suche und Social Media verändert, und was das für Ihre Marke bedeutet.",
     journalAll: "Alle Notizen",
     copyEmail: "E-Mail kopieren",
     copied: "Kopiert",
     statement:
-      "Wir beginnen mit Zuhören: Ihr Geschäft, Ihr Publikum und wie Erfolg aussehen soll. Dann legen wir die Strategie fest, gestalten und bauen die Marke, die Website und die Inhalte und bringen alles an den Start. Danach bleiben wir dabei, messen, was wirkt, und verbessern es weiter.",
+      "Am Anfang steht das Verständnis für Ihr Unternehmen, Ihre Ziele und die Menschen, die Sie erreichen möchten. Darauf aufbauend planen wir die Strategie, gestalten Ihre Marke, Website und Inhalte und bringen alles für den Launch zusammen. Und sobald Sie live sind, behalten wir im Blick, was funktioniert, und suchen nach Wegen, es noch besser zu machen.",
     stickers: {
       hello: "Hallo sagen!",
       ready: "Bereit, wenn Sie es sind",
