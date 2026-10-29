@@ -7,6 +7,7 @@ The files here are **placeholders**. Drop the official artwork in with the
 | --- | --- | --- |
 | `mtc-logo.svg` | Navigation, primary brand touchpoints | Official **blue** logo, as delivered |
 | `mtc-logo-mono.svg` | Footer, low-contrast contexts | Single colour; should use `fill="currentColor"` so it inherits text colour |
+| `mtc-icon.png` | Source of the site icons (browser tab, bookmarks, phone home screens) | The white M on blue, 1024 px square. After replacing it, run `node scripts/build-favicons.mjs` to rebuild `src/app/favicon.ico`, `icon.png` and `apple-icon.png` |
 
 ## Logo rules (from the brief)
 

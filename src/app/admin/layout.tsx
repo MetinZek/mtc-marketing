@@ -40,7 +40,7 @@ export const metadata: Metadata = {
     title: `${siteConfig.name} — Creative digital agency`,
     description: siteConfig.description,
   },
-  icons: { icon: "/brand/mtc-logo.svg" },
+  // Icons come from src/app (favicon.ico, icon.png, apple-icon.png).
   robots: { index: false, follow: false, nocache: true },
 };
 

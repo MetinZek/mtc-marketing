@@ -58,7 +58,8 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description: dict.meta.description,
     },
-    icons: { icon: "/brand/mtc-logo.svg" },
+    // Icons: favicon.ico, icon.png and apple-icon.png in src/app (built by
+    // scripts/build-favicons.mjs); Next.js writes their tags.
     robots: { index: true, follow: true },
   };
 }
