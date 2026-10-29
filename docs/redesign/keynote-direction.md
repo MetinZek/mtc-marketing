@@ -119,8 +119,9 @@ largest size that keeps them to three lines). Each letter is its own box;
 with a mouse or trackpad the letters near the pointer drop toward weight 200
 and fill back in as it moves on; on touch screens an invisible point drifts through the
 text in a slow figure of eight instead. Four stickers sit on its corners:
-"Say hi!" (red to pink), a 3D eyes emoji (for "Oh look"), a
-3D rocket (launches) and "Ready when you are" (blue to violet).
+"Say hi!" (red to pink), a 3D eyes emoji (for "Oh look", tilted 20° so
+its leftward gaze falls on that word), a 3D rocket (launches) and "Ready
+when you are" (blue to violet).
 The pill above names the agency and its three languages. Static first frame:
 everything in place at full weight.
 

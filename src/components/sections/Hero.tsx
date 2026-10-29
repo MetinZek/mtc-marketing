@@ -28,9 +28,10 @@ type HeroProps = {
  *   the pointer and fill back in as it moves on; on touch screens a slow
  *   drift plays the same effect.
  * - Four stickers sit on its corners: two short, upbeat pills in MTC's
- *   colours with a shine, and two 3D emojis (eyes, for "Oh look", and a
- *   rocket, for launches). They pop in after the headline, straighten and
- *   grow on hover, and can be picked up and moved with a mouse.
+ *   colours with a shine, and two 3D emojis (eyes, for "Oh look", tilted
+ *   to look down at that word, and a rocket, for launches). They pop in
+ *   after the headline, straighten and grow on hover, and can be picked up
+ *   and moved with a mouse.
  * - The intro: pill, letters in turn, line and actions, stickers, logos.
  *
  * Without JavaScript or with reduced motion everything is in place at once
@@ -108,7 +109,8 @@ export function Hero({ label, headline, supporting, primary, secondary, stickers
             <Sticker rot={-8} className="left-[-2%] top-[-17%] origin-top-left max-md:scale-[0.56] md:left-[3%] md:top-[-22%] md:max-lg:scale-[0.8]">
               <StickerPill tone="red">{stickers.hello}</StickerPill>
             </Sticker>
-            <Sticker rot={10} className="right-[-3%] top-[-19%] origin-top-right max-md:scale-[0.56] md:right-[5%] md:top-[-36%] md:max-lg:scale-[0.75]">
+            {/* Tilted so the eyes, which look left, look down at "look". */}
+            <Sticker rot={-20} className="right-[-3%] top-[-19%] origin-top-right max-md:scale-[0.56] md:right-[5%] md:top-[-36%] md:max-lg:scale-[0.75]">
               <StickerEmoji src="/media/emoji/eyes.webp" />
             </Sticker>
             <Sticker rot={-14} className="bottom-[-16%] left-[-3%] origin-bottom-left max-md:scale-[0.5] md:bottom-[-40%] md:left-[-1%] md:max-lg:scale-[0.75]">
