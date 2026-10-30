@@ -13,7 +13,6 @@ import { DESKTOP, REDUCED_MOTION, useMedia } from "./use-media";
 
 type View = { block: BlockId | null; floor: number | null; unit: string | null };
 
-const NAV_EVENT = "troy:navigate";
 export const ENQUIRE_EVENT = "troy:enquire";
 
 /** The view lives in the address (?b=A&f=7&u=A-701), so a home can be
@@ -29,21 +28,50 @@ function parse(search: string): View {
   return { block, floor, unit };
 }
 
-function href(view: View): string {
+function searchOf(view: View): string {
   const q = new URLSearchParams();
   if (view.block) q.set("b", view.block);
   if (view.block && view.floor) q.set("f", String(view.floor));
   if (view.floor && view.unit) q.set("u", view.unit);
   const s = q.toString();
-  return `${window.location.pathname}${s ? `?${s}` : ""}`;
+  return s ? `?${s}` : "";
+}
+
+/**
+ * The open view, kept here and mirrored to the address. Where the address
+ * cannot be rewritten (a page shown in a sandboxed frame refuses
+ * pushState), the view still changes; only the address stays put.
+ */
+const address = { search: null as string | null, path: "", listeners: new Set<() => void>() };
+
+function readAddress(): string {
+  if (address.search === null || address.path !== window.location.pathname) {
+    address.search = window.location.search;
+    address.path = window.location.pathname;
+  }
+  return address.search;
+}
+
+function writeAddress(search: string) {
+  address.search = search;
+  try {
+    window.history.pushState(null, "", `${window.location.pathname}${search}`);
+  } catch {
+    // Kept in memory only.
+  }
+  address.listeners.forEach((listener) => listener());
 }
 
 const subscribe = (onChange: () => void) => {
-  window.addEventListener("popstate", onChange);
-  window.addEventListener(NAV_EVENT, onChange);
+  const onPop = () => {
+    address.search = window.location.search;
+    onChange();
+  };
+  address.listeners.add(onChange);
+  window.addEventListener("popstate", onPop);
   return () => {
-    window.removeEventListener("popstate", onChange);
-    window.removeEventListener(NAV_EVENT, onChange);
+    address.listeners.delete(onChange);
+    window.removeEventListener("popstate", onPop);
   };
 };
 
@@ -58,7 +86,7 @@ const PANEL = 380;
  */
 export function Explorer({ lang }: { lang: Lang }) {
   const t = DICTS[lang];
-  const search = useSyncExternalStore(subscribe, () => window.location.search, () => "");
+  const search = useSyncExternalStore(subscribe, readAddress, () => "");
   const view = useMemo(() => parse(search), [search]);
   const desktop = useMedia(DESKTOP);
   const reduced = useMedia(REDUCED_MOTION);
@@ -73,8 +101,7 @@ export function Explorer({ lang }: { lang: Lang }) {
   const previewFloor = preview && preview.block === view.block ? preview.floor : null;
 
   const go = useCallback((next: View) => {
-    window.history.pushState(null, "", href(next));
-    window.dispatchEvent(new Event(NAV_EVENT));
+    writeAddress(searchOf(next));
     setHoverUnit(null);
     // The 3D code loads while the camera is still on the facade.
     if (next.block) void import("../scene/floor-scene");
