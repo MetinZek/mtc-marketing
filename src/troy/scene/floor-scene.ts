@@ -222,6 +222,8 @@ export class FloorScene {
   resize() {
     const w = Math.max(1, this.host.clientWidth);
     const h = Math.max(1, this.host.clientHeight);
+    // A ResizeObserver also reports the size it starts with: nothing to do.
+    if (w === this.width && h === this.height) return;
     this.width = w;
     this.height = h;
     this.renderer.setSize(w, h, false);
@@ -229,15 +231,20 @@ export class FloorScene {
     this.camera.right = w / 2;
     this.camera.top = h / 2;
     this.camera.bottom = -h / 2;
+    this.camera.updateProjectionMatrix();
     if (this.plan) {
-      // Keep the same framing at the new size.
       const unit = this.selected ? this.plan.units.find((u) => u.id === this.selected) : null;
       const next = unit ? this.unitPose([unit.bounds, unit.outdoor]) : this.homePose();
-      this.tween?.kill();
-      this.pose = { ...next, phi: this.currentPhi(), theta: this.currentTheta() };
-      this.applyPose();
+      if (this.tween && this.tween.progress() < 1) {
+        // Mid-flight (the arrival, or framing a home): land on the new
+        // framing instead of freezing at the angle it had reached.
+        this.animateTo(next, 0.8, "expo.out");
+      } else {
+        // At rest: keep the angle the visitor left it at, framed anew.
+        this.pose = { ...next, phi: this.currentPhi(), theta: this.currentTheta() };
+        this.applyPose();
+      }
     }
-    this.camera.updateProjectionMatrix();
     this.invalidate();
   }
 

@@ -60,6 +60,7 @@ export function FacadeStage(props: Props) {
   const worldRef = useRef<HTMLDivElement>(null);
   const pinRefs = useRef<Partial<Record<BlockId, HTMLElement | null>>>({});
   const tagRef = useRef<HTMLDivElement>(null);
+  const stillRef = useRef<HTMLImageElement>(null);
   const cam = useRef<Cam>({ x: 0, y: 0, s: 0.5, o: 0 });
   const started = useRef(false);
   const hoverFloorRef = useRef<number | null>(hoverFloor);
@@ -119,6 +120,8 @@ export function FacadeStage(props: Props) {
     gsap.killTweensOf(cam.current);
     if (!started.current) {
       started.current = true;
+      // The camera takes over from the still picture.
+      if (stillRef.current) stillRef.current.style.opacity = "0";
       if (reduced) {
         Object.assign(cam.current, next);
         apply();
@@ -170,6 +173,14 @@ export function FacadeStage(props: Props) {
 
   return (
     <div ref={stageRef} className="absolute inset-0 overflow-hidden" aria-hidden={level === "floor"}>
+      {/* eslint-disable-next-line @next/next/no-img-element -- the same render, shown before the camera starts (troy.css) */}
+      <img
+        ref={stillRef}
+        src={RENDER.src}
+        alt=""
+        draggable={false}
+        className="troy-still pointer-events-none absolute max-w-none select-none transition-opacity duration-700"
+      />
       <div
         ref={worldRef}
         className="absolute left-0 top-0 origin-top-left will-change-transform"

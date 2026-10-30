@@ -27,7 +27,7 @@ export function Wordmark({ light = false }: { light?: boolean }) {
 export function Header({ lang }: { lang: Lang }) {
   const t = DICTS[lang];
   const router = useRouter();
-  const scrolled = useSyncExternalStore(subscribe, () => window.scrollY > window.innerHeight * 0.75, () => false);
+  const scrolled = useSyncExternalStore(subscribe, () => window.scrollY > 24, () => false);
   const links = [
     { href: "#residences", label: t.nav.homes },
     { href: "#project", label: t.nav.project },

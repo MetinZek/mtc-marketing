@@ -275,3 +275,27 @@
     transition-duration: 1ms !important;
   }
 }
+
+/* ============================================================
+   The render before scripts run (FacadeStage): placed where the
+   camera will frame it, near enough for a seamless hand-over, and
+   left in place if the scripts never arrive. --h is the picture's
+   height: as wide as the screen allows, below the heading.
+   ============================================================ */
+.troy-still {
+  --h: calc((100vw - 32px) * 0.6067);
+  height: var(--h);
+  width: calc(var(--h) * 1.7778);
+  left: 50%;
+  top: calc((300px + 100svh) / 2 - var(--h) * 0.58);
+  transform: translateX(-50%);
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 5%, #000 95%, transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 5%, #000 95%, transparent 100%);
+}
+@media (min-width: 1024px) {
+  .troy-still {
+    --h: min(calc((100vw - 32px) * 0.6067), calc((100svh - 300px - 5.5vw) * 1.2558));
+    top: auto;
+    bottom: calc(var(--h) * -0.0222);
+  }
+}

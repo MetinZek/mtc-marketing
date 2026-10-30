@@ -233,9 +233,10 @@ export function Explorer({ lang }: { lang: Lang }) {
         <p className="mt-4 max-w-[52ch] text-lead text-ink-soft">{t.hero.lead}</p>
       </div>
 
-      {/* Top-left: the way back, once inside. */}
-      {level !== "site" && desktop && (
-        <div className="absolute left-6 top-[88px] z-10 flex items-center gap-1 text-[13px]">
+      {/* Top-left: the way back, once inside. Layout is left to CSS
+          (lg:), so the first paint is right before scripts run. */}
+      {level !== "site" && (
+        <div className="absolute left-6 top-[88px] z-10 hidden items-center gap-1 text-[13px] lg:flex">
           <nav aria-label="breadcrumb" className="frost flex items-center rounded-full px-2 py-1 shadow-[var(--shadow-card)]">
             <button type="button" onClick={() => goBlock(null)} className="rounded-full px-2 py-1 font-semibold text-ink-soft hover:text-ink">
               Troy Residence
@@ -274,17 +275,15 @@ export function Explorer({ lang }: { lang: Lang }) {
       <div
         ref={sheetRef}
         className={clsx(
-          "absolute z-10 transition-[opacity,transform] duration-700 ease-[var(--ease-out-expo)]",
-          desktop
-            ? "bottom-6 right-6 top-[88px] w-[380px] overflow-hidden rounded-[var(--radius-xl)] shadow-[var(--shadow-float)]"
-            : "inset-x-0 bottom-0 max-h-[58%] overflow-y-auto rounded-t-[var(--radius-xl)] px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 shadow-[0_-12px_40px_-20px_rgb(31_25_20/0.35)]",
-          desktop && level === "site" ? "pointer-events-none translate-x-6 opacity-0" : "opacity-100",
-          "frost",
+          "frost absolute z-10 transition-[opacity,transform] duration-700 ease-[var(--ease-out-expo)]",
+          "bottom-0 left-0 right-0 max-h-[58%] overflow-y-auto rounded-t-[var(--radius-xl)] px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 shadow-[0_-12px_40px_-20px_rgb(31_25_20/0.35)]",
+          "lg:bottom-6 lg:left-auto lg:right-6 lg:top-[88px] lg:max-h-none lg:w-[380px] lg:overflow-hidden lg:rounded-[var(--radius-xl)] lg:p-0 lg:shadow-[var(--shadow-float)]",
+          level === "site" && "lg:pointer-events-none lg:translate-x-6 lg:opacity-0",
         )}
         data-lenis-prevent
       >
-        {level === "site" && !desktop && (
-          <div className="grid grid-cols-3 gap-2">
+        {level === "site" && (
+          <div className="grid grid-cols-3 gap-2 lg:hidden">
             {BLOCKS.map((id) => {
               const s = blockSummary(id);
               return (
@@ -303,7 +302,7 @@ export function Explorer({ lang }: { lang: Lang }) {
           </div>
         )}
         {level === "block" && view.block && (
-          <div key={`b-${view.block}`} className={clsx("animate-enter", desktop && "h-full")}>
+          <div key={`b-${view.block}`} className="animate-enter lg:h-full">
             <BlockPanel
               lang={lang}
               block={view.block}
@@ -316,7 +315,7 @@ export function Explorer({ lang }: { lang: Lang }) {
           </div>
         )}
         {level === "floor" && view.block && view.floor && (
-          <div key={`f-${view.block}-${view.floor}`} className={clsx("animate-enter", desktop && "h-full")}>
+          <div key={`f-${view.block}-${view.floor}`} className="animate-enter lg:h-full">
             <FloorPanel
               lang={lang}
               block={view.block}
@@ -331,7 +330,7 @@ export function Explorer({ lang }: { lang: Lang }) {
           </div>
         )}
         {level === "unit" && unit && (
-          <div key="unit" className={clsx("animate-enter", desktop && "h-full")}>
+          <div key="unit" className="animate-enter lg:h-full">
             <UnitPanel
               lang={lang}
               unit={unit}
@@ -345,9 +344,9 @@ export function Explorer({ lang }: { lang: Lang }) {
       </div>
 
       {/* On arrival: what to do, and where the page goes on. */}
-      {level === "site" && desktop && (
+      {level === "site" && (
         <>
-          <p className="frost pointer-events-none absolute bottom-6 left-1/2 z-10 flex -translate-x-1/2 animate-enter items-center gap-2.5 rounded-full py-2.5 pl-3.5 pr-4 text-sm font-semibold text-ink shadow-[var(--shadow-card)] [animation-delay:1.4s]">
+          <p className="frost pointer-events-none absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 animate-enter items-center lg:flex gap-2.5 rounded-full py-2.5 pl-3.5 pr-4 text-sm font-semibold text-ink shadow-[var(--shadow-card)] [animation-delay:1.4s]">
             <span className="relative grid size-2.5 place-items-center text-bronze">
               <span className="troy-pulse absolute inset-0 rounded-full" />
               <span className="relative size-2.5 rounded-full bg-bronze" />
@@ -356,18 +355,18 @@ export function Explorer({ lang }: { lang: Lang }) {
           </p>
           <a
             href="#project"
-            className="frost absolute bottom-6 right-6 z-10 flex items-center gap-2 rounded-full px-4 py-2.5 text-xs font-semibold text-ink-soft shadow-[var(--shadow-card)] transition-colors hover:text-ink"
+            className="frost absolute bottom-6 right-6 z-10 hidden items-center gap-2 rounded-full px-4 py-2.5 text-xs lg:flex font-semibold text-ink-soft shadow-[var(--shadow-card)] transition-colors hover:text-ink"
           >
             {t.hero.scroll}
             <Arrow className="size-3.5 rotate-90" />
           </a>
         </>
       )}
-      {level !== "site" && !desktop && (
+      {level !== "site" && (
         <BackButton
           label={t.explorer.back}
           onClick={up}
-          className="frost absolute left-3 top-[80px] z-10 shadow-[var(--shadow-card)]"
+          className="frost absolute left-3 top-[80px] z-10 shadow-[var(--shadow-card)] lg:hidden"
         />
       )}
     </section>
