@@ -15,9 +15,14 @@ import { defaultLocale, locales } from "@/i18n/locales";
  *    rewritten internally to the "/en" route segment so it still
  *    resolves under src/app/[locale]. "/de" and "/sv" are real prefixes
  *    that match their route segment directly — no rewrite needed.
+ *
+ * /troy (the Troy Residence presentation concept, src/app/troy) is its
+ * own site with its own languages, so it passes through untouched.
  */
 export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  if (pathname === "/troy" || pathname.startsWith("/troy/")) return NextResponse.next();
 
   if (pathname.startsWith("/admin")) {
     if (pathname === "/admin/login") return NextResponse.next();

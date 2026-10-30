@@ -1,4 +1,7 @@
 @import "tailwindcss";
+/* The Troy concept (/troy) has its own stylesheet, src/app/troy/troy.css. */
+@source not "./troy";
+@source not "../troy";
 
 /* ============================================================
    MTC design system: "Keynote"

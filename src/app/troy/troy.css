@@ -1,0 +1,277 @@
+@import "tailwindcss" source(none);
+@source "./";
+@source "../../troy";
+@source "../../components/motion";
+
+/* ============================================================
+   Troy Residence: presentation concept.
+   Warm stone grounds and espresso ink taken from the render's
+   bronze facades and planting; Instrument Serif for display,
+   Inter for everything else. Its own tokens, separate from the
+   MTC site's (src/app/globals.css).
+   ============================================================ */
+
+@theme {
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  --color-sand: #f2ede5;
+  --color-sand-deep: #e9e2d7;
+  --color-paper: #fbf8f4;
+  --color-ink: #1d1813;
+  --color-ink-soft: #5c5249;
+  --color-ink-faint: #8f857a;
+  --color-line: #e3dacd;
+  --color-line-strong: #d3c7b6;
+  --color-bronze: #9a6a40;
+  --color-bronze-deep: #7a5130;
+  --color-espresso: #1f1914;
+  --color-espresso-soft: #2b241e;
+  --color-espresso-line: #3d342c;
+  --color-cream: #f4ead9;
+  --color-cream-soft: #c9bba7;
+  --color-gold: #d9b779;
+  --color-leaf: #4e7146;
+  --color-available: #3f7a4c;
+  --color-reserved: #c48a2c;
+  --color-reserved-ink: #8f611a;
+  --color-sold: #a39a8f;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-serif: var(--font-instrument), "Iowan Old Style", "Times New Roman", serif;
+
+  --text-hero: clamp(3rem, 1.6rem + 5.4vw, 7.25rem);
+  --text-hero--line-height: 0.92;
+  --text-hero--letter-spacing: -0.02em;
+  --text-display: clamp(2.5rem, 1.7rem + 3.4vw, 5rem);
+  --text-display--line-height: 0.98;
+  --text-display--letter-spacing: -0.018em;
+  --text-title: clamp(1.75rem, 1.35rem + 1.6vw, 2.75rem);
+  --text-title--line-height: 1.02;
+  --text-title--letter-spacing: -0.012em;
+  --text-statement: clamp(1.75rem, 1.2rem + 2.3vw, 3.4rem);
+  --text-statement--line-height: 1.12;
+  --text-statement--letter-spacing: -0.012em;
+  --text-lead: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --text-lead--line-height: 1.5;
+  --text-eyebrow: 0.75rem;
+  --text-eyebrow--line-height: 1.2;
+  --text-eyebrow--letter-spacing: 0.16em;
+
+  --radius-sm: 10px;
+  --radius-md: 16px;
+  --radius-lg: 24px;
+  --radius-xl: 32px;
+
+  --shadow-card: 0 1px 2px rgb(31 25 20 / 0.05), 0 18px 48px -20px rgb(31 25 20 / 0.28);
+  --shadow-float: 0 2px 6px rgb(31 25 20 / 0.08), 0 30px 80px -28px rgb(31 25 20 / 0.45);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-in-out-soft: cubic-bezier(0.65, 0, 0.35, 1);
+
+  --animate-enter: troy-enter 700ms var(--ease-out-expo) both;
+  --animate-fade: troy-fade 500ms var(--ease-out-soft) both;
+}
+
+@keyframes troy-enter {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 14px, 0);
+  }
+}
+@keyframes troy-fade {
+  from {
+    opacity: 0;
+  }
+}
+@keyframes troy-pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(2.4);
+    opacity: 0;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    -webkit-text-size-adjust: 100%;
+    background-color: var(--color-sand);
+  }
+
+  body {
+    background-color: var(--color-sand);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-size: 1rem;
+    line-height: 1.55;
+    letter-spacing: -0.011em;
+    font-optical-sizing: auto;
+  }
+
+  h1,
+  h2,
+  h3,
+  .font-serif {
+    font-family: var(--font-serif);
+    font-weight: 400;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  ::selection {
+    background: var(--color-bronze);
+    color: #ffffff;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-bronze);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+
+  ::placeholder {
+    color: var(--color-ink-faint);
+  }
+
+  img,
+  svg,
+  video,
+  canvas {
+    display: block;
+    max-width: none;
+  }
+}
+
+@layer utilities {
+  .container-troy {
+    width: 100%;
+    max-width: 1320px;
+    margin-inline: auto;
+    padding-inline: clamp(1rem, 4vw, 3rem);
+  }
+
+  .eyebrow {
+    font-size: var(--text-eyebrow);
+    line-height: var(--text-eyebrow--line-height);
+    letter-spacing: var(--text-eyebrow--letter-spacing);
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Frosted panels over the render and the model. */
+  .frost {
+    background-color: rgb(251 248 244 / 0.82);
+    -webkit-backdrop-filter: saturate(160%) blur(18px);
+    backdrop-filter: saturate(160%) blur(18px);
+  }
+  .frost-dark {
+    background-color: rgb(31 25 20 / 0.84);
+    -webkit-backdrop-filter: saturate(160%) blur(18px);
+    backdrop-filter: saturate(160%) blur(18px);
+  }
+
+  /* A scroll area inside a panel: thin bar, no chaining into the page. */
+  .panel-scroll {
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-line-strong) transparent;
+  }
+
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* ============================================================
+   The sky behind the render (its own sky is transparent): pale
+   blue overhead warming to the stone ground at the horizon.
+   ============================================================ */
+.troy-sky {
+  background:
+    radial-gradient(120% 70% at 70% 0%, rgb(255 255 255 / 0.55), transparent 60%),
+    linear-gradient(180deg, #c6d6e0 0%, #dbe3e5 34%, #ebe8e1 66%, var(--color-sand) 100%);
+}
+
+/* A pin's pulse ring (the block markers). */
+.troy-pulse::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: currentColor;
+  animation: troy-pulse 2.2s var(--ease-out-soft) infinite;
+}
+
+/* ============================================================
+   Motion start states, as on the MTC site: the boot script marks
+   <html class="motion"> before first paint (unless the visitor
+   prefers reduced motion); only then do these start hidden, and
+   MotionRoot brings them in.
+   ============================================================ */
+.motion [data-reveal="up"]:not(.is-in) {
+  opacity: 0;
+  transform: translate3d(0, 32px, 0);
+}
+.motion [data-reveal="fade"]:not(.is-in) {
+  opacity: 0;
+}
+.motion [data-reveal="stagger"]:not(.is-in) > * {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+}
+.motion [data-split]:not(.is-in) .split-word > span {
+  transform: translate3d(0, 105%, 0);
+}
+.motion [data-reveal="ink"]:not(.is-in) .ink-word {
+  opacity: 0.32;
+}
+.split-word {
+  display: inline-block;
+  overflow: clip;
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+  vertical-align: top;
+}
+.split-word > span {
+  display: inline-block;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 1ms !important;
+  }
+}

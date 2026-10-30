@@ -187,3 +187,53 @@ src/i18n/dictionaries/  UI strings (en is the source of truth, de/sv typed again
 - Localized 404 for any unmatched public URL (`[locale]/(site)/[...missing]`).
 - Dynamic Open Graph image per locale; Organization JSON-LD.
 - `/admin` is `noindex`.
+
+## Troy Residence concept (`/troy`)
+
+A presentation website made for Troy Construction's **Troy Residence**
+(three towers in Mitrovica), at `/troy` in Albanian and `/troy/en` in
+English. It is a site of its own beside the MTC site: its own root layout,
+stylesheet and copy, passed through untouched by the proxy, kept out of
+search engines (`noindex`) while it is a concept.
+
+The page opens on the interactive model, built on the project's render
+(`public/troy/render.webp`, transparent sky):
+
+1. **Blocks.** Hover a tower and it lifts out of the dimmed picture; pins
+   over the roofs give floors and availability.
+2. **Floors.** The camera glides to the chosen block; hovering a floor
+   lights its windows. The panel lists every floor.
+3. **The floor in 3D.** The camera flies into the floor and a three.js
+   maquette rises (walls cut at 2.3 m, glass, furniture, balconies,
+   green roofs on the penthouse floors), loaded only now. A 2D plan of the
+   same floor is one click away.
+4. **The home.** The model frames it and names its rooms; the panel gives
+   areas, a measured plan and WhatsApp, call and offer buttons (the offer
+   fills in the contact form).
+
+The view lives in the address (`/troy?b=A&f=7&u=A-701`), so a home can be
+sent as a link, and the back button and Escape step back a level. Below
+the model: the project (a pinned frame travelling over the render), the
+location, and a contact form that writes the message into WhatsApp or an
+email (nothing is sent or stored by the site).
+
+```
+src/app/troy/          layout (fonts, metadata), the two pages, troy.css, icon
+src/troy/data/
+  facade.ts            the render's geometry: tower outlines, floor bands
+  plans.ts             floor plates, home templates, walls and doors
+  furniture.ts         furniture placed by rule in every room
+  inventory.ts         availability, summaries, lookups
+src/troy/scene/        the 3D floor (three.js)
+src/troy/components/   Explorer (the model), panels, plan, page sections
+src/troy/i18n.ts       Albanian and English copy, contacts
+```
+
+**Illustrative data.** The floor plans, areas and availability are
+generated stand-ins, and the footer says so. With Troy's real material:
+their plans replace the templates and slots in `plans.ts` (the 3D model,
+2D plans and areas follow), their sales list replaces `statusOf` in
+`inventory.ts`, and prices can join the unit panel. The project facts in
+the copy come from Troy's own page (three towers, central Mitrovica, the
+Ibar and the mountains, 30,000+ m² of structural works by March 2024,
+address and contacts).
