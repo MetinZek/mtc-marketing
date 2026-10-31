@@ -149,12 +149,24 @@ export function Explorer({ lang }: { lang: Lang }) {
 
   const previewFloor = preview && preview.block === view.block ? preview.floor : null;
 
-  const go = useCallback((next: View) => {
-    writeAddress(searchOf(next));
-    setHoverUnit(null);
-    // The 3D code loads while the camera is still on the facade.
-    if (next.block) void import("../scene/floor-scene");
-  }, []);
+  const go = useCallback(
+    (next: View) => {
+      writeAddress(searchOf(next));
+      setHoverUnit(null);
+      if (!next.block) return;
+      // The 3D code loads while the camera is still on the facade.
+      void import("../scene/floor-scene");
+      // Scrolled part-way past the scene? Bring it back fully into view.
+      const sticky = stickyRef.current;
+      const anchor = document.getElementById("residences");
+      if (sticky && anchor && Math.abs(sticky.getBoundingClientRect().top) > 1) {
+        const lenis = getLenis();
+        if (lenis) lenis.scrollTo(anchor, { duration: 0.9 });
+        else anchor.scrollIntoView({ behavior: reduced ? "auto" : "smooth" });
+      }
+    },
+    [reduced],
+  );
 
   const goBlock = useCallback(
     (block: BlockId | null) => {
