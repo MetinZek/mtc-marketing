@@ -1,18 +1,22 @@
 import { MotionRoot } from "@/components/motion/MotionRoot";
 import { DICTS, type Lang } from "../i18n";
-import { Construction } from "./Construction";
+import { Brand } from "./Brand";
 import { Contact } from "./Contact";
 import { Explorer } from "./Explorer";
+import { Features } from "./Features";
 import { Footer } from "./Footer";
-import { Gallery } from "./Gallery";
 import { Header } from "./Header";
+import { Home } from "./Home";
 import { Location } from "./Location";
-import { Story } from "./Story";
+import { News } from "./News";
+import { Steps } from "./Steps";
+import { Why } from "./Why";
 
 /**
  * Troy Residence, the whole page: the opening close-up that pulls back into
- * the interactive model, then the project, the gallery, the construction,
- * the location and the contact form.
+ * the interactive model; the name as a window onto the towers; why Troy;
+ * not just a home; the three steps; what the project offers; news from the
+ * site; the location; and the closing band with the contact form.
  */
 export function TroySite({ lang }: { lang: Lang }) {
   const t = DICTS[lang];
@@ -28,9 +32,12 @@ export function TroySite({ lang }: { lang: Lang }) {
       <main id="main">
         <Explorer lang={lang} />
         <MotionRoot>
-          <Story lang={lang} />
-          <Gallery lang={lang} />
-          <Construction lang={lang} />
+          <Brand lang={lang} />
+          <Why lang={lang} />
+          <Home lang={lang} />
+          <Steps lang={lang} />
+          <Features lang={lang} />
+          <News lang={lang} />
           <Location lang={lang} />
           <Contact lang={lang} />
         </MotionRoot>

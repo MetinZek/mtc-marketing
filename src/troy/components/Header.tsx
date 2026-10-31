@@ -36,9 +36,8 @@ export function Header({ lang }: { lang: Lang }) {
   const scrolled = useSyncExternalStore(subscribe, () => window.scrollY > 24, () => false);
   const links = [
     { href: "#residences", label: t.nav.homes },
-    { href: "#project", label: t.nav.project },
-    { href: "#gallery", label: t.nav.gallery },
-    { href: "#construction", label: t.nav.construction },
+    { href: "#why", label: t.nav.why },
+    { href: "#news", label: t.nav.news },
     { href: "#location", label: t.nav.location },
   ];
 

@@ -11,7 +11,7 @@ import { FacadeStage, type Insets, type StageApi } from "./FacadeStage";
 import { FloorView } from "./FloorView";
 import { LOGO } from "./Header";
 import { Arrow, BackButton, BlockPanel, FloorPanel, UnitPanel } from "./Panels";
-import { Rich } from "./Rich";
+import { Rich, RiseText } from "./Rich";
 import { DESKTOP, REDUCED_MOTION, useMedia } from "./use-media";
 
 type View = { block: BlockId | null; floor: number | null; unit: string | null };
@@ -355,7 +355,7 @@ export function Explorer({ lang }: { lang: Lang }) {
           >
             {/* The brand's lockup, as Troy's film closes on it: the emblem
                 and the name over the slogan. */}
-            <p className="eyebrow flex items-center gap-3 text-navy">
+            <p className="eyebrow flex items-center gap-3 text-navy" data-intro style={{ ["--d" as string]: "0.1s" }}>
               <span className="h-px w-6 bg-gold-deep" />
               {/* eslint-disable-next-line @next/next/no-img-element -- the gold emblem */}
               <img src={LOGO} alt="" width={32} height={32} className="size-7 rounded-[3px] shadow-[var(--shadow-card)] lg:size-8" />
@@ -363,15 +363,17 @@ export function Explorer({ lang }: { lang: Lang }) {
               <span className="h-px w-6 bg-gold-deep" />
             </p>
             <h1 className="mt-5 text-hero uppercase text-navy">
-              <Rich text={t.hero.title} />
+              <RiseText text={t.hero.title} />
             </h1>
-            <p className="mt-5 max-w-[46ch] text-lead lg:max-w-[92ch]">
+            <p className="mt-5 max-w-[46ch] text-lead lg:max-w-[92ch]" data-intro style={{ ["--d" as string]: "0.65s" }}>
               <strong className="font-semibold text-ink">{t.hero.leadStrong}</strong> <span className="text-ink-soft">{t.hero.lead}</span>
             </p>
             <button
               type="button"
               onClick={scrollToPick}
               tabIndex={heroFaded ? -1 : 0}
+              data-intro
+              style={{ ["--d" as string]: "0.8s" }}
               className={clsx(
                 "group mt-8 inline-flex h-12 items-center gap-3 rounded-full bg-navy pl-6 pr-5 text-sm font-semibold text-white shadow-[var(--shadow-card)] transition-colors hover:bg-navy-soft",
                 !heroFaded && "pointer-events-auto",

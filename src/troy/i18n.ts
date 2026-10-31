@@ -20,6 +20,7 @@ export const CONTACT = {
   whatsapp: "38344222282",
   email: "info@troyresidence.com",
   maps: "https://maps.google.com/maps?q=42.89380916%2C20.87273598&hl=en",
+  facebook: "https://www.facebook.com/troyresidence1",
   lat: 42.89380916,
   lon: 20.87273598,
 } as const;
@@ -34,9 +35,8 @@ const sq = {
   },
   nav: {
     homes: "Banesat",
-    project: "Projekti",
-    gallery: "Galeria",
-    construction: "Ndërtimi",
+    why: "Projekti",
+    news: "Lajme",
     location: "Lokacioni",
     contact: "Kontakti",
     cta: "Na kontaktoni",
@@ -128,49 +128,81 @@ const sq = {
     balcony: "Ballkoni",
     terrace: "Tarraca",
   } satisfies Record<RoomKind | OutdoorKind | "master", string>,
-  story: {
-    eyebrow: "Projekti",
-    title: "Tri *kulla*. Një *adresë*.",
-    river: "Kullat e Troy Residence përtej lumit, në renderin 3D",
+  brand: { big: "Troy", small: "Residence" },
+  why: {
+    eyebrow: "Pse Troy Residence",
     statement:
-      "*Troy Residence* sjell në qendër të Mitrovicës *tri kulla banimi* me ballkone të gjelbra, pamje nga *lumi Ibër* dhe malet përreth, të ndërtuara me shpejtësi, siguri dhe profesionalizëm.",
-    chapters: [
-      { title: "*Ballkone* të gjelbra", text: "Bimësi në çdo kat dhe drurë në tarraca: kullat marrin frymë bashkë me qytetin." },
-      { title: "*Penthouse* me tarraca", text: "Në majë të blloqeve A dhe C, penthouse me tarraca private dhe pamje nga i gjithë qyteti." },
-      { title: "*Lokale* në përdhesë", text: "Kati përdhesë hapet nga rruga me lokale afariste, nën pemë dhe gjelbërim." },
-    ],
-  },
-  gallery: {
-    eyebrow: "Galeria",
-    title: "Hapësira për *jetën tuaj*",
-    items: [
-      { src: "garden", alt: "Kopshti me kënd lojërash dhe kalin e Trojës", caption: "Kopsht me kënd lojërash" },
-      { src: "interior", alt: "Dhoma e ndenjes me dritare deri në tavan", caption: "Dritare të mëdha, dritë natyrale" },
-      { src: "morning", alt: "Një vajzë zgjohet në një dhomë plot dritë", caption: "Mëngjese plot dritë" },
-      { src: "family", alt: "Fëmijët dalin me vrap nga shtëpia", caption: "Hapësirë për familjen" },
-      { src: "evening", alt: "Kafe në mbrëmje, me dritat e qytetit pas xhamit", caption: "Mbrëmje me pamje nga qyteti" },
-    ],
-  },
-  construction: {
-    eyebrow: "Ndërtimi",
-    title: "Ndërtimi ecën me *hapa të shpejtë*",
-    lead: "Nga themelet deri në majë: punimet në Troy Residence, hap pas hapi.",
-    steps: [
-      { src: "build-1", title: "Gërmimi dhe mbushja" },
-      { src: "build-2", title: "Rrafshimi dhe ngjeshja e tamponit" },
-      { src: "build-3", title: "Shtresa e parë e betonit të varfër" },
-      { src: "build-4", title: "Izolimi i themelpllakës së Kullës A" },
-    ],
+      "Jeta juaj po ndryshon. Mos gjeni thjesht një banesë, gjeni vendin ku do të rriteni. *Tri kulla banimi* në zemër të Mitrovicës, me dritë, gjelbërim dhe qytetin te pragu juaj.",
+    river: "Kullat e Troy Residence përtej lumit, në renderin 3D",
   },
   numbers: [
     { value: "3", label: "blloqe banimi" },
     { value: "32", label: "kate banimi" },
     { value: "30 000+", label: "m² punime të vrazhda deri në mars 2024" },
   ],
+  home: {
+    title: "Nuk është vetëm *një shtëpi*.",
+    text: "Është drita e mëngjesit, fëmijët që luajnë në kopsht, mbrëmja në ballkon me pamje nga qyteti. Nuk kërkoni vetëm mure. Kërkoni vendin tuaj. Këtë ju ndihmojmë të gjeni.",
+    items: [
+      { src: "morning", video: false, alt: "Një vajzë zgjohet në një dhomë plot dritë" },
+      { src: "garden", video: true, alt: "Kopshti me kënd lojërash dhe kalin e Trojës" },
+      { src: "interior", video: false, alt: "Dhoma e ndenjes me dritare deri në tavan" },
+      { src: "evening", video: false, alt: "Kafe në mbrëmje, me dritat e qytetit pas xhamit" },
+    ],
+  },
+  steps: {
+    eyebrow: "Si funksionon",
+    title: "Banesa juaj, *në tre hapa*.",
+    items: [
+      { title: "Zgjidhni bllokun", text: "Shikoni tri kullat dhe zgjidhni atë që ju pëlqen." },
+      { title: "Shikoni katin në 3D", text: "Hyni në çdo kat, krahasoni banesat dhe shikoni cilat janë të lira." },
+      { title: "Na kontaktoni", text: "Ju tregojmë çmimin, ju shoqërojmë në vizitë dhe ju ndihmojmë në çdo hap." },
+    ],
+    cta: "Fillo kërkimin",
+  },
+  features: {
+    eyebrow: "Projekti",
+    title: "Çfarë ju ofron *Troy Residence*",
+    lead: "Ndërtuar me shpejtësi, siguri dhe profesionalizëm.",
+    items: [
+      { src: "balcony", video: false, title: "*Ballkone* të gjelbra", text: "Bimësi në çdo kat dhe drurë në tarraca: kullat marrin frymë bashkë me qytetin." },
+      { src: "street", video: false, title: "*Penthouse* me tarraca", text: "Në majë të blloqeve A dhe C, penthouse me tarraca private dhe pamje nga i gjithë qyteti." },
+      { src: "avenue", video: true, title: "*Lokale* në përdhesë", text: "Kati përdhesë hapet nga rruga me lokale afariste, nën pemë dhe gjelbërim." },
+    ],
+  },
+  news: {
+    eyebrow: "Lajme",
+    title: "Lajme nga *kantieri*",
+    lead: "Shikoni si po ngrihen kullat, hap pas hapi.",
+    all: "Të gjitha lajmet",
+    read: "Lexo më shumë",
+    items: [
+      {
+        date: "2024-03-06",
+        src: "build-4",
+        title: "Të tri kullat po ngrihen shpejt dhe sigurt",
+        text: "Mbi 30 000 m² punime të vrazhda të përfunduara në qendër të Mitrovicës, me shpejtësi, siguri dhe profesionalizëm.",
+        href: "https://www.facebook.com/troyresidence1/videos/936072211224388/",
+      },
+      {
+        date: "2023-11-22",
+        src: "build-2",
+        title: "Ndërtimi i kompleksit po ecën me hapa të shpejtë",
+        text: "Ndjeni magjinë e lumit Ibër dhe maleve përreth, në shtëpinë e ëndrrave tuaja.",
+        href: "https://www.facebook.com/troyresidence1/videos/250443884415844/",
+      },
+      {
+        date: "2023-08-21",
+        src: "build-1",
+        title: "Ta ndërtojmë së bashku kryeveprën e re të Mitrovicës",
+        text: "Nga gërmimi i parë deri te themelet: punimet në kantier, hap pas hapi.",
+        href: "https://www.facebook.com/troyresidence1/videos/244787181851032/",
+      },
+    ],
+  },
   location: {
     eyebrow: "Lokacioni",
     title: "Në zemër të *Mitrovicës*",
-    photo: "Kullat e Troy Residence përtej lumit",
     text: "Troy Residence ngrihet në rrugën Agim Ramadani, në Katana, në qendër të qytetit, me pamje nga lumi Ibër dhe malet përreth.",
     address: ["Rr. Agim Ramadani – Katana", "Mitrovicë 40000, Kosovë"],
     maps: "Hapni në Google Maps",
@@ -178,7 +210,7 @@ const sq = {
   },
   contact: {
     eyebrow: "Kontakti",
-    title: "Le ta gjejmë *banesën tuaj*.",
+    title: "Gjeni shtëpinë tuaj. *Ne ju ndihmojmë të arrini atje.*",
     lead: "Na shkruani ose na telefononi. Ekipi i shitjes përgjigjet në telefon, Viber dhe WhatsApp.",
     name: "Emri dhe mbiemri",
     phone: "Telefoni",
@@ -199,6 +231,11 @@ const sq = {
     phoneLine: (phone: string) => `Telefoni: ${phone}`,
   },
   footer: {
+    office: "Zyra e shitjes",
+    write: "Na shkruani",
+    call: "Na telefononi",
+    pages: "Faqja",
+    follow: "Na ndiqni",
     rights: "© 2026 Troy Construction L.L.C.",
     concept: "Koncept prezantimi. Planimetritë, sipërfaqet dhe statuset e banesave janë ilustruese.",
     credit: "Dizajn dhe zhvillim: MTC",
@@ -215,9 +252,8 @@ const en: Dict = {
   },
   nav: {
     homes: "Residences",
-    project: "Project",
-    gallery: "Gallery",
-    construction: "Construction",
+    why: "Project",
+    news: "News",
     location: "Location",
     contact: "Contact",
     cta: "Contact us",
@@ -308,49 +344,81 @@ const en: Dict = {
     balcony: "Balcony",
     terrace: "Terrace",
   },
-  story: {
-    eyebrow: "The project",
-    title: "Three *towers*. One *address*.",
-    river: "The Troy Residence towers across the river, in the 3D render",
+  brand: { big: "Troy", small: "Residence" },
+  why: {
+    eyebrow: "Why Troy Residence",
     statement:
-      "*Troy Residence* brings *three residential towers* to the centre of Mitrovica, with green balconies and views of the *Ibar river* and the surrounding mountains, built with speed, safety and professionalism.",
-    chapters: [
-      { title: "*Green* balconies", text: "Planting on every floor and trees on the terraces: the towers breathe with the city." },
-      { title: "*Penthouses* with terraces", text: "Crowning blocks A and C, penthouses with private terraces and views across the whole city." },
-      { title: "*Shops* at street level", text: "The ground floor opens onto the street with shops, under trees and greenery." },
-    ],
-  },
-  gallery: {
-    eyebrow: "Gallery",
-    title: "Room for *your life*",
-    items: [
-      { src: "garden", alt: "The garden with a playground and the Trojan horse", caption: "A garden with a playground" },
-      { src: "interior", alt: "A living room with floor-to-ceiling windows", caption: "Large windows, natural light" },
-      { src: "morning", alt: "A girl wakes up in a bright room", caption: "Mornings full of light" },
-      { src: "family", alt: "Children running out of the home", caption: "Room for the family" },
-      { src: "evening", alt: "Coffee in the evening, the city lights behind the glass", caption: "Evenings with a city view" },
-    ],
-  },
-  construction: {
-    eyebrow: "Construction",
-    title: "Building at a *fast pace*",
-    lead: "From the foundations up: the works at Troy Residence, step by step.",
-    steps: [
-      { src: "build-1", title: "Excavation and backfill" },
-      { src: "build-2", title: "Levelling and compacting the base" },
-      { src: "build-3", title: "First layer of lean concrete" },
-      { src: "build-4", title: "Waterproofing Tower A's foundation slab" },
-    ],
+      "Your life is changing. Don't just find an apartment, find the place where you'll grow. *Three residential towers* in the heart of Mitrovica, with light, greenery and the city on your doorstep.",
+    river: "The Troy Residence towers across the river, in the 3D render",
   },
   numbers: [
     { value: "3", label: "residential blocks" },
     { value: "32", label: "residential floors" },
     { value: "30,000+", label: "m² of structural works by March 2024" },
   ],
+  home: {
+    title: "This isn't just *a home*.",
+    text: "It's the morning light, the children playing in the garden, the evening on the balcony over the city. You're not looking for walls. You're looking for your place. That's what we help you find.",
+    items: [
+      { src: "morning", video: false, alt: "A girl wakes up in a bright room" },
+      { src: "garden", video: true, alt: "The garden with a playground and the Trojan horse" },
+      { src: "interior", video: false, alt: "A living room with floor-to-ceiling windows" },
+      { src: "evening", video: false, alt: "Coffee in the evening, the city lights behind the glass" },
+    ],
+  },
+  steps: {
+    eyebrow: "How it works",
+    title: "Your home, *in three steps*.",
+    items: [
+      { title: "Choose a block", text: "Look at the three towers and pick the one you like." },
+      { title: "See the floor in 3D", text: "Step into any floor, compare the homes and see which are available." },
+      { title: "Talk to us", text: "We give you the price, show you around and help you at every step." },
+    ],
+    cta: "Start your search",
+  },
+  features: {
+    eyebrow: "The project",
+    title: "What *Troy Residence* offers",
+    lead: "Built with speed, safety and professionalism.",
+    items: [
+      { src: "balcony", video: false, title: "*Green* balconies", text: "Planting on every floor and trees on the terraces: the towers breathe with the city." },
+      { src: "street", video: false, title: "*Penthouses* with terraces", text: "Crowning blocks A and C, penthouses with private terraces and views across the whole city." },
+      { src: "avenue", video: true, title: "*Shops* at street level", text: "The ground floor opens onto the street with shops, under trees and greenery." },
+    ],
+  },
+  news: {
+    eyebrow: "News",
+    title: "News from *the site*",
+    lead: "Watch the towers rise, step by step.",
+    all: "All news",
+    read: "Read more",
+    items: [
+      {
+        date: "2024-03-06",
+        src: "build-4",
+        title: "All three towers are rising fast and safely",
+        text: "Over 30,000 m² of structural works completed in the centre of Mitrovica, with speed, safety and professionalism.",
+        href: "https://www.facebook.com/troyresidence1/videos/936072211224388/",
+      },
+      {
+        date: "2023-11-22",
+        src: "build-2",
+        title: "Construction of the complex is moving fast",
+        text: "Feel the magic of the Ibar river and the mountains around, in the home of your dreams.",
+        href: "https://www.facebook.com/troyresidence1/videos/250443884415844/",
+      },
+      {
+        date: "2023-08-21",
+        src: "build-1",
+        title: "Let's build Mitrovica's new masterpiece together",
+        text: "From the first dig to the foundations: the works on site, step by step.",
+        href: "https://www.facebook.com/troyresidence1/videos/244787181851032/",
+      },
+    ],
+  },
   location: {
     eyebrow: "Location",
     title: "In the heart of *Mitrovica*",
-    photo: "The Troy Residence towers across the river",
     text: "Troy Residence rises on Agim Ramadani street in Katana, in the city centre, with views of the Ibar river and the surrounding mountains.",
     address: ["Rr. Agim Ramadani – Katana", "Mitrovica 40000, Kosovo"],
     maps: "Open in Google Maps",
@@ -358,7 +426,7 @@ const en: Dict = {
   },
   contact: {
     eyebrow: "Contact",
-    title: "Let's find *your home*.",
+    title: "Find your home. *We'll help you get there.*",
     lead: "Write or call us. The sales team answers by phone, Viber and WhatsApp.",
     name: "Full name",
     phone: "Phone",
@@ -379,6 +447,11 @@ const en: Dict = {
     phoneLine: (phone: string) => `Phone: ${phone}`,
   },
   footer: {
+    office: "Sales office",
+    write: "Email us",
+    call: "Call us",
+    pages: "Pages",
+    follow: "Follow us",
     rights: "© 2026 Troy Construction L.L.C.",
     concept: "Presentation concept. Floor plans, areas and availability are illustrative.",
     credit: "Design and development: MTC",
@@ -396,3 +469,14 @@ export function formatArea(value: number, lang: Lang): string {
 }
 
 export const HOME_PATH: Record<Lang, string> = { sq: "/troy", en: "/troy/en" };
+
+const MONTHS: Record<Lang, string[]> = {
+  sq: ["janar", "shkurt", "mars", "prill", "maj", "qershor", "korrik", "gusht", "shtator", "tetor", "nëntor", "dhjetor"],
+  en: ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"],
+};
+
+/** "2024-03-06" → "6 mars 2024" / "6 March 2024". */
+export function formatDate(iso: string, lang: Lang): string {
+  const [y, m, d] = iso.split("-").map(Number);
+  return `${d} ${MONTHS[lang][(m ?? 1) - 1]} ${y}`;
+}

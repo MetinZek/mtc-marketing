@@ -354,3 +354,55 @@
     --roof: max(53svh, calc(clamp(100px, 15svh, 190px) + var(--text-hero) * 0.92 + 247px));
   }
 }
+
+/* ============================================================
+   Gold, the logo's, as type: the gradient clipped to the letters.
+   ============================================================ */
+.gold-text {
+  background-image: linear-gradient(135deg, #b28c41 0%, #eed09a 40%, #d6ac64 65%, #a38a36 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+.gold-strong strong {
+  background-image: linear-gradient(135deg, #c9a24f 0%, #f3dcae 45%, #d9b46c 70%, #b8963f 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* The name as a window (Brand): the element's picture shows only
+   through its letters, edged in gold. */
+.troy-window {
+  background-size: cover;
+  background-position: center;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: clamp(1px, 0.18vw, 2.5px) rgb(238 208 154 / 0.95);
+}
+
+/* The headline rises in word by word as the page opens (RiseText). */
+.rise {
+  display: inline-block;
+  overflow: clip;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+  vertical-align: top;
+}
+.rise > span {
+  display: inline-block;
+}
+.motion .rise > span {
+  animation: troy-rise 1.15s var(--ease-out-expo) both;
+  animation-delay: calc(0.25s + var(--i) * 0.09s);
+}
+.motion [data-intro] {
+  animation: troy-enter 0.9s var(--ease-out-expo) both;
+  animation-delay: var(--d, 0.5s);
+}
+@keyframes troy-rise {
+  from {
+    transform: translate3d(0, 105%, 0);
+  }
+}

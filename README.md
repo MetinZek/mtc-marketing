@@ -196,21 +196,20 @@ English. It is a site of its own beside the MTC site: its own root layout,
 stylesheet and copy, passed through untouched by the proxy, kept out of
 search engines (`noindex`) while it is a concept.
 
-**Brand.** Troy's navy (`#012f47`) and gold (`#eed09a`–`#b28c41`), taken
-from the logo, on white and a soft blue sky; Inter throughout, headings
-light with their key words bold (marked `*like this*` in the copy and set
-by `Rich`). The logo (`public/troy/logo.webp`, also the favicon) is cut
-from the emblem Troy supplied. The moving pictures are short seamless
-loops cut from Troy's own two films (`public/troy/video/`: a desktop and a
-phone size of each, and its first frame as a poster; the player bar and
-the watermark cropped out). Each loads near the screen and plays only
-while on it (`Loop`); with reduced motion the poster shows instead.
+**Brand.** Troy's navy (`#012f47`) and the logo's gold gradient
+(`#eed09a`–`#b28c41`) on white; Inter throughout, headings light with
+their key words bold (marked `*like this*` in the copy and set by `Rich`;
+on navy the bold words turn gold). The logo (`public/troy/logo.webp`,
+also the favicon) is the gold emblem Troy supplied. Pictures are frames
+from Troy's own films (`public/troy/photos/`) and two short seamless loops
+(`public/troy/video/`, a desktop and a phone size of each; each plays only
+while on screen, with a poster frame for reduced motion).
 
 The page opens with Troy's lockup (the emblem and the name) over
-**"Kryevepra e Qytetit"**, above a close-up of Block C
-rising out of mist. Scrolling pulls the camera back until all three towers
-stand in view (the scene is pinned while it does), and the interactive
-model takes over:
+**"Kryevepra e Qytetit"**, its words rising into place one by one, above
+a close-up of Block C rising out of mist. Scrolling pulls the camera back
+until all three towers stand in view (the scene is pinned while it does),
+and the interactive model takes over:
 
 1. **Blocks.** Hover a tower and it lifts out of the dimmed picture; pins
    over the roofs give floors and availability.
@@ -225,13 +224,19 @@ model takes over:
    fills in the contact form).
 
 The view lives in the address (`/troy?b=A&f=7&u=A-701`), so a home can be
-sent as a link, and the back button and Escape step back a level. Below
-the model: the project (a pinned film that opens on Troy's 3D render of
-the towers across the river and fades through a clip per chapter), a
-gallery of clips, the construction so far (a clip per stage, named as in
-Troy's site film), the location with Troy's poster, and a contact form
-that writes the message into WhatsApp or an email (nothing is sent or
-stored by the site).
+sent as a link, and the back button and Escape step back a level.
+
+Below the model, laid out after findrealestate.com's calm, text-led
+rhythm: the name as a window onto the towers (Troy's 3D render shows
+through the letters of TROY as the page scrolls); why Troy, its words
+lighting up as it scrolls, with the numbers in gold and the 3D render;
+"not just a home", four moments from the film; the three steps on navy;
+what the project offers in three cards; news from the site (Troy's own
+posts, opening on Facebook); the location; and a closing navy band over
+Troy's poster with a contact form that writes the message into WhatsApp
+or an email (nothing is sent or stored by the site). The footer gives the
+office, email, phone and pages in columns, with the name in gold across
+its foot.
 
 ```
 src/app/troy/          layout, the two pages, troy.css, icons

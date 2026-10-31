@@ -16,3 +16,29 @@ export function Rich({ text }: { text: string }) {
 
 /** The same copy without its marks, for labels and titles. */
 export const plain = (text: string) => text.replaceAll("*", "");
+
+/** The same copy, its words rising into place one after another as the
+ * page opens (troy.css, .rise). */
+export function RiseText({ text }: { text: string }) {
+  let n = 0;
+  return (
+    <>
+      {text
+        .split(/(\*[^*]+\*)/g)
+        .filter(Boolean)
+        .map((part, i) => {
+          const bold = part.startsWith("*") && part.endsWith("*");
+          const words = (bold ? part.slice(1, -1) : part).split(/(\s+)/).map((word, k) =>
+            !word || /^\s+$/.test(word) ? (
+              word
+            ) : (
+              <span key={k} className="rise">
+                <span style={{ ["--i" as string]: n++ }}>{word}</span>
+              </span>
+            ),
+          );
+          return bold ? <strong key={i}>{words}</strong> : <Fragment key={i}>{words}</Fragment>;
+        })}
+    </>
+  );
+}

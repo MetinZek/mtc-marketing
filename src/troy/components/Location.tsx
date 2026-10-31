@@ -6,24 +6,13 @@ import { Rich } from "./Rich";
 const BBOX = [CONTACT.lon - 0.012, CONTACT.lat - 0.006, CONTACT.lon + 0.012, CONTACT.lat + 0.006].join(",");
 const MAP = `https://www.openstreetmap.org/export/embed.html?bbox=${BBOX}&layer=mapnik&marker=${CONTACT.lat},${CONTACT.lon}`;
 
-/** Where it is: Troy's poster of the towers by the water, the address,
- * the map. */
+/** Where it is: the address, the way there and the map. */
 export function Location({ lang }: { lang: Lang }) {
   const t = DICTS[lang];
   return (
-    <section id="location" className="bg-cream py-24 lg:py-32">
+    <section id="location" className="bg-canvas py-24 lg:py-32">
       <div className="container-troy">
-        <figure className="overflow-hidden rounded-[var(--radius-xl)] bg-mist" data-reveal="up">
-          {/* eslint-disable-next-line @next/next/no-img-element -- Troy's own poster, navy and gold */}
-          <img
-            src="/troy/photos/poster.webp"
-            alt={t.location.photo}
-            loading="lazy"
-            decoding="async"
-            className="aspect-[4/3] w-full object-cover sm:aspect-[16/9] lg:aspect-[21/9]"
-          />
-        </figure>
-        <div className="mt-14 grid items-start gap-12 lg:mt-20 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
+        <div className="grid items-start gap-12 lg:grid-cols-[1fr_1.2fr] lg:gap-20">
           <div>
             <Eyebrow>{t.location.eyebrow}</Eyebrow>
             <h2 className="mt-5 max-w-[14ch] text-display text-navy" data-reveal="up">

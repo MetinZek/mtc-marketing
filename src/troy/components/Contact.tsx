@@ -51,43 +51,43 @@ export function Contact({ lang }: { lang: Lang }) {
   };
 
   return (
-    <section id="contact" className="bg-canvas py-24 lg:py-36">
-      <div className="container-troy grid gap-14 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
+    <section id="contact" className="relative overflow-hidden bg-navy py-24 text-white lg:py-36">
+      {/* Troy's navy-and-gold poster behind, deepened so the words read. */}
+      {/* eslint-disable-next-line @next/next/no-img-element -- Troy's own poster */}
+      <img src="/troy/photos/poster.webp" alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full object-cover opacity-40" />
+      <div className="absolute inset-0 bg-gradient-to-r from-navy via-navy/90 to-navy/50" />
+      <div className="container-troy relative grid gap-14 lg:grid-cols-[1fr_1.05fr] lg:gap-20">
         <div>
-          <Eyebrow>{t.contact.eyebrow}</Eyebrow>
-          <h2 className="mt-5 max-w-[12ch] text-display text-navy" data-reveal="up">
+          <Eyebrow light>{t.contact.eyebrow}</Eyebrow>
+          <h2 className="gold-strong mt-5 max-w-[15ch] text-display" data-reveal="up">
             <Rich text={t.contact.title} />
           </h2>
-          <p className="mt-6 max-w-[44ch] text-lead text-ink-soft" data-reveal="up">
+          <p className="mt-6 max-w-[44ch] text-lead text-snow-soft" data-reveal="up">
             {t.contact.lead}
           </p>
           <dl className="mt-10 grid gap-6 sm:grid-cols-2" data-reveal="stagger">
             <div>
-              <dt className="eyebrow text-ink-soft">{t.contact.phoneLabel}</dt>
+              <dt className="eyebrow text-snow-soft">{t.contact.phoneLabel}</dt>
               <dd className="mt-2">
-                <a href={CONTACT.phoneHref} className="text-[28px] font-bold leading-none tracking-[-0.03em] text-navy tabular hover:text-gold-ink">
+                <a href={CONTACT.phoneHref} className="text-[28px] font-bold leading-none tracking-[-0.03em] text-white tabular hover:text-gold-light">
                   {CONTACT.phone}
                 </a>
               </dd>
             </div>
             <div>
-              <dt className="eyebrow text-ink-soft">{t.contact.emailLabel}</dt>
+              <dt className="eyebrow text-snow-soft">{t.contact.emailLabel}</dt>
               <dd className="mt-2">
-                <a href={`mailto:${CONTACT.email}`} className="text-lg font-semibold text-navy hover:text-gold-ink">
+                <a href={`mailto:${CONTACT.email}`} className="text-lg font-semibold text-white hover:text-gold-light">
                   {CONTACT.email}
                 </a>
               </dd>
-            </div>
-            <div className="sm:col-span-2">
-              <dt className="eyebrow text-ink-soft">{t.contact.addressLabel}</dt>
-              <dd className="mt-2 text-lg font-semibold text-navy">{t.location.address.join(", ")}</dd>
             </div>
           </dl>
         </div>
 
         <form
           onSubmit={onSubmit}
-          className="rounded-[var(--radius-xl)] border border-line bg-mist p-6 sm:p-8"
+          className="rounded-[var(--radius-xl)] bg-white p-6 text-ink shadow-[var(--shadow-float)] sm:p-8"
           data-reveal="up"
         >
           <div className="grid gap-5 sm:grid-cols-2">
@@ -117,7 +117,7 @@ export function Contact({ lang }: { lang: Lang }) {
           <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-3">
             <button
               type="submit"
-              className="group inline-flex h-12 items-center gap-3 rounded-full bg-navy px-6 text-sm font-semibold text-white transition-colors hover:bg-navy-soft"
+              className="gold-foil group inline-flex h-12 items-center gap-3 rounded-full px-6 text-sm font-semibold text-navy transition-[filter] hover:brightness-110"
             >
               {t.contact.submit}
               <Arrow className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
