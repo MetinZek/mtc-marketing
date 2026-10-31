@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useState, type FormEvent } from "react";
-import { SplitWords } from "@/components/motion/SplitWords";
 import { CONTACT, DICTS, whatsappUrl, type Lang } from "../i18n";
 import { ENQUIRE_EVENT } from "./Explorer";
+import { Eyebrow } from "./Eyebrow";
 import { Arrow } from "./Panels";
+import { Rich } from "./Rich";
 
 const field =
-  "mt-2 w-full rounded-[var(--radius-sm)] border border-line-strong bg-white/70 px-4 py-3 text-base text-ink outline-none transition-colors focus:border-bronze focus:bg-white";
+  "mt-2 w-full rounded-[var(--radius-sm)] border border-line-strong bg-white px-4 py-3 text-base font-normal text-ink outline-none transition-colors focus:border-navy";
 
 /**
  * The enquiry form. Nothing is sent from here: it writes the message and
@@ -50,13 +51,13 @@ export function Contact({ lang }: { lang: Lang }) {
   };
 
   return (
-    <section id="contact" className="bg-sand py-24 lg:py-36">
+    <section id="contact" className="bg-canvas py-24 lg:py-36">
       <div className="container-troy grid gap-14 lg:grid-cols-[1fr_1.1fr] lg:gap-20">
         <div>
-          <p className="eyebrow text-bronze-deep" data-reveal="fade">
-            {t.contact.eyebrow}
-          </p>
-          <SplitWords as="h2" text={t.contact.title} className="mt-4 max-w-[12ch] text-display" />
+          <Eyebrow>{t.contact.eyebrow}</Eyebrow>
+          <h2 className="mt-5 max-w-[12ch] text-display text-navy" data-reveal="up">
+            <Rich text={t.contact.title} />
+          </h2>
           <p className="mt-6 max-w-[44ch] text-lead text-ink-soft" data-reveal="up">
             {t.contact.lead}
           </p>
@@ -64,7 +65,7 @@ export function Contact({ lang }: { lang: Lang }) {
             <div>
               <dt className="eyebrow text-ink-soft">{t.contact.phoneLabel}</dt>
               <dd className="mt-2">
-                <a href={CONTACT.phoneHref} className="font-serif text-[32px] leading-none tabular hover:text-bronze-deep">
+                <a href={CONTACT.phoneHref} className="text-[28px] font-bold leading-none tracking-[-0.03em] text-navy tabular hover:text-gold-ink">
                   {CONTACT.phone}
                 </a>
               </dd>
@@ -72,21 +73,21 @@ export function Contact({ lang }: { lang: Lang }) {
             <div>
               <dt className="eyebrow text-ink-soft">{t.contact.emailLabel}</dt>
               <dd className="mt-2">
-                <a href={`mailto:${CONTACT.email}`} className="text-lg font-semibold hover:text-bronze-deep">
+                <a href={`mailto:${CONTACT.email}`} className="text-lg font-semibold text-navy hover:text-gold-ink">
                   {CONTACT.email}
                 </a>
               </dd>
             </div>
             <div className="sm:col-span-2">
               <dt className="eyebrow text-ink-soft">{t.contact.addressLabel}</dt>
-              <dd className="mt-2 text-lg font-semibold">{t.location.address.join(", ")}</dd>
+              <dd className="mt-2 text-lg font-semibold text-navy">{t.location.address.join(", ")}</dd>
             </div>
           </dl>
         </div>
 
         <form
           onSubmit={onSubmit}
-          className="rounded-[var(--radius-xl)] bg-paper p-6 shadow-[var(--shadow-card)] sm:p-8"
+          className="rounded-[var(--radius-xl)] border border-line bg-mist p-6 sm:p-8"
           data-reveal="up"
         >
           <div className="grid gap-5 sm:grid-cols-2">
@@ -116,14 +117,14 @@ export function Contact({ lang }: { lang: Lang }) {
           <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-3">
             <button
               type="submit"
-              className="group inline-flex h-12 items-center gap-3 rounded-full bg-espresso px-6 text-sm font-semibold text-cream transition-colors hover:bg-espresso-soft"
+              className="group inline-flex h-12 items-center gap-3 rounded-full bg-navy px-6 text-sm font-semibold text-white transition-colors hover:bg-navy-soft"
             >
               {t.contact.submit}
               <Arrow className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
             </button>
             <span className="text-sm text-ink-soft">
               {t.contact.or}{" "}
-              <a href={`mailto:${CONTACT.email}`} onClick={onEmail} className="font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-bronze">
+              <a href={`mailto:${CONTACT.email}`} onClick={onEmail} className="font-semibold text-ink underline decoration-line-strong underline-offset-4 hover:decoration-gold-deep">
                 {t.contact.email}
               </a>
             </span>

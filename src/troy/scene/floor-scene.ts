@@ -53,14 +53,14 @@ const PAINT = {
   slab: 0xebe5dc,
   slabEdge: 0xcfc5b8,
   wall: 0xf8f5f0,
-  cap: 0x2d2621,
+  cap: 0x0f2a3d,
   brick: 0xa47852,
   brickCap: 0x8a6244,
-  frame: 0x3b342e,
+  frame: 0x1d2f3d,
   glass: 0xc4dae2,
   sold: 0xd9d4cd,
   reserved: 0xe2d2b4,
-  hover: 0xc28a52,
+  hover: 0xd6b36d,
 };
 
 export type SceneEvents = {

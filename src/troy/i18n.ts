@@ -2,10 +2,12 @@ import type { RoomKind, OutdoorKind, UnitType } from "./data/plans";
 import type { Status } from "./data/inventory";
 
 /**
- * The concept's copy, in Albanian (the default, at /troy) and English (at
- * /troy/en). Facts about the project come from Troy's own page: three
- * towers in central Mitrovica, the Ibar river and mountain views, over
- * 30,000 m² of structural works by March 2024, the address and contacts.
+ * The site's copy, in Albanian (the default, at /troy) and English (at
+ * /troy/en). Facts about the project come from Troy's own page and films:
+ * three towers in central Mitrovica, the Ibar river and mountain views, over
+ * 30,000 m² of structural works by March 2024, the construction stages, the
+ * address and contacts. In headings, *asterisks* mark the key words, set
+ * bold (see Rich).
  */
 
 export type Lang = "sq" | "en";
@@ -26,17 +28,34 @@ export const whatsappUrl = (text: string) => `https://wa.me/${CONTACT.whatsapp}?
 
 const sq = {
   meta: {
-    title: "Troy Residence | Kryevepra e Mitrovicës",
+    title: "Troy Residence | Kryevepra e Qytetit",
     description:
       "Tri kulla banimi në qendër të Mitrovicës. Zgjidhni bllokun, katin dhe banesën tuaj në modelin interaktiv.",
   },
-  nav: { project: "Projekti", homes: "Banesat", location: "Lokacioni", contact: "Kontakti", cta: "Na kontaktoni", skip: "Kalo te përmbajtja", menu: "Menyja" },
+  nav: {
+    homes: "Banesat",
+    project: "Projekti",
+    gallery: "Galeria",
+    construction: "Ndërtimi",
+    location: "Lokacioni",
+    contact: "Kontakti",
+    cta: "Na kontaktoni",
+    skip: "Kalo te përmbajtja",
+    menu: "Menyja",
+  },
   hero: {
-    eyebrow: "Mitrovicë · Kosovë",
-    title: "Kryevepra e Mitrovicës",
-    lead: "Tri kulla banimi në qendër të qytetit, mes lumit Ibër dhe maleve. Zgjidhni bllokun, katin dhe banesën tuaj.",
-    hint: "Zgjidhni një bllok",
+    eyebrow: "Troy Residence · Mitrovicë",
+    title: "*Kryevepra* e Qytetit",
+    leadStrong: "Tri kulla banimi në qendër të Mitrovicës.",
+    lead: "Zgjidhni bllokun, katin dhe banesën tuaj.",
+    cta: "Zgjidhni banesën",
     scroll: "Lëvizni poshtë",
+  },
+  pick: {
+    eyebrow: "Banesat",
+    title: "Zgjidhni *bllokun*",
+    hint: "Klikoni mbi një kullë për të parë katet.",
+    nudge: "Zgjidhni një bllok",
   },
   block: (id: string) => `Blloku ${id}`,
   floors: (n: number) => `${n} kate`,
@@ -111,13 +130,35 @@ const sq = {
   } satisfies Record<RoomKind | OutdoorKind | "master", string>,
   story: {
     eyebrow: "Projekti",
-    title: "Tri kulla. Një adresë.",
+    title: "Tri *kulla*. Një *adresë*.",
     statement:
-      "Troy Residence sjell në qendër të Mitrovicës tri kulla banimi me ballkone të gjelbra, pamje nga lumi Ibër dhe malet përreth, të ndërtuara me shpejtësi, siguri dhe profesionalizëm.",
+      "*Troy Residence* sjell në qendër të Mitrovicës *tri kulla banimi* me ballkone të gjelbra, pamje nga *lumi Ibër* dhe malet përreth, të ndërtuara me shpejtësi, siguri dhe profesionalizëm.",
     chapters: [
-      { title: "Ballkone të gjelbra", text: "Bimësi në çdo kat dhe drurë në tarraca: kullat marrin frymë bashkë me qytetin." },
-      { title: "Penthouse me tarraca", text: "Në majë të blloqeve A dhe C, penthouse me tarraca private dhe pamje nga i gjithë qyteti." },
-      { title: "Lokale në përdhesë", text: "Kati përdhesë hapet nga rruga me lokale afariste, nën pemë dhe gjelbërim." },
+      { title: "*Ballkone* të gjelbra", text: "Bimësi në çdo kat dhe drurë në tarraca: kullat marrin frymë bashkë me qytetin." },
+      { title: "*Penthouse* me tarraca", text: "Në majë të blloqeve A dhe C, penthouse me tarraca private dhe pamje nga i gjithë qyteti." },
+      { title: "*Lokale* në përdhesë", text: "Kati përdhesë hapet nga rruga me lokale afariste, nën pemë dhe gjelbërim." },
+    ],
+  },
+  gallery: {
+    eyebrow: "Galeria",
+    title: "Hapësira për *jetën tuaj*",
+    items: [
+      { src: "garden", alt: "Kopshti me kënd lojërash dhe kalin e Trojës", caption: "Kopsht me kënd lojërash" },
+      { src: "interior", alt: "Dhoma e ndenjes me dritare deri në tavan", caption: "Dritare të mëdha, dritë natyrale" },
+      { src: "balcony", alt: "Ballkone me bimë në fasadë", caption: "Ballkone plot gjelbërim" },
+      { src: "street", alt: "Kullat nga rruga me pemë", caption: "Rrugë me pemë" },
+      { src: "river", alt: "Kullat përtej lumit", caption: "Pamje nga lumi" },
+    ],
+  },
+  construction: {
+    eyebrow: "Ndërtimi",
+    title: "Ndërtimi ecën me *hapa të shpejtë*",
+    lead: "Nga themelet deri në majë: punimet në Troy Residence, hap pas hapi.",
+    steps: [
+      { src: "build-1", title: "Gërmimi dhe mbushja" },
+      { src: "build-2", title: "Rrafshimi dhe ngjeshja e tamponit" },
+      { src: "build-3", title: "Shtresa e parë e betonit të varfër" },
+      { src: "build-4", title: "Izolimi i themelpllakës së Kullës A" },
     ],
   },
   numbers: [
@@ -127,7 +168,8 @@ const sq = {
   ],
   location: {
     eyebrow: "Lokacioni",
-    title: "Në zemër të Mitrovicës",
+    title: "Në zemër të *Mitrovicës*",
+    photo: "Kullat e Troy Residence përtej lumit",
     text: "Troy Residence ngrihet në rrugën Agim Ramadani, në Katana, në qendër të qytetit, me pamje nga lumi Ibër dhe malet përreth.",
     address: ["Rr. Agim Ramadani – Katana", "Mitrovicë 40000, Kosovë"],
     maps: "Hapni në Google Maps",
@@ -135,7 +177,7 @@ const sq = {
   },
   contact: {
     eyebrow: "Kontakti",
-    title: "Le ta gjejmë banesën tuaj.",
+    title: "Le ta gjejmë *banesën tuaj*.",
     lead: "Na shkruani ose na telefononi. Ekipi i shitjes përgjigjet në telefon, Viber dhe WhatsApp.",
     name: "Emri dhe mbiemri",
     phone: "Telefoni",
@@ -167,16 +209,33 @@ export type Dict = typeof sq;
 
 const en: Dict = {
   meta: {
-    title: "Troy Residence | The masterpiece of Mitrovica",
+    title: "Troy Residence | The masterpiece of the city",
     description: "Three residential towers in the centre of Mitrovica. Choose your block, floor and home in the interactive model.",
   },
-  nav: { project: "Project", homes: "Residences", location: "Location", contact: "Contact", cta: "Contact us", skip: "Skip to content", menu: "Menu" },
+  nav: {
+    homes: "Residences",
+    project: "Project",
+    gallery: "Gallery",
+    construction: "Construction",
+    location: "Location",
+    contact: "Contact",
+    cta: "Contact us",
+    skip: "Skip to content",
+    menu: "Menu",
+  },
   hero: {
-    eyebrow: "Mitrovica · Kosovo",
-    title: "The masterpiece of Mitrovica",
-    lead: "Three residential towers in the heart of the city, between the Ibar river and the mountains. Choose your block, your floor and your home.",
-    hint: "Choose a block",
+    eyebrow: "Troy Residence · Mitrovica",
+    title: "The *masterpiece* of the city",
+    leadStrong: "Three residential towers in the heart of Mitrovica.",
+    lead: "Choose your block, your floor and your home.",
+    cta: "Find your home",
     scroll: "Scroll",
+  },
+  pick: {
+    eyebrow: "Residences",
+    title: "Choose a *block*",
+    hint: "Click a tower to see its floors.",
+    nudge: "Choose a block",
   },
   block: (id: string) => `Block ${id}`,
   floors: (n: number) => `${n} floors`,
@@ -250,13 +309,35 @@ const en: Dict = {
   },
   story: {
     eyebrow: "The project",
-    title: "Three towers. One address.",
+    title: "Three *towers*. One *address*.",
     statement:
-      "Troy Residence brings three residential towers to the centre of Mitrovica, with green balconies and views of the Ibar river and the surrounding mountains, built with speed, safety and professionalism.",
+      "*Troy Residence* brings *three residential towers* to the centre of Mitrovica, with green balconies and views of the *Ibar river* and the surrounding mountains, built with speed, safety and professionalism.",
     chapters: [
-      { title: "Green balconies", text: "Planting on every floor and trees on the terraces: the towers breathe with the city." },
-      { title: "Penthouses with terraces", text: "Crowning blocks A and C, penthouses with private terraces and views across the whole city." },
-      { title: "Shops at street level", text: "The ground floor opens onto the street with shops, under trees and greenery." },
+      { title: "*Green* balconies", text: "Planting on every floor and trees on the terraces: the towers breathe with the city." },
+      { title: "*Penthouses* with terraces", text: "Crowning blocks A and C, penthouses with private terraces and views across the whole city." },
+      { title: "*Shops* at street level", text: "The ground floor opens onto the street with shops, under trees and greenery." },
+    ],
+  },
+  gallery: {
+    eyebrow: "Gallery",
+    title: "Room for *your life*",
+    items: [
+      { src: "garden", alt: "The garden with a playground and the Trojan horse", caption: "A garden with a playground" },
+      { src: "interior", alt: "A living room with floor-to-ceiling windows", caption: "Large windows, natural light" },
+      { src: "balcony", alt: "Balconies planted along the facade", caption: "Balconies full of green" },
+      { src: "street", alt: "The towers from a tree-lined street", caption: "Tree-lined streets" },
+      { src: "river", alt: "The towers across the river", caption: "Views of the river" },
+    ],
+  },
+  construction: {
+    eyebrow: "Construction",
+    title: "Building at a *fast pace*",
+    lead: "From the foundations up: the works at Troy Residence, step by step.",
+    steps: [
+      { src: "build-1", title: "Excavation and backfill" },
+      { src: "build-2", title: "Levelling and compacting the base" },
+      { src: "build-3", title: "First layer of lean concrete" },
+      { src: "build-4", title: "Waterproofing Tower A's foundation slab" },
     ],
   },
   numbers: [
@@ -266,7 +347,8 @@ const en: Dict = {
   ],
   location: {
     eyebrow: "Location",
-    title: "In the heart of Mitrovica",
+    title: "In the heart of *Mitrovica*",
+    photo: "The Troy Residence towers across the river",
     text: "Troy Residence rises on Agim Ramadani street in Katana, in the city centre, with views of the Ibar river and the surrounding mountains.",
     address: ["Rr. Agim Ramadani – Katana", "Mitrovica 40000, Kosovo"],
     maps: "Open in Google Maps",
@@ -274,7 +356,7 @@ const en: Dict = {
   },
   contact: {
     eyebrow: "Contact",
-    title: "Let's find your home.",
+    title: "Let's find *your home*.",
     lead: "Write or call us. The sales team answers by phone, Viber and WhatsApp.",
     name: "Full name",
     phone: "Phone",

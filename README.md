@@ -196,8 +196,17 @@ English. It is a site of its own beside the MTC site: its own root layout,
 stylesheet and copy, passed through untouched by the proxy, kept out of
 search engines (`noindex`) while it is a concept.
 
-The page opens on the interactive model, built on the project's render
-(`public/troy/render.webp`, transparent sky):
+**Brand.** Troy's navy (`#012f47`) and gold (`#eed09a`–`#b28c41`), taken
+from the logo, on white and a soft blue sky; Inter throughout, headings
+light with their key words bold (marked `*like this*` in the copy and set
+by `Rich`). The logo (`public/troy/logo.webp`, also the favicon) is cut
+from the emblem Troy supplied; the photographs are stills from Troy's own
+films (`public/troy/photos/`, the player bar and watermark cropped out).
+
+The page opens with **"Kryevepra e Qytetit"** over a close-up of Block C
+rising out of mist. Scrolling pulls the camera back until all three towers
+stand in view (the scene is pinned while it does), and the interactive
+model takes over:
 
 1. **Blocks.** Hover a tower and it lifts out of the dimmed picture; pins
    over the roofs give floors and availability.
@@ -213,19 +222,20 @@ The page opens on the interactive model, built on the project's render
 
 The view lives in the address (`/troy?b=A&f=7&u=A-701`), so a home can be
 sent as a link, and the back button and Escape step back a level. Below
-the model: the project (a pinned frame travelling over the render), the
-location, and a contact form that writes the message into WhatsApp or an
-email (nothing is sent or stored by the site).
+the model: the project (a pinned frame travelling over the render, and
+Troy's poster), a gallery, the construction so far (the stages named in
+Troy's site film), the location, and a contact form that writes the message
+into WhatsApp or an email (nothing is sent or stored by the site).
 
 ```
-src/app/troy/          layout (fonts, metadata), the two pages, troy.css, icon
+src/app/troy/          layout, the two pages, troy.css, icons
 src/troy/data/
   facade.ts            the render's geometry: tower outlines, floor bands
   plans.ts             floor plates, home templates, walls and doors
   furniture.ts         furniture placed by rule in every room
   inventory.ts         availability, summaries, lookups
 src/troy/scene/        the 3D floor (three.js)
-src/troy/components/   Explorer (the model), panels, plan, page sections
+src/troy/components/   Explorer (opening + model), panels, plan, sections
 src/troy/i18n.ts       Albanian and English copy, contacts
 ```
 
@@ -234,6 +244,6 @@ generated stand-ins, and the footer says so. With Troy's real material:
 their plans replace the templates and slots in `plans.ts` (the 3D model,
 2D plans and areas follow), their sales list replaces `statusOf` in
 `inventory.ts`, and prices can join the unit panel. The project facts in
-the copy come from Troy's own page (three towers, central Mitrovica, the
-Ibar and the mountains, 30,000+ m² of structural works by March 2024,
-address and contacts).
+the copy come from Troy's own page and films (three towers, central
+Mitrovica, the Ibar and the mountains, 30,000+ m² of structural works by
+March 2024, the construction stages, address and contacts).

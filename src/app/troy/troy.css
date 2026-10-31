@@ -4,11 +4,11 @@
 @source "../../components/motion";
 
 /* ============================================================
-   Troy Residence: presentation concept.
-   Warm stone grounds and espresso ink taken from the render's
-   bronze facades and planting; Instrument Serif for display,
-   Inter for everything else. Its own tokens, separate from the
-   MTC site's (src/app/globals.css).
+   Troy Residence.
+   The brand's navy and gold (from the logo) on white, a soft sky
+   behind the render, and Inter throughout: key words bold, the
+   rest light. Its own tokens, separate from the MTC site's
+   (src/app/globals.css).
    ============================================================ */
 
 @theme {
@@ -18,56 +18,66 @@
   --color-transparent: transparent;
   --color-current: currentColor;
 
-  --color-sand: #f2ede5;
-  --color-sand-deep: #e9e2d7;
-  --color-paper: #fbf8f4;
-  --color-ink: #1d1813;
-  --color-ink-soft: #5c5249;
-  --color-ink-faint: #8f857a;
-  --color-line: #e3dacd;
-  --color-line-strong: #d3c7b6;
-  --color-bronze: #9a6a40;
-  --color-bronze-deep: #7a5130;
-  --color-espresso: #1f1914;
-  --color-espresso-soft: #2b241e;
-  --color-espresso-line: #3d342c;
-  --color-cream: #f4ead9;
-  --color-cream-soft: #c9bba7;
-  --color-gold: #d9b779;
-  --color-leaf: #4e7146;
-  --color-available: #3f7a4c;
+  /* Grounds */
+  --color-canvas: #ffffff;
+  --color-paper: #ffffff;
+  --color-mist: #f3f5f7;
+  --color-cream: #f7f3ea;
+
+  /* Ink: near-black with a drop of the navy */
+  --color-ink: #0c1a24;
+  --color-ink-soft: #56636e;
+  --color-ink-faint: #8a949d;
+  --color-line: #e4e8ec;
+  --color-line-strong: #cfd6dc;
+
+  /* Brand: the logo's navy ground and its gold */
+  --color-navy: #012f47;
+  --color-navy-deep: #00233a;
+  --color-navy-soft: #0b3e5b;
+  --color-navy-line: #1c4a66;
+  --color-snow: #f5f3ee;
+  --color-snow-soft: #a9bccb;
+  --color-gold: #d6b36d;
+  --color-gold-light: #eed09a;
+  --color-gold-deep: #b28c41;
+  /* Gold for small text on white (5:1). */
+  --color-gold-ink: #8a6a2b;
+
+  /* Availability */
+  --color-available: #2e7d4f;
   --color-reserved: #c48a2c;
-  --color-reserved-ink: #8f611a;
-  --color-sold: #a39a8f;
+  --color-reserved-ink: #8a5f16;
+  --color-sold: #a4acb3;
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-serif: var(--font-instrument), "Iowan Old Style", "Times New Roman", serif;
 
-  --text-hero: clamp(3rem, 1.6rem + 5.4vw, 7.25rem);
+  --text-hero: clamp(2.5rem, min(0.5rem + 6.2vw, 10svh), 7rem);
   --text-hero--line-height: 0.92;
-  --text-hero--letter-spacing: -0.02em;
-  --text-display: clamp(2.5rem, 1.7rem + 3.4vw, 5rem);
-  --text-display--line-height: 0.98;
-  --text-display--letter-spacing: -0.018em;
-  --text-title: clamp(1.75rem, 1.35rem + 1.6vw, 2.75rem);
-  --text-title--line-height: 1.02;
-  --text-title--letter-spacing: -0.012em;
-  --text-statement: clamp(1.75rem, 1.2rem + 2.3vw, 3.4rem);
-  --text-statement--line-height: 1.12;
-  --text-statement--letter-spacing: -0.012em;
-  --text-lead: clamp(1.0625rem, 1rem + 0.3vw, 1.25rem);
+  --text-hero--letter-spacing: -0.045em;
+  --text-display: clamp(2.25rem, min(1.35rem + 3.4vw, 8svh), 4.5rem);
+  --text-display--line-height: 1.02;
+  --text-display--letter-spacing: -0.04em;
+  --text-title: clamp(1.5rem, 1.2rem + 1.2vw, 2.25rem);
+  --text-title--line-height: 1.1;
+  --text-title--letter-spacing: -0.03em;
+  --text-statement: clamp(1.6rem, 1.05rem + 2.1vw, 3rem);
+  --text-statement--line-height: 1.2;
+  --text-statement--letter-spacing: -0.032em;
+  --text-lead: clamp(1.0625rem, 1rem + 0.35vw, 1.3rem);
   --text-lead--line-height: 1.5;
+  --text-lead--letter-spacing: -0.015em;
   --text-eyebrow: 0.75rem;
   --text-eyebrow--line-height: 1.2;
-  --text-eyebrow--letter-spacing: 0.16em;
+  --text-eyebrow--letter-spacing: 0.18em;
 
   --radius-sm: 10px;
   --radius-md: 16px;
-  --radius-lg: 24px;
-  --radius-xl: 32px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
 
-  --shadow-card: 0 1px 2px rgb(31 25 20 / 0.05), 0 18px 48px -20px rgb(31 25 20 / 0.28);
-  --shadow-float: 0 2px 6px rgb(31 25 20 / 0.08), 0 30px 80px -28px rgb(31 25 20 / 0.45);
+  --shadow-card: 0 1px 2px rgb(1 47 71 / 0.06), 0 18px 48px -22px rgb(1 47 71 / 0.3);
+  --shadow-float: 0 2px 6px rgb(1 47 71 / 0.08), 0 30px 80px -30px rgb(1 47 71 / 0.5);
 
   --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
@@ -75,6 +85,7 @@
 
   --animate-enter: troy-enter 700ms var(--ease-out-expo) both;
   --animate-fade: troy-fade 500ms var(--ease-out-soft) both;
+  --animate-drop: troy-drop 2.2s var(--ease-in-out-soft) infinite;
 }
 
 @keyframes troy-enter {
@@ -98,6 +109,25 @@
     opacity: 0;
   }
 }
+/* The scroll cue's line, falling. */
+@keyframes troy-drop {
+  0% {
+    transform: scaleY(0);
+    transform-origin: top;
+  }
+  45% {
+    transform: scaleY(1);
+    transform-origin: top;
+  }
+  55% {
+    transform: scaleY(1);
+    transform-origin: bottom;
+  }
+  100% {
+    transform: scaleY(0);
+    transform-origin: bottom;
+  }
+}
 
 @layer base {
   html {
@@ -105,11 +135,11 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     -webkit-text-size-adjust: 100%;
-    background-color: var(--color-sand);
+    background-color: var(--color-canvas);
   }
 
   body {
-    background-color: var(--color-sand);
+    background-color: var(--color-canvas);
     color: var(--color-ink);
     font-family: var(--font-sans);
     font-size: 1rem;
@@ -118,13 +148,17 @@
     font-optical-sizing: auto;
   }
 
+  /* Headings are light; their key words are set bold with <strong>. */
   h1,
   h2,
-  h3,
-  .font-serif {
-    font-family: var(--font-serif);
-    font-weight: 400;
+  h3 {
+    font-weight: 300;
     text-wrap: balance;
+  }
+  h1 strong,
+  h2 strong,
+  h3 strong {
+    font-weight: 700;
   }
 
   p {
@@ -141,12 +175,12 @@
   }
 
   ::selection {
-    background: var(--color-bronze);
+    background: var(--color-navy);
     color: #ffffff;
   }
 
   :focus-visible {
-    outline: 2px solid var(--color-bronze);
+    outline: 2px solid var(--color-gold-deep);
     outline-offset: 3px;
     border-radius: 6px;
   }
@@ -186,14 +220,19 @@
 
   /* Frosted panels over the render and the model. */
   .frost {
-    background-color: rgb(251 248 244 / 0.82);
+    background-color: rgb(255 255 255 / 0.84);
     -webkit-backdrop-filter: saturate(160%) blur(18px);
     backdrop-filter: saturate(160%) blur(18px);
   }
   .frost-dark {
-    background-color: rgb(31 25 20 / 0.84);
+    background-color: rgb(1 47 71 / 0.88);
     -webkit-backdrop-filter: saturate(160%) blur(18px);
     backdrop-filter: saturate(160%) blur(18px);
+  }
+
+  /* The gold of the logo, as a fill. */
+  .gold-foil {
+    background: linear-gradient(135deg, #b28c41 0%, #eed09a 38%, #d6ac64 62%, #a38a36 100%);
   }
 
   /* A scroll area inside a panel: thin bar, no chaining into the page. */
@@ -212,13 +251,28 @@
 }
 
 /* ============================================================
-   The sky behind the render (its own sky is transparent): pale
-   blue overhead warming to the stone ground at the horizon.
+   The sky behind the render (its own sky is transparent): soft
+   blue with drifting haze, paling towards the horizon.
    ============================================================ */
 .troy-sky {
   background:
-    radial-gradient(120% 70% at 70% 0%, rgb(255 255 255 / 0.55), transparent 60%),
-    linear-gradient(180deg, #c6d6e0 0%, #dbe3e5 34%, #ebe8e1 66%, var(--color-sand) 100%);
+    radial-gradient(42% 22% at 16% 20%, rgb(255 255 255 / 0.7), transparent 70%),
+    radial-gradient(34% 16% at 30% 30%, rgb(255 255 255 / 0.45), transparent 70%),
+    radial-gradient(38% 18% at 84% 16%, rgb(255 255 255 / 0.6), transparent 70%),
+    radial-gradient(30% 14% at 70% 34%, rgb(255 255 255 / 0.35), transparent 70%),
+    radial-gradient(80% 40% at 50% 100%, rgb(255 255 255 / 0.9), transparent 70%),
+    linear-gradient(180deg, #8db4d1 0%, #b4cfe2 26%, #d6e4ee 55%, #eef3f6 80%, #f8f8f6 100%);
+}
+
+/* Mist at the foot of the opening close-up: the tower rises out of
+   cloud. Fades as the camera pulls back (--hero on the stage). */
+.troy-mist {
+  height: 32%;
+  background:
+    radial-gradient(38% 60% at 12% 100%, #ffffff 0%, rgb(255 255 255 / 0.85) 40%, transparent 72%),
+    radial-gradient(34% 55% at 44% 104%, #ffffff 0%, rgb(255 255 255 / 0.9) 42%, transparent 74%),
+    radial-gradient(40% 60% at 80% 100%, #ffffff 0%, rgb(255 255 255 / 0.85) 40%, transparent 72%),
+    linear-gradient(0deg, #ffffff 0%, rgb(255 255 255 / 0.8) 30%, transparent 100%);
 }
 
 /* A pin's pulse ring (the block markers). */
@@ -252,7 +306,7 @@
   transform: translate3d(0, 105%, 0);
 }
 .motion [data-reveal="ink"]:not(.is-in) .ink-word {
-  opacity: 0.32;
+  opacity: 0.25;
 }
 .split-word {
   display: inline-block;
@@ -277,25 +331,26 @@
 }
 
 /* ============================================================
-   The render before scripts run (FacadeStage): placed where the
-   camera will frame it, near enough for a seamless hand-over, and
-   left in place if the scripts never arrive. --h is the picture's
-   height: as wide as the screen allows, below the heading.
+   The render before scripts run (FacadeStage): placed as the
+   opening close-up frames it (Block C, --w wide, its roof just
+   under the headline), near enough for a seamless hand-over and
+   left in place if the scripts never arrive. Mirrors heroCam();
+   --roof estimates where the opening's text ends (two lines of
+   headline on phones, one from 1024px).
    ============================================================ */
 .troy-still {
-  --h: calc((100vw - 32px) * 0.6067);
-  height: var(--h);
-  width: calc(var(--h) * 1.7778);
-  left: 50%;
-  top: calc((300px + 100svh) / 2 - var(--h) * 0.58);
-  transform: translateX(-50%);
+  --w: min(86vw, 783px);
+  --roof: max(50svh, calc(clamp(100px, 15svh, 190px) + var(--text-hero) * 1.84 + 250px));
+  width: calc(var(--w) * 3.4347);
+  height: calc(var(--w) * 1.932);
+  left: calc(50vw - var(--w) * 2.6807);
+  top: calc(var(--roof) - var(--w) * 0.3739);
   -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 5%, #000 95%, transparent 100%);
   mask-image: linear-gradient(90deg, transparent 0, #000 5%, #000 95%, transparent 100%);
 }
 @media (min-width: 1024px) {
   .troy-still {
-    --h: min(calc((100vw - 32px) * 0.6067), calc((100svh - 300px - 5.5vw) * 1.2558));
-    top: auto;
-    bottom: calc(var(--h) * -0.0222);
+    --w: min(42vw, 783px);
+    --roof: max(53svh, calc(clamp(100px, 15svh, 190px) + var(--text-hero) * 0.92 + 230px));
   }
 }

@@ -1,31 +1,47 @@
 import { CONTACT, DICTS, type Lang } from "../i18n";
 import { Wordmark } from "./Header";
+import { plain } from "./Rich";
 
 export function Footer({ lang }: { lang: Lang }) {
   const t = DICTS[lang];
+  const links = [
+    { href: "#residences", label: t.nav.homes },
+    { href: "#project", label: t.nav.project },
+    { href: "#gallery", label: t.nav.gallery },
+    { href: "#construction", label: t.nav.construction },
+    { href: "#location", label: t.nav.location },
+    { href: "#contact", label: t.nav.contact },
+  ];
   return (
-    <footer className="bg-espresso text-cream">
-      <div className="container-troy py-16">
-        <div className="flex flex-col justify-between gap-10 border-b border-espresso-line pb-12 md:flex-row md:items-end">
+    <footer className="bg-navy-deep text-white">
+      <div className="container-troy py-16 lg:py-20">
+        <div className="grid gap-12 border-b border-navy-line pb-12 md:grid-cols-[1.4fr_1fr_1fr]">
           <div>
-            <Wordmark light />
-            <p className="mt-4 max-w-[34ch] font-serif text-[28px] leading-tight text-cream">{t.hero.title}</p>
+            <Wordmark light size={48} />
+            <p className="mt-6 text-[13px] uppercase tracking-[0.3em] text-gold-light">{plain(t.hero.title)}</p>
           </div>
-          <div className="grid gap-2 text-sm text-cream-soft md:text-right">
-            <a href={CONTACT.phoneHref} className="hover:text-cream">
+          <nav aria-label={t.nav.menu} className="grid grid-cols-2 gap-x-6 gap-y-3 text-sm text-snow-soft">
+            {links.map((l) => (
+              <a key={l.href} href={l.href} className="transition-colors hover:text-white">
+                {l.label}
+              </a>
+            ))}
+          </nav>
+          <div className="grid content-start gap-2 text-sm text-snow-soft">
+            <a href={CONTACT.phoneHref} className="text-lg font-semibold text-white tabular transition-colors hover:text-gold-light">
               {CONTACT.phone}
             </a>
-            <a href={`mailto:${CONTACT.email}`} className="hover:text-cream">
+            <a href={`mailto:${CONTACT.email}`} className="transition-colors hover:text-white">
               {CONTACT.email}
             </a>
             <span>{t.location.address.join(", ")}</span>
           </div>
         </div>
-        <div className="mt-8 flex flex-col gap-3 text-xs text-cream-soft md:flex-row md:items-center md:justify-between">
+        <div className="mt-8 flex flex-col gap-3 text-xs text-snow-soft md:flex-row md:items-center md:justify-between">
           <p>{t.footer.rights}</p>
           <p className="max-w-[60ch]">{t.footer.concept}</p>
           <p>{t.footer.credit}</p>
-          <a href="#residences" className="font-semibold text-cream hover:text-gold">
+          <a href="#top" className="font-semibold text-white transition-colors hover:text-gold-light">
             {t.footer.top} ↑
           </a>
         </div>

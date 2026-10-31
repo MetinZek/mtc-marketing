@@ -140,15 +140,15 @@ export function FloorView({ lang, block, floor, selected, hovered, shown, onHove
                   className={clsx(
                     "absolute bottom-2 left-0 flex -translate-x-1/2 items-center gap-1.5 whitespace-nowrap rounded-full py-1 pl-2 pr-3 text-xs shadow-[var(--shadow-card)] transition-colors duration-300",
                     !dimmed && "pointer-events-auto",
-                    active ? "bg-espresso text-cream" : "frost text-ink",
+                    active ? "bg-navy text-snow" : "frost text-ink",
                   )}
                 >
                   <span className={clsx("size-2 rounded-full", STATUS_DOT[status])} />
                   <span className="font-semibold tabular">{u.id.split("-")[1]}</span>
-                  <span className={active ? "text-cream-soft" : "text-ink-soft"}>{t.unit.type(u.type)}</span>
-                  {active && <span className="tabular text-cream-soft">· {formatArea(u.area.net, lang)} m²</span>}
+                  <span className={active ? "text-snow-soft" : "text-ink-soft"}>{t.unit.type(u.type)}</span>
+                  {active && <span className="tabular text-snow-soft">· {formatArea(u.area.net, lang)} m²</span>}
                 </button>
-                <span className="absolute bottom-0 left-0 block h-2 w-px -translate-x-1/2 bg-espresso/50" />
+                <span className="absolute bottom-0 left-0 block h-2 w-px -translate-x-1/2 bg-navy/50" />
               </div>
             );
           })}
@@ -218,7 +218,7 @@ export function FloorView({ lang, block, floor, selected, hovered, shown, onHove
                 onClick={() => setMode(m)}
                 className={clsx(
                   "rounded-full px-3 py-1.5 uppercase transition-colors",
-                  mode === m ? "bg-espresso text-cream" : "text-ink-soft hover:text-ink",
+                  mode === m ? "bg-navy text-snow" : "text-ink-soft hover:text-ink",
                 )}
               >
                 {m}

@@ -51,6 +51,18 @@ function StatusChip({ status, lang }: { status: Status; lang: Lang }) {
   );
 }
 
+/** "Blloku A", "Kati 7": the words light, the name bold. */
+function Title({ text }: { text: string }) {
+  const words = text.split(" ");
+  const last = words.pop();
+  return (
+    <>
+      {words.length > 0 && <span className="font-light">{words.join(" ")} </span>}
+      <strong className="font-bold">{last}</strong>
+    </>
+  );
+}
+
 function floorLabel(f: FloorSummary) {
   return f.top ? "PH" : String(f.floor).padStart(2, "0");
 }
@@ -84,7 +96,9 @@ export function BlockPanel({
       <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h2 className="text-[28px] leading-none">{t.block(block)}</h2>
+            <h2 className="text-[26px] leading-none tracking-[-0.03em] text-navy">
+              <Title text={t.block(block)} />
+            </h2>
             <p className="mt-1 text-xs text-ink-soft">
               {t.floors(summary.floors)} · {t.available(summary)}
             </p>
@@ -100,8 +114,8 @@ export function BlockPanel({
               aria-pressed={preview === f.floor}
               aria-label={`${t.floorName(f.floor, f.top)}, ${t.available(f)}`}
               className={clsx(
-                "relative grid h-11 min-w-11 shrink-0 place-items-center rounded-xl px-2 font-serif text-xl leading-none transition-colors tabular",
-                preview === f.floor ? "bg-espresso text-cream" : "bg-ink/5 text-ink",
+                "relative grid h-11 min-w-11 shrink-0 place-items-center rounded-xl px-2 text-[15px] font-semibold leading-none transition-colors tabular",
+                preview === f.floor ? "bg-navy text-white" : "bg-navy/[0.05] text-navy",
                 f.available === 0 && preview !== f.floor && "text-ink-faint",
               )}
             >
@@ -114,7 +128,7 @@ export function BlockPanel({
           type="button"
           disabled={!current}
           onClick={() => current && onEnter(current.floor)}
-          className="flex h-12 items-center justify-between rounded-full bg-espresso px-5 text-sm font-semibold text-cream transition-opacity disabled:opacity-40"
+          className="flex h-12 items-center justify-between rounded-full bg-navy px-5 text-sm font-semibold text-white transition-opacity disabled:opacity-40"
         >
           <span>
             {current ? `${t.floorName(current.floor, current.top)} · ${t.available(current)}` : t.explorer.chooseFloor}
@@ -132,28 +146,30 @@ export function BlockPanel({
     <div className="flex h-full flex-col">
       <div className="px-6 pt-5">
         <BackButton label={t.explorer.allBlocks} onClick={onBack} className="-ml-2" />
-        <h2 className="mt-4 text-[52px] leading-[0.9]">{t.block(block)}</h2>
+        <h2 className="mt-4 text-[44px] leading-none tracking-[-0.045em] text-navy">
+          <Title text={t.block(block)} />
+        </h2>
         <p className="mt-2 text-sm text-ink-soft">
           {t.floors(summary.floors)} · {t.homes(summary.units)} · {t.available(summary)}
         </p>
       </div>
 
-      <div className="mx-6 mt-5 rounded-[var(--radius-lg)] bg-espresso p-5 text-cream">
-        <p className="eyebrow text-gold">{t.explorer.chooseFloor}</p>
+      <div className="mx-6 mt-5 rounded-[var(--radius-lg)] bg-navy p-5 text-white">
+        <p className="eyebrow text-gold-light">{t.explorer.chooseFloor}</p>
         {current ? (
           <div key={current.floor} className="animate-enter">
             <div className="mt-3 flex items-end gap-4">
-              <span className="font-serif text-[76px] leading-[0.8] tabular">{floorLabel(current)}</span>
+              <span className="text-[64px] font-bold leading-[0.82] tracking-[-0.05em] tabular">{floorLabel(current)}</span>
               <span className="pb-1 text-sm leading-snug">
                 <span className="block font-semibold">{t.floorName(current.floor, current.top)}</span>
-                <span className="block text-cream-soft">
+                <span className="block text-snow-soft">
                   {t.homes(current.units)} · {t.available(current)}
                 </span>
               </span>
             </div>
             <div className="mt-4 flex flex-wrap gap-1.5">
               {current.types.map((type) => (
-                <span key={type} className="rounded-full border border-espresso-line px-2.5 py-1 text-xs text-cream-soft">
+                <span key={type} className="rounded-full border border-navy-line px-2.5 py-1 text-xs text-snow-soft">
                   {t.unit.type(type)}
                 </span>
               ))}
@@ -161,14 +177,14 @@ export function BlockPanel({
             <button
               type="button"
               onClick={() => onEnter(current.floor)}
-              className="group mt-5 flex h-12 w-full items-center justify-between rounded-full bg-gold px-5 text-sm font-semibold text-espresso transition-colors hover:bg-cream"
+              className="gold-foil group mt-5 flex h-12 w-full items-center justify-between rounded-full px-5 text-sm font-semibold text-navy transition-[filter] hover:brightness-110"
             >
               {t.explorer.stepInside}
               <Arrow className="size-4 transition-transform duration-300 group-hover:translate-x-1" />
             </button>
           </div>
         ) : (
-          <p className="mt-3 text-sm leading-relaxed text-cream-soft">{t.explorer.chooseFloorHint}</p>
+          <p className="mt-3 text-sm leading-relaxed text-snow-soft">{t.explorer.chooseFloorHint}</p>
         )}
       </div>
 
@@ -185,7 +201,7 @@ export function BlockPanel({
                 preview === f.floor ? "bg-ink/[0.06]" : "hover:bg-ink/[0.04]",
               )}
             >
-              <span className="w-9 font-serif text-2xl leading-none tabular">{floorLabel(f)}</span>
+              <span className="w-9 text-lg font-bold leading-none tracking-[-0.03em] text-navy tabular">{floorLabel(f)}</span>
               <span className="flex-1 text-sm">
                 <span className="block font-semibold">{t.floorName(f.floor, f.top)}</span>
                 <span className="block text-xs text-ink-soft">{f.types.map((x) => t.unit.type(x)).join(" · ")}</span>
@@ -293,7 +309,9 @@ export function FloorPanel({
         <div className="flex items-center justify-between gap-3">
           <div>
             <BackButton label={t.block(block)} onClick={onBack} className="-ml-2" />
-            <h2 className="text-[28px] leading-none">{t.floorName(floor, summary.top)}</h2>
+            <h2 className="text-[26px] leading-none tracking-[-0.03em] text-navy">
+              <Title text={t.floorName(floor, summary.top)} />
+            </h2>
           </div>
           {stepper}
         </div>
@@ -307,13 +325,15 @@ export function FloorPanel({
       <div className="px-6 pt-5">
         <BackButton label={t.block(block)} onClick={onBack} className="-ml-2" />
         <div className="mt-4 flex items-end justify-between gap-3">
-          <h2 className="text-[52px] leading-[0.9]">{t.floorName(floor, summary.top)}</h2>
+          <h2 className="text-[44px] leading-none tracking-[-0.045em] text-navy">
+            <Title text={t.floorName(floor, summary.top)} />
+          </h2>
           {stepper}
         </div>
         <p className="mt-2 text-sm text-ink-soft">
           {t.block(block)} · {t.homes(summary.units)} · {t.available(summary)}
         </p>
-        <p className="eyebrow mt-6 text-bronze-deep">{t.explorer.chooseHome}</p>
+        <p className="eyebrow mt-6 text-gold-ink">{t.explorer.chooseHome}</p>
         <p className="mt-1 text-sm text-ink-soft">{t.explorer.chooseHomeHint}</p>
       </div>
       <div className="panel-scroll mt-3 flex-1 overflow-y-auto px-3 pb-4" data-lenis-prevent>
@@ -392,9 +412,9 @@ export function UnitPanel({
 
       <div className={clsx(!compact && "panel-scroll flex-1 overflow-y-auto px-6 pb-6")} data-lenis-prevent={!compact || undefined}>
         <div key={unit.id} className="animate-enter">
-          <p className="eyebrow mt-4 text-bronze-deep">{t.unit.word}</p>
+          <p className="eyebrow mt-4 text-gold-ink">{t.unit.word}</p>
           <div className="mt-1 flex items-end justify-between gap-3">
-            <h2 className={clsx("leading-[0.9] tabular", compact ? "text-[40px]" : "text-[56px]")}>{unit.id}</h2>
+            <h2 className={clsx("font-bold leading-[0.9] tracking-[-0.045em] text-navy tabular", compact ? "text-[36px]" : "text-[48px]")}>{unit.id}</h2>
             <StatusChip status={status} lang={lang} />
           </div>
           <p className="mt-2 text-sm text-ink-soft">
@@ -428,7 +448,7 @@ export function UnitPanel({
               href={whatsappUrl(message)}
               target="_blank"
               rel="noopener noreferrer"
-              className="group flex h-12 items-center justify-between rounded-full bg-espresso px-5 text-sm font-semibold text-cream transition-colors hover:bg-espresso-soft"
+              className="group flex h-12 items-center justify-between rounded-full bg-navy px-5 text-sm font-semibold text-white transition-colors hover:bg-navy-soft"
             >
               {t.unit.whatsapp}
               <Arrow className="size-4 transition-transform duration-300 group-hover:translate-x-1" />

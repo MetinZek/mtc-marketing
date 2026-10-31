@@ -2,8 +2,9 @@
 
 import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
-import { SplitWords } from "@/components/motion/SplitWords";
-import { InkText } from "@/components/motion/InkText";
+import { Eyebrow } from "./Eyebrow";
+import { Ink } from "./Ink";
+import { Rich } from "./Rich";
 import { RENDER, SITE_FRAME, type Box } from "../data/facade";
 import { DICTS, type Lang } from "../i18n";
 
@@ -87,24 +88,29 @@ export function Story({ lang }: { lang: Lang }) {
   }, []);
 
   return (
-    <section id="project" className="relative bg-sand">
-      <div className="container-troy pb-16 pt-28 lg:pb-24 lg:pt-40">
-        <p className="eyebrow text-bronze-deep" data-reveal="fade">
-          {t.story.eyebrow}
-        </p>
-        <SplitWords as="h2" text={t.story.title} className="mt-4 max-w-[16ch] text-display" />
-        <InkText text={t.story.statement} className="mt-10 max-w-[30ch] font-serif text-statement text-ink lg:mt-14" />
-        <dl className="mt-16 grid gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line bg-line sm:grid-cols-3" data-reveal="stagger">
+    <section id="project" className="relative bg-canvas">
+      <div className="container-troy pb-16 pt-28 lg:pb-24 lg:pt-36">
+        <Eyebrow>{t.story.eyebrow}</Eyebrow>
+        <h2 className="mt-5 max-w-[18ch] text-display text-navy" data-reveal="up">
+          <Rich text={t.story.title} />
+        </h2>
+        <Ink text={t.story.statement} className="mt-10 max-w-[34ch] text-statement font-light text-ink lg:mt-14" />
+        <dl className="mt-14 grid grid-cols-3 gap-px overflow-hidden rounded-[var(--radius-lg)] border border-line bg-line lg:mt-16" data-reveal="stagger">
           {t.numbers.map((n) => (
-            <div key={n.label} className="bg-paper px-6 py-7">
+            <div key={n.label} className="bg-paper px-3 py-5 sm:px-6 sm:py-7">
               <dt className="sr-only">{n.label}</dt>
               <dd>
-                <span className="block font-serif text-[clamp(3rem,2rem+3vw,4.5rem)] leading-none tabular">{n.value}</span>
-                <span className="mt-3 block max-w-[24ch] text-sm text-ink-soft">{n.label}</span>
+                <span className="block text-[clamp(1.6rem,0.9rem+3.6vw,4.25rem)] font-bold leading-none tracking-[-0.05em] text-navy tabular">{n.value}</span>
+                <span className="mt-3 block h-px w-8 bg-gold-deep" />
+                <span className="mt-3 block max-w-[24ch] text-xs leading-snug text-ink-soft sm:text-sm">{n.label}</span>
               </dd>
             </div>
           ))}
         </dl>
+        <figure className="mt-6 overflow-hidden rounded-[var(--radius-xl)] bg-navy" data-reveal="up">
+          {/* eslint-disable-next-line @next/next/no-img-element -- Troy's own poster of the towers, navy and gold */}
+          <img src="/troy/photos/poster.webp" alt={t.location.photo} loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover sm:aspect-[21/9]" />
+        </figure>
       </div>
 
       {/* Desktop: pinned frame over the render. */}
@@ -115,13 +121,18 @@ export function Story({ lang }: { lang: Lang }) {
               {/* eslint-disable-next-line @next/next/no-img-element -- the same render, moved under a transform */}
               <img src={RENDER.src} width={RENDER.width} height={RENDER.height} alt="" loading="lazy" decoding="async" />
             </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-[46%] bg-gradient-to-r from-espresso/80 via-espresso/40 to-transparent" />
-            <div className="absolute bottom-10 left-10 w-[min(420px,38%)]">
+            <div className="pointer-events-none absolute inset-y-0 left-0 w-[50%] bg-gradient-to-r from-navy/85 via-navy/45 to-transparent" />
+            <div className="absolute bottom-10 left-10 w-[min(440px,38%)]">
               {t.story.chapters.map((c, i) => (
-                <div key={c.title} data-chapter className="absolute bottom-0 left-0 w-full text-cream">
-                  <p className="eyebrow text-gold tabular">0{i + 1} / 0{t.story.chapters.length}</p>
-                  <h3 className="mt-3 text-[clamp(2.5rem,1.8rem+2vw,3.75rem)] leading-[0.95]">{c.title}</h3>
-                  <p className="mt-4 text-lead text-cream/85">{c.text}</p>
+                <div key={c.title} data-chapter className="absolute bottom-0 left-0 w-full text-white">
+                  <p className="eyebrow flex items-center gap-3 text-gold-light tabular">
+                    <span className="h-px w-6 bg-gold" />
+                    0{i + 1} / 0{t.story.chapters.length}
+                  </p>
+                  <h3 className="mt-4 text-[clamp(2.25rem,1.6rem+2vw,3.5rem)] leading-[1] tracking-[-0.04em]">
+                    <Rich text={c.title} />
+                  </h3>
+                  <p className="mt-4 text-lead text-white/80">{c.text}</p>
                 </div>
               ))}
             </div>
@@ -132,11 +143,13 @@ export function Story({ lang }: { lang: Lang }) {
       {/* Phones and reduced motion: stacked chapters. */}
       <div className="container-troy grid gap-6 pb-20 lg:hidden motion-reduce:lg:grid motion-reduce:lg:grid-cols-3">
         {t.story.chapters.map((c, i) => (
-          <article key={c.title} className="overflow-hidden rounded-[var(--radius-lg)] bg-paper" data-reveal="up">
+          <article key={c.title} className="overflow-hidden rounded-[var(--radius-lg)] border border-line bg-paper" data-reveal="up">
             <Crop box={FOCUS[i]!} className="troy-sky" />
             <div className="p-5">
-              <p className="eyebrow text-bronze-deep tabular">0{i + 1}</p>
-              <h3 className="mt-2 text-[34px] leading-none">{c.title}</h3>
+              <p className="eyebrow text-gold-ink tabular">0{i + 1}</p>
+              <h3 className="mt-2 text-[30px] leading-none tracking-[-0.04em] text-navy">
+                <Rich text={c.title} />
+              </h3>
               <p className="mt-3 text-ink-soft">{c.text}</p>
             </div>
           </article>

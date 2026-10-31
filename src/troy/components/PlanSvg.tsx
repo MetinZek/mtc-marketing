@@ -52,8 +52,8 @@ export function PlanSvg({ plan, lang, statuses, focus, selected, hovered, onSele
 
   return (
     <svg viewBox={view} className={clsx("h-full w-full", className)} role="img" aria-label={unit ? `${t.unit.plan} ${unit.id}` : t.floorName(plan.floor, plan.top)}>
-      <rect x={plan.corridor.x} y={plan.corridor.y} width={plan.corridor.w} height={plan.corridor.h} fill="#ece7df" />
-      {plan.core.w > 0 && <rect x={plan.core.x} y={plan.core.y} width={plan.core.w} height={plan.core.h} fill="#e0d9cf" />}
+      <rect x={plan.corridor.x} y={plan.corridor.y} width={plan.corridor.w} height={plan.corridor.h} fill="#eceff1" />
+      {plan.core.w > 0 && <rect x={plan.core.x} y={plan.core.y} width={plan.core.w} height={plan.core.h} fill="#e1e6ea" />}
       {plan.roofs.map((r, i) => (
         <rect key={i} x={r.x} y={r.y} width={r.w} height={r.h} fill="#cbd8b6" />
       ))}
@@ -65,7 +65,7 @@ export function PlanSvg({ plan, lang, statuses, focus, selected, hovered, onSele
       })}
       {pieces.map((p, i) =>
         p.shape === "box" ? (
-          <rect key={i} x={p.x} y={p.y} width={p.w} height={p.h} rx={4} fill="#fbf8f4" stroke="#8d8378" strokeWidth={2.5} />
+          <rect key={i} x={p.x} y={p.y} width={p.w} height={p.h} rx={4} fill="#ffffff" stroke="#8a949d" strokeWidth={2.5} />
         ) : (
           <ellipse
             key={i}
@@ -73,8 +73,8 @@ export function PlanSvg({ plan, lang, statuses, focus, selected, hovered, onSele
             cy={p.y + p.h / 2}
             rx={p.w / 2}
             ry={p.h / 2}
-            fill={p.finish.startsWith("green") || p.finish === "grass" ? "#9cb682" : "#fbf8f4"}
-            stroke="#8d8378"
+            fill={p.finish.startsWith("green") || p.finish === "grass" ? "#9cb682" : "#ffffff"}
+            stroke="#8a949d"
             strokeWidth={2.5}
           />
         ),
@@ -84,7 +84,7 @@ export function PlanSvg({ plan, lang, statuses, focus, selected, hovered, onSele
         if (w.kind === "window") {
           return (
             <g key={i}>
-              <line x1={w.x1} y1={w.y1} x2={w.x2} y2={w.y2} stroke="#2b2420" strokeWidth={spec.t} />
+              <line x1={w.x1} y1={w.y1} x2={w.x2} y2={w.y2} stroke="#0f2a3d" strokeWidth={spec.t} />
               <line x1={w.x1} y1={w.y1} x2={w.x2} y2={w.y2} stroke="#f7f4ef" strokeWidth={spec.t - 8} />
               <line x1={w.x1} y1={w.y1} x2={w.x2} y2={w.y2} stroke="#7c9fb0" strokeWidth={3} />
             </g>
@@ -98,7 +98,7 @@ export function PlanSvg({ plan, lang, statuses, focus, selected, hovered, onSele
             y1={w.y1}
             x2={w.x2}
             y2={w.y2}
-            stroke={masonry ? "#a47852" : "#2b2420"}
+            stroke={masonry ? "#a47852" : "#0f2a3d"}
             strokeWidth={spec.t}
             strokeLinecap="square"
           />
@@ -119,11 +119,11 @@ export function PlanSvg({ plan, lang, statuses, focus, selected, hovered, onSele
           return (
             <g key={i}>
               <line x1={d.x1} y1={d.y1} x2={d.x2} y2={d.y2} stroke="#f7f4ef" strokeWidth={8} />
-              <line x1={hx} y1={hy} x2={leaf[0]} y2={leaf[1]} stroke="#5c5249" strokeWidth={3} />
+              <line x1={hx} y1={hy} x2={leaf[0]} y2={leaf[1]} stroke="#56636e" strokeWidth={3} />
               <path
                 d={`M ${leaf[0]} ${leaf[1]} A ${len} ${len} 0 0 ${sweep} ${d.x2} ${d.y2}`}
                 fill="none"
-                stroke="#8d8378"
+                stroke="#8a949d"
                 strokeWidth={2}
                 strokeDasharray="10 8"
               />
@@ -149,18 +149,18 @@ export function PlanSvg({ plan, lang, statuses, focus, selected, hovered, onSele
                 y={box.y}
                 width={box.w}
                 height={box.h}
-                fill={active ? "#c28a52" : "transparent"}
+                fill={active ? "#d6b36d" : "transparent"}
                 fillOpacity={active ? 0.22 : 0}
-                stroke={u.id === selected ? "#9a6a40" : "none"}
+                stroke={u.id === selected ? "#b28c41" : "none"}
                 strokeWidth={14}
               />
               <g transform={`translate(${u.bounds.x + u.bounds.w / 2} ${u.bounds.y + u.bounds.h / 2})`} pointerEvents="none">
-                <rect x={-150} y={-62} width={300} height={124} rx={62} fill="#fbf8f4" stroke="#d3c7b6" strokeWidth={3} />
+                <rect x={-150} y={-62} width={300} height={124} rx={62} fill="#ffffff" stroke="#cfd6dc" strokeWidth={3} />
                 <circle cx={-96} cy={0} r={16} fill={STATUS_COLOR[status]} />
-                <text x={12} y={-6} textAnchor="middle" fontSize={50} fontWeight={600} fill="#1d1813" className="tabular">
+                <text x={12} y={-6} textAnchor="middle" fontSize={50} fontWeight={600} fill="#0c1a24" className="tabular">
                   {u.id.split("-")[1]}
                 </text>
-                <text x={12} y={42} textAnchor="middle" fontSize={34} fill="#5c5249">
+                <text x={12} y={42} textAnchor="middle" fontSize={34} fill="#56636e">
                   {t.unit.type(u.type)}
                 </text>
               </g>
@@ -175,11 +175,11 @@ export function PlanSvg({ plan, lang, statuses, focus, selected, hovered, onSele
           const size = Math.max(24, Math.min(40, (r.w - 30) / (name.length * 0.55)));
           return (
             <g key={r.id} transform={`translate(${r.x + r.w / 2} ${r.y + r.h / 2})`} pointerEvents="none">
-              <rect x={-r.w / 2 + 14} y={-size * 1.05} width={r.w - 28} height={size * 2.3} rx={10} fill="#fbf8f4" fillOpacity={0.82} />
-              <text textAnchor="middle" y={-2} fontSize={size} fontWeight={600} fill="#1d1813">
+              <rect x={-r.w / 2 + 14} y={-size * 1.05} width={r.w - 28} height={size * 2.3} rx={10} fill="#ffffff" fillOpacity={0.82} />
+              <text textAnchor="middle" y={-2} fontSize={size} fontWeight={600} fill="#0c1a24">
                 {name}
               </text>
-              <text textAnchor="middle" y={size * 0.98} fontSize={size * 0.86} fill="#5c5249" className="tabular">
+              <text textAnchor="middle" y={size * 0.98} fontSize={size * 0.86} fill="#56636e" className="tabular">
                 {formatArea((r.w * r.h) / 10000, lang)} m²
               </text>
             </g>

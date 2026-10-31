@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import clsx from "clsx";
 import { gsap } from "@/lib/gsap";
 import { FACADE, RENDER, SITE_FRAME, bboxOf, toPoints, type Box } from "../data/facade";
@@ -13,6 +13,10 @@ export type Insets = { top: number; right: number; bottom: number; left: number 
 /** The render's placement on screen: screen = picture × s + (x, y). */
 type Cam = { x: number; y: number; s: number; o: number };
 
+/** What the page drives from outside: the opening scroll (0 = close on
+ * Block C under the headline, 1 = the whole project). */
+export type StageApi = { setHero: (progress: number) => void };
+
 function fit(box: Box, w: number, h: number, insets: Insets, fill: number, align: "center" | "bottom"): Cam {
   const aw = Math.max(1, w - insets.left - insets.right);
   const ah = Math.max(1, h - insets.top - insets.bottom);
@@ -23,6 +27,30 @@ function fit(box: Box, w: number, h: number, insets: Insets, fill: number, align
 }
 
 const DUR = { move: 1.25, fly: 0.95, back: 1.05 };
+
+/** Block C on the render: its middle and its roof line, the opening's
+ * close-up. */
+const HERO_X = 1498.5;
+const HERO_W = 559;
+const HERO_TOP = 209;
+
+/** Close on Block C, its roof just under the headline (never above
+ * `below`, the bottom of the opening's text); never enlarged past 1.4×
+ * (the render is 1920 px wide). Mirrored by .troy-still in troy.css. */
+function heroCam(w: number, h: number, compact: boolean, below: number): Cam {
+  const width = Math.min(w * (compact ? 0.86 : 0.42), HERO_W * 1.4);
+  const s = width / HERO_W;
+  const roof = Math.max(h * (compact ? 0.5 : 0.53), below + 28);
+  return { s, x: w / 2 - HERO_X * s, y: roof - HERO_TOP * s, o: 1 };
+}
+
+const mix = (a: Cam, b: Cam, t: number): Cam => ({
+  x: a.x + (b.x - a.x) * t,
+  y: a.y + (b.y - a.y) * t,
+  s: a.s + (b.s - a.s) * t,
+  o: a.o + (b.o - a.o) * t,
+});
+const smooth = (t: number) => t * t * (3 - 2 * t);
 
 const MASK_X = "linear-gradient(90deg, transparent 0, #000 5%, #000 95%, transparent 100%)";
 const MASK_Y = "linear-gradient(180deg, #000 0, #000 94%, transparent 100%)";
@@ -38,6 +66,12 @@ type Props = {
    * the sheet. */
   compact: boolean;
   reduced: boolean;
+  /** The opening scroll has reached the whole project: pins and blocks
+   * answer the pointer. */
+  heroDone: boolean;
+  apiRef: RefObject<StageApi | null>;
+  /** The opening's text: the tower's roof stays below it. */
+  heroTextRef: RefObject<HTMLElement | null>;
   onHoverBlock: (id: BlockId | null) => void;
   /** A floor pointed at with a mouse; it stays lit until another is. */
   onHoverFloor: (floor: number) => void;
@@ -54,7 +88,7 @@ type Props = {
  * windows light up warm, as if someone were home.
  */
 export function FacadeStage(props: Props) {
-  const { lang, block, floor, hoverBlock, hoverFloor, insets, compact, reduced } = props;
+  const { lang, block, floor, hoverBlock, hoverFloor, insets, compact, reduced, heroDone, apiRef, heroTextRef } = props;
   const t = DICTS[lang];
   const stageRef = useRef<HTMLDivElement>(null);
   const worldRef = useRef<HTMLDivElement>(null);
@@ -65,6 +99,7 @@ export function FacadeStage(props: Props) {
   const started = useRef(false);
   const hoverFloorRef = useRef<number | null>(hoverFloor);
   const blockRef = useRef<BlockId | null>(block);
+  const heroRef = useRef(0);
 
   const level = floor != null ? "floor" : block ? "block" : "site";
   const lifted = new Set<BlockId>();
@@ -100,7 +135,12 @@ export function FacadeStage(props: Props) {
     if (!stage) return null;
     const w = stage.clientWidth;
     const h = stage.clientHeight;
-    if (!block) return fit(SITE_FRAME, w, h, insets, 1, compact ? "center" : "bottom");
+    // Arrival: from the close-up to the whole project as the page scrolls.
+    if (!block) {
+      const text = heroTextRef.current;
+      const below = text ? text.offsetTop + text.offsetHeight : 0;
+      return mix(heroCam(w, h, compact, below), fit(SITE_FRAME, w, h, insets, 1, compact ? "center" : "bottom"), smooth(heroRef.current));
+    }
     const base = fit(FACADE[block].frame, w, h, insets, 0.94, "center");
     if (floor == null) return base;
     // Fly into the floor: zoom on the band's middle and fade out.
@@ -139,11 +179,36 @@ export function FacadeStage(props: Props) {
       duration: reduced ? 0.01 : flying ? DUR.fly : leaving ? DUR.back : DUR.move,
       ease: flying ? "power3.in" : "expo.inOut",
       onUpdate: apply,
+      // The page may have scrolled meanwhile: land where it now says.
+      onComplete: () => {
+        const now = target();
+        if (now && !block) {
+          Object.assign(cam.current, now);
+          apply();
+        }
+      },
     });
     // `target` reads the latest props; the insets object changes identity
     // only when its numbers change (see Explorer).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [block, floor, insets, compact]);
+
+  // The opening scroll moves the camera directly, unless a move is under way.
+  useEffect(() => {
+    apiRef.current = {
+      setHero: (progress) => {
+        heroRef.current = progress;
+        if (blockRef.current || !started.current || gsap.isTweening(cam.current)) return;
+        const next = target();
+        if (!next) return;
+        Object.assign(cam.current, next);
+        apply();
+      },
+    };
+    return () => {
+      apiRef.current = null;
+    };
+  });
 
   // Re-frame at once when the stage itself is resized.
   useEffect(() => {
@@ -291,7 +356,7 @@ export function FacadeStage(props: Props) {
                 key={id}
                 points={toPoints(FACADE[id].outline)}
                 fill="transparent"
-                className="cursor-pointer outline-none"
+                className={clsx("cursor-pointer outline-none", level === "site" && !heroDone && "pointer-events-none")}
                 onPointerEnter={(e) => e.pointerType === "mouse" && props.onHoverBlock(id)}
                 onPointerLeave={(e) => e.pointerType === "mouse" && props.onHoverBlock(null)}
                 onClick={() => props.onSelectBlock(id)}
@@ -326,12 +391,12 @@ export function FacadeStage(props: Props) {
             }}
             className={clsx(
               "pointer-events-none absolute left-0 top-0 transition-opacity duration-500",
-              level === "site" ? "opacity-100" : "opacity-0",
+              level === "site" && heroDone ? "opacity-100" : "opacity-0",
             )}
           >
             <button
               type="button"
-              tabIndex={level === "site" ? 0 : -1}
+              tabIndex={level === "site" && heroDone ? 0 : -1}
               aria-label={`${t.block(id)}: ${t.floors(s.floors)}, ${t.available(s)}`}
               onClick={() => props.onSelectBlock(id)}
               onPointerEnter={(e) => e.pointerType === "mouse" && props.onHoverBlock(id)}
@@ -340,26 +405,26 @@ export function FacadeStage(props: Props) {
               onBlur={() => props.onHoverBlock(null)}
               className={clsx(
                 "absolute bottom-3 left-0 flex -translate-x-1/2 items-center gap-2 rounded-full py-1 pl-1 pr-1 shadow-[var(--shadow-card)] transition-[padding,background-color,color] duration-500 ease-[var(--ease-out-expo)]",
-                level === "site" && "pointer-events-auto",
-                active ? "bg-espresso pr-4 text-cream" : "frost text-ink lg:pr-4",
+                level === "site" && heroDone && "pointer-events-auto",
+                active ? "bg-navy pr-4 text-white" : "frost text-ink lg:pr-4",
               )}
             >
               <span
                 className={clsx(
-                  "relative grid size-8 place-items-center rounded-full font-serif text-lg leading-none",
-                  active ? "bg-gold text-espresso" : "bg-espresso text-cream",
+                  "relative grid size-8 place-items-center rounded-full text-sm font-bold leading-none",
+                  active ? "bg-gold text-navy" : "bg-navy text-white",
                 )}
               >
                 {id}
               </span>
               <span className={clsx("whitespace-nowrap text-left text-[13px] leading-tight", active ? "block" : "hidden lg:block")}>
                 <span className="block font-semibold">{t.block(id)}</span>
-                <span className={clsx("block text-xs", active ? "text-cream-soft" : "text-ink-soft")}>
+                <span className={clsx("block text-xs", active ? "text-snow-soft" : "text-ink-soft")}>
                   {t.floors(s.floors)} · {t.available(s)}
                 </span>
               </span>
             </button>
-            <span className="absolute bottom-0 left-0 block h-3 w-px -translate-x-1/2 bg-espresso/60" />
+            <span className="absolute bottom-0 left-0 block h-3 w-px -translate-x-1/2 bg-navy/60" />
           </div>
         );
       })}
@@ -373,13 +438,13 @@ export function FacadeStage(props: Props) {
         )}
       >
         {hoverSummary && (
-          <div className="frost-dark flex items-center gap-3 rounded-xl py-2 pl-2 pr-4 text-cream shadow-[var(--shadow-float)]">
-            <span className="grid h-10 min-w-10 place-items-center rounded-lg bg-gold px-2 font-serif text-2xl leading-none text-espresso tabular">
+          <div className="frost-dark flex items-center gap-3 rounded-xl py-2 pl-2 pr-4 text-white shadow-[var(--shadow-float)]">
+            <span className="grid h-10 min-w-10 place-items-center rounded-lg bg-gold px-2 text-lg font-bold leading-none text-navy tabular">
               {hoverSummary.top ? "PH" : String(hoverSummary.floor).padStart(2, "0")}
             </span>
             <span className="text-[13px] leading-tight">
               <span className="block font-semibold">{t.floorName(hoverSummary.floor, hoverSummary.top)}</span>
-              <span className="block text-cream-soft">
+              <span className="block text-snow-soft">
                 {t.homes(hoverSummary.units)} · {t.available(hoverSummary)}
               </span>
             </span>
