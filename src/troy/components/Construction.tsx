@@ -1,8 +1,9 @@
 import { DICTS, type Lang } from "../i18n";
 import { Eyebrow } from "./Eyebrow";
+import { Loop } from "./Loop";
 import { Rich } from "./Rich";
 
-/** The works so far, stage by stage, in stills from Troy's site film. */
+/** The works so far, stage by stage, in clips from Troy's site film. */
 export function Construction({ lang }: { lang: Lang }) {
   const t = DICTS[lang];
   return (
@@ -34,14 +35,7 @@ export function Construction({ lang }: { lang: Lang }) {
                 <span className="h-px flex-1 bg-navy-line" />
               </div>
               <figure className="mt-5 overflow-hidden rounded-[var(--radius-lg)] bg-navy-soft">
-                {/* eslint-disable-next-line @next/next/no-img-element -- a still from Troy's site film */}
-                <img
-                  src={`/troy/photos/${step.src}.webp`}
-                  alt={step.title}
-                  loading="lazy"
-                  decoding="async"
-                  className="aspect-[4/3] w-full object-cover"
-                />
+                <Loop name={step.src} label={step.title} className="aspect-[4/3] w-full object-cover" />
               </figure>
               <p className="mt-4 text-[17px] font-semibold leading-snug tracking-[-0.02em]">{step.title}</p>
             </li>

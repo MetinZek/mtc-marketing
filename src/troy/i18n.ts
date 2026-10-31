@@ -44,7 +44,7 @@ const sq = {
     menu: "Menyja",
   },
   hero: {
-    eyebrow: "Troy Residence · Mitrovicë",
+    eyebrow: "Troy Residence",
     title: "*Kryevepra* e Qytetit",
     leadStrong: "Tri kulla banimi në qendër të Mitrovicës.",
     lead: "Zgjidhni bllokun, katin dhe banesën tuaj.",
@@ -131,6 +131,7 @@ const sq = {
   story: {
     eyebrow: "Projekti",
     title: "Tri *kulla*. Një *adresë*.",
+    river: "Kullat e Troy Residence përtej lumit, në renderin 3D",
     statement:
       "*Troy Residence* sjell në qendër të Mitrovicës *tri kulla banimi* me ballkone të gjelbra, pamje nga *lumi Ibër* dhe malet përreth, të ndërtuara me shpejtësi, siguri dhe profesionalizëm.",
     chapters: [
@@ -145,9 +146,9 @@ const sq = {
     items: [
       { src: "garden", alt: "Kopshti me kënd lojërash dhe kalin e Trojës", caption: "Kopsht me kënd lojërash" },
       { src: "interior", alt: "Dhoma e ndenjes me dritare deri në tavan", caption: "Dritare të mëdha, dritë natyrale" },
-      { src: "balcony", alt: "Ballkone me bimë në fasadë", caption: "Ballkone plot gjelbërim" },
-      { src: "street", alt: "Kullat nga rruga me pemë", caption: "Rrugë me pemë" },
-      { src: "river", alt: "Kullat përtej lumit", caption: "Pamje nga lumi" },
+      { src: "morning", alt: "Një vajzë zgjohet në një dhomë plot dritë", caption: "Mëngjese plot dritë" },
+      { src: "family", alt: "Fëmijët dalin me vrap nga shtëpia", caption: "Hapësirë për familjen" },
+      { src: "evening", alt: "Kafe në mbrëmje, me dritat e qytetit pas xhamit", caption: "Mbrëmje me pamje nga qyteti" },
     ],
   },
   construction: {
@@ -224,7 +225,7 @@ const en: Dict = {
     menu: "Menu",
   },
   hero: {
-    eyebrow: "Troy Residence · Mitrovica",
+    eyebrow: "Troy Residence",
     title: "The *masterpiece* of the city",
     leadStrong: "Three residential towers in the heart of Mitrovica.",
     lead: "Choose your block, your floor and your home.",
@@ -310,6 +311,7 @@ const en: Dict = {
   story: {
     eyebrow: "The project",
     title: "Three *towers*. One *address*.",
+    river: "The Troy Residence towers across the river, in the 3D render",
     statement:
       "*Troy Residence* brings *three residential towers* to the centre of Mitrovica, with green balconies and views of the *Ibar river* and the surrounding mountains, built with speed, safety and professionalism.",
     chapters: [
@@ -324,9 +326,9 @@ const en: Dict = {
     items: [
       { src: "garden", alt: "The garden with a playground and the Trojan horse", caption: "A garden with a playground" },
       { src: "interior", alt: "A living room with floor-to-ceiling windows", caption: "Large windows, natural light" },
-      { src: "balcony", alt: "Balconies planted along the facade", caption: "Balconies full of green" },
-      { src: "street", alt: "The towers from a tree-lined street", caption: "Tree-lined streets" },
-      { src: "river", alt: "The towers across the river", caption: "Views of the river" },
+      { src: "morning", alt: "A girl wakes up in a bright room", caption: "Mornings full of light" },
+      { src: "family", alt: "Children running out of the home", caption: "Room for the family" },
+      { src: "evening", alt: "Coffee in the evening, the city lights behind the glass", caption: "Evenings with a city view" },
     ],
   },
   construction: {

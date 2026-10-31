@@ -9,6 +9,7 @@ import { BLOCKS, blockSummary, findUnit, isBlock } from "../data/inventory";
 import { DICTS, type Lang } from "../i18n";
 import { FacadeStage, type Insets, type StageApi } from "./FacadeStage";
 import { FloorView } from "./FloorView";
+import { LOGO } from "./Header";
 import { Arrow, BackButton, BlockPanel, FloorPanel, UnitPanel } from "./Panels";
 import { Rich } from "./Rich";
 import { DESKTOP, REDUCED_MOTION, useMedia } from "./use-media";
@@ -331,8 +332,12 @@ export function Explorer({ lang }: { lang: Lang }) {
             className="pointer-events-none absolute inset-x-0 top-0 z-[5] flex flex-col items-center px-5 pt-[clamp(100px,15svh,190px)] text-center"
             style={{ opacity: "calc(1 - var(--hero) * 2.4)", transform: "translate3d(0, calc(var(--hero) * -90px), 0)" }}
           >
+            {/* The brand's lockup, as Troy's film closes on it: the emblem
+                and the name over the slogan. */}
             <p className="eyebrow flex items-center gap-3 text-navy">
               <span className="h-px w-6 bg-gold-deep" />
+              {/* eslint-disable-next-line @next/next/no-img-element -- the gold emblem */}
+              <img src={LOGO} alt="" width={32} height={32} className="size-7 rounded-[3px] shadow-[var(--shadow-card)] lg:size-8" />
               {t.hero.eyebrow}
               <span className="h-px w-6 bg-gold-deep" />
             </p>

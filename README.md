@@ -200,10 +200,14 @@ search engines (`noindex`) while it is a concept.
 from the logo, on white and a soft blue sky; Inter throughout, headings
 light with their key words bold (marked `*like this*` in the copy and set
 by `Rich`). The logo (`public/troy/logo.webp`, also the favicon) is cut
-from the emblem Troy supplied; the photographs are stills from Troy's own
-films (`public/troy/photos/`, the player bar and watermark cropped out).
+from the emblem Troy supplied. The moving pictures are short seamless
+loops cut from Troy's own two films (`public/troy/video/`: a desktop and a
+phone size of each, and its first frame as a poster; the player bar and
+the watermark cropped out). Each loads near the screen and plays only
+while on it (`Loop`); with reduced motion the poster shows instead.
 
-The page opens with **"Kryevepra e Qytetit"** over a close-up of Block C
+The page opens with Troy's lockup (the emblem and the name) over
+**"Kryevepra e Qytetit"**, above a close-up of Block C
 rising out of mist. Scrolling pulls the camera back until all three towers
 stand in view (the scene is pinned while it does), and the interactive
 model takes over:
@@ -222,10 +226,12 @@ model takes over:
 
 The view lives in the address (`/troy?b=A&f=7&u=A-701`), so a home can be
 sent as a link, and the back button and Escape step back a level. Below
-the model: the project (a pinned frame travelling over the render, and
-Troy's poster), a gallery, the construction so far (the stages named in
-Troy's site film), the location, and a contact form that writes the message
-into WhatsApp or an email (nothing is sent or stored by the site).
+the model: the project (a pinned film that opens on Troy's 3D render of
+the towers across the river and fades through a clip per chapter), a
+gallery of clips, the construction so far (a clip per stage, named as in
+Troy's site film), the location with Troy's poster, and a contact form
+that writes the message into WhatsApp or an email (nothing is sent or
+stored by the site).
 
 ```
 src/app/troy/          layout, the two pages, troy.css, icons

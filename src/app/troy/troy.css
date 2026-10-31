@@ -340,7 +340,7 @@
    ============================================================ */
 .troy-still {
   --w: min(86vw, 783px);
-  --roof: max(50svh, calc(clamp(100px, 15svh, 190px) + var(--text-hero) * 1.84 + 250px));
+  --roof: max(50svh, calc(clamp(100px, 15svh, 190px) + var(--text-hero) * 1.84 + 265px));
   width: calc(var(--w) * 3.4347);
   height: calc(var(--w) * 1.932);
   left: calc(50vw - var(--w) * 2.6807);
@@ -351,6 +351,6 @@
 @media (min-width: 1024px) {
   .troy-still {
     --w: min(42vw, 783px);
-    --roof: max(53svh, calc(clamp(100px, 15svh, 190px) + var(--text-hero) * 0.92 + 230px));
+    --roof: max(53svh, calc(clamp(100px, 15svh, 190px) + var(--text-hero) * 0.92 + 247px));
   }
 }

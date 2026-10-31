@@ -4,83 +4,92 @@ import { useEffect, useRef } from "react";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { Eyebrow } from "./Eyebrow";
 import { Ink } from "./Ink";
+import { Loop, clipPoster, playClip } from "./Loop";
 import { Rich } from "./Rich";
-import { RENDER, SITE_FRAME, type Box } from "../data/facade";
 import { DICTS, type Lang } from "../i18n";
 
-/** What each chapter looks at on the render. */
-const FOCUS: Box[] = [
-  { x: 604, y: 420, w: 780, h: 460 },
-  { x: 1110, y: 190, w: 780, h: 460 },
-  { x: 610, y: 618, w: 780, h: 460 },
-];
-
-/** A crop of the render showing `box`, in plain CSS: the picture is sized
- * and shifted so the box fills a frame of the box's own proportions. */
-function Crop({ box, className }: { box: Box; className?: string }) {
-  return (
-    <div className={className} style={{ aspectRatio: `${box.w} / ${box.h}` }}>
-      <div className="relative h-full w-full overflow-hidden">
-        {/* eslint-disable-next-line @next/next/no-img-element -- a crop of the same render the stage uses */}
-        <img
-          src={RENDER.src}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          className="absolute max-w-none"
-          style={{
-            width: `${(RENDER.width / box.w) * 100}%`,
-            left: `${(-box.x / box.w) * 100}%`,
-            top: `${(-box.y / box.h) * 100}%`,
-          }}
-        />
-      </div>
-    </div>
-  );
-}
+/** The film's opening shot: Troy's 3D render of the towers across the
+ * river. */
+const RIVER = "/troy/photos/river-hd.webp";
+/** A clip from Troy's 3D film for each chapter: the green balconies, the
+ * towers' tops, the street. */
+const CLIPS = ["balcony", "street", "avenue"] as const;
 
 /**
- * The project in words and pictures. On a desktop, a pinned frame travels
- * over the render (the balconies, the penthouses, the street) while the
- * chapters change beside it, all following the scroll; on phones, and with
- * reduced motion, the chapters are simply stacked with their crops.
+ * The project in words, then as a film. On a desktop a pinned frame opens
+ * on the 3D render of the towers across the river and, as the page
+ * scrolls, each chapter's clip fades in over it with its words, a slow
+ * zoom keeping the picture alive. Only the clip on show plays. On phones,
+ * and with reduced motion, the render and the chapters are stacked, each
+ * chapter with its clip.
  */
 export function Story({ lang }: { lang: Lang }) {
   const t = DICTS[lang];
   const wrapRef = useRef<HTMLDivElement>(null);
-  const frameRef = useRef<HTMLDivElement>(null);
-  const worldRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const wrap = wrapRef.current;
-    const frame = frameRef.current;
-    const world = worldRef.current;
-    if (!wrap || !frame || !world) return;
+    if (!wrap) return;
     const mm = gsap.matchMedia();
     mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
-      const cam = (box: Box, cover: boolean) => {
-        const w = frame.clientWidth;
-        const h = frame.clientHeight;
-        const s = cover ? Math.max(w / box.w, h / box.h) : Math.min((w * 0.94) / box.w, (h * 0.86) / box.h);
-        return { x: w * 0.62 - (box.x + box.w / 2) * s, y: h / 2 - (box.y + box.h / 2) * s, scale: s };
-      };
-      const shots = [() => cam(SITE_FRAME, false), ...FOCUS.map((b) => () => cam(b, true))];
-      gsap.set(world, { transformOrigin: "0 0", ...shots[0]!() });
+      const shots = gsap.utils.toArray<HTMLElement>("[data-shot]", wrap);
+      const videos = gsap.utils.toArray<HTMLVideoElement>("video[data-clip]", wrap);
       const chapters = gsap.utils.toArray<HTMLElement>("[data-chapter]", wrap);
+      const veils = gsap.utils.toArray<HTMLElement>("[data-veil]", wrap);
+      gsap.set(shots.slice(1), { autoAlpha: 0 });
+      gsap.set(veils, { autoAlpha: 0 });
+      gsap.set(shots, { scale: 1.1, transformOrigin: "50% 60%" });
       gsap.set(chapters, { autoAlpha: 0, y: 24 });
+
+      let onScreen = false;
+      const opacity = (i: number) => (i < shots.length ? Number(gsap.getProperty(shots[i]!, "opacity")) : 0);
+      // Play the clip on show (and the one under it while the next fades
+      // in over it); pause the rest.
+      const sync = () => {
+        videos.forEach((video, i) => {
+          const shown = onScreen && opacity(i + 1) > 0.02 && opacity(i + 2) < 0.98;
+          if (shown) playClip(video, video.dataset.clip ?? "");
+          else video.pause();
+        });
+      };
+
       const tl = gsap.timeline({
         defaults: { ease: "power2.inOut" },
-        scrollTrigger: { trigger: wrap, start: "top top", end: "bottom bottom", scrub: 0.8, invalidateOnRefresh: true },
+        scrollTrigger: {
+          trigger: wrap,
+          start: "top top",
+          end: "bottom bottom",
+          scrub: 0.8,
+          invalidateOnRefresh: true,
+        },
+        onUpdate: sync,
       });
+      tl.to(shots[0]!, { scale: 1, duration: 1.4, ease: "none" }, 0);
+      // The shade behind the words arrives with the first chapter, so the
+      // render opens clear.
+      tl.to(veils, { autoAlpha: 1, duration: 0.55 }, 0.6);
       chapters.forEach((el, i) => {
-        const shot = shots[i + 1]!;
-        tl.to(world, { x: () => shot().x, y: () => shot().y, scale: () => shot().scale, duration: 1 }, i * 1.4);
-        tl.to(el, { autoAlpha: 1, y: 0, duration: 0.45 }, i * 1.4 + 0.55);
-        if (i < chapters.length - 1) tl.to(el, { autoAlpha: 0, y: -24, duration: 0.35 }, (i + 1) * 1.4 - 0.05);
+        const at = 0.6 + i * 1.4;
+        tl.to(shots[i + 1]!, { autoAlpha: 1, duration: 0.55 }, at);
+        tl.to(shots[i + 1]!, { scale: 1, duration: 1.6, ease: "none" }, at);
+        tl.to(el, { autoAlpha: 1, y: 0, duration: 0.45 }, at + 0.35);
+        if (i < chapters.length - 1) tl.to(el, { autoAlpha: 0, y: -24, duration: 0.35 }, at + 1.3);
       });
       tl.to({}, { duration: 0.5 });
+
+      const seen = ScrollTrigger.create({
+        trigger: wrap,
+        start: "top bottom",
+        end: "bottom top",
+        onToggle: (self) => {
+          onScreen = self.isActive;
+          sync();
+        },
+      });
       return () => {
-        gsap.set([world, ...chapters], { clearProps: "all" });
+        seen.kill();
+        videos.forEach((v) => v.pause());
+        gsap.set([...shots, ...chapters, ...veils], { clearProps: "all" });
       };
     });
     ScrollTrigger.refresh();
@@ -107,21 +116,33 @@ export function Story({ lang }: { lang: Lang }) {
             </div>
           ))}
         </dl>
-        <figure className="mt-6 overflow-hidden rounded-[var(--radius-xl)] bg-navy" data-reveal="up">
-          {/* eslint-disable-next-line @next/next/no-img-element -- Troy's own poster of the towers, navy and gold */}
-          <img src="/troy/photos/poster.webp" alt={t.location.photo} loading="lazy" decoding="async" className="aspect-[16/9] w-full object-cover sm:aspect-[21/9]" />
-        </figure>
       </div>
 
-      {/* Desktop: pinned frame over the render. */}
-      <div ref={wrapRef} className="relative hidden h-[360vh] lg:block motion-reduce:hidden">
+      {/* Desktop: the pinned film. */}
+      <div ref={wrapRef} className="relative hidden h-[400vh] lg:block motion-reduce:hidden">
         <div className="sticky top-0 h-[100svh] p-4">
-          <div ref={frameRef} className="troy-sky relative h-full w-full overflow-hidden rounded-[var(--radius-xl)]">
-            <div ref={worldRef} className="absolute left-0 top-0 will-change-transform" style={{ width: RENDER.width, height: RENDER.height }}>
-              {/* eslint-disable-next-line @next/next/no-img-element -- the same render, moved under a transform */}
-              <img src={RENDER.src} width={RENDER.width} height={RENDER.height} alt="" loading="lazy" decoding="async" />
+          <div className="relative h-full w-full overflow-hidden rounded-[var(--radius-xl)] bg-navy">
+            <div data-shot className="absolute inset-0 will-change-transform">
+              {/* eslint-disable-next-line @next/next/no-img-element -- Troy's 3D render, under a transform */}
+              <img src={RIVER} alt={t.story.river} loading="lazy" decoding="async" className="h-full w-full object-cover" />
             </div>
-            <div className="pointer-events-none absolute inset-y-0 left-0 w-[50%] bg-gradient-to-r from-navy/85 via-navy/45 to-transparent" />
+            {CLIPS.map((name) => (
+              <div key={name} data-shot className="absolute inset-0 will-change-transform">
+                <video
+                  data-clip={name}
+                  poster={clipPoster(name)}
+                  muted
+                  loop
+                  playsInline
+                  preload="none"
+                  disablePictureInPicture
+                  aria-hidden="true"
+                  className="h-full w-full object-cover"
+                />
+              </div>
+            ))}
+            <div data-veil className="pointer-events-none absolute inset-y-0 left-0 w-[55%] bg-gradient-to-r from-navy/80 via-navy/35 to-transparent" />
+            <div data-veil className="pointer-events-none absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-navy/50 to-transparent" />
             <div className="absolute bottom-10 left-10 w-[min(440px,38%)]">
               {t.story.chapters.map((c, i) => (
                 <div key={c.title} data-chapter className="absolute bottom-0 left-0 w-full text-white">
@@ -132,7 +153,7 @@ export function Story({ lang }: { lang: Lang }) {
                   <h3 className="mt-4 text-[clamp(2.25rem,1.6rem+2vw,3.5rem)] leading-[1] tracking-[-0.04em]">
                     <Rich text={c.title} />
                   </h3>
-                  <p className="mt-4 text-lead text-white/80">{c.text}</p>
+                  <p className="mt-4 text-lead text-white/85">{c.text}</p>
                 </div>
               ))}
             </div>
@@ -140,20 +161,26 @@ export function Story({ lang }: { lang: Lang }) {
         </div>
       </div>
 
-      {/* Phones and reduced motion: stacked chapters. */}
-      <div className="container-troy grid gap-6 pb-20 lg:hidden motion-reduce:lg:grid motion-reduce:lg:grid-cols-3">
-        {t.story.chapters.map((c, i) => (
-          <article key={c.title} className="overflow-hidden rounded-[var(--radius-lg)] border border-line bg-paper" data-reveal="up">
-            <Crop box={FOCUS[i]!} className="troy-sky" />
-            <div className="p-5">
-              <p className="eyebrow text-gold-ink tabular">0{i + 1}</p>
-              <h3 className="mt-2 text-[30px] leading-none tracking-[-0.04em] text-navy">
-                <Rich text={c.title} />
-              </h3>
-              <p className="mt-3 text-ink-soft">{c.text}</p>
-            </div>
-          </article>
-        ))}
+      {/* Phones and reduced motion: the render, then the chapters. */}
+      <div className="container-troy pb-20 lg:hidden motion-reduce:lg:block">
+        <figure className="overflow-hidden rounded-[var(--radius-lg)] bg-navy" data-reveal="up">
+          {/* eslint-disable-next-line @next/next/no-img-element -- Troy's 3D render */}
+          <img src={RIVER} alt={t.story.river} loading="lazy" decoding="async" className="aspect-[16/10] w-full object-cover" />
+        </figure>
+        <div className="mt-6 grid gap-6 motion-reduce:lg:grid-cols-3">
+          {t.story.chapters.map((c, i) => (
+            <article key={c.title} className="overflow-hidden rounded-[var(--radius-lg)] border border-line bg-paper" data-reveal="up">
+              <Loop name={CLIPS[i]!} className="aspect-[16/10] w-full bg-navy object-cover" />
+              <div className="p-5">
+                <p className="eyebrow text-gold-ink tabular">0{i + 1}</p>
+                <h3 className="mt-2 text-[30px] leading-none tracking-[-0.04em] text-navy">
+                  <Rich text={c.title} />
+                </h3>
+                <p className="mt-3 text-ink-soft">{c.text}</p>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
     </section>
   );

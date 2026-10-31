@@ -6,16 +6,17 @@ import { Rich } from "./Rich";
 const BBOX = [CONTACT.lon - 0.012, CONTACT.lat - 0.006, CONTACT.lon + 0.012, CONTACT.lat + 0.006].join(",");
 const MAP = `https://www.openstreetmap.org/export/embed.html?bbox=${BBOX}&layer=mapnik&marker=${CONTACT.lat},${CONTACT.lon}`;
 
-/** Where it is: the towers across the river, the address, the map. */
+/** Where it is: Troy's poster of the towers by the water, the address,
+ * the map. */
 export function Location({ lang }: { lang: Lang }) {
   const t = DICTS[lang];
   return (
     <section id="location" className="bg-cream py-24 lg:py-32">
       <div className="container-troy">
         <figure className="overflow-hidden rounded-[var(--radius-xl)] bg-mist" data-reveal="up">
-          {/* eslint-disable-next-line @next/next/no-img-element -- a still from Troy's film */}
+          {/* eslint-disable-next-line @next/next/no-img-element -- Troy's own poster, navy and gold */}
           <img
-            src="/troy/photos/river.webp"
+            src="/troy/photos/poster.webp"
             alt={t.location.photo}
             loading="lazy"
             decoding="async"
