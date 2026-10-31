@@ -105,7 +105,7 @@ export function BlockPanel({
           </div>
           <BackButton label={t.explorer.allBlocks} onClick={onBack} className="-mr-2" />
         </div>
-        <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto px-4 pb-1" data-lenis-prevent>
+        <div className="no-scrollbar -mx-4 flex gap-1.5 overflow-x-auto overscroll-x-contain px-4 pb-1">
           {[...floors].reverse().map((f) => (
             <button
               key={f.floor}
@@ -268,7 +268,7 @@ export function FloorPanel({
   );
 
   const list = (
-    <ul className={clsx(compact ? "no-scrollbar -mx-4 flex gap-2 overflow-x-auto px-4 pb-1" : "space-y-1")} data-lenis-prevent={compact || undefined}>
+    <ul className={clsx(compact ? "no-scrollbar -mx-4 flex gap-2 overflow-x-auto overscroll-x-contain px-4 pb-1" : "space-y-1")}>
       {plan.units.map((u) => {
         const status = statusOf(u);
         return (
