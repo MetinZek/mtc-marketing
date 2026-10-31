@@ -139,6 +139,9 @@ export const FACADE: Record<BlockId, FacadeBlock> = {
 
 /** The whole project, as framed on arrival. */
 export const SITE_FRAME: Box = { x: 70, y: 196, w: 1780, h: 860 };
+/** The same on phones: closer in at the sides, so the towers are as large
+ * as the width allows. */
+export const SITE_FRAME_COMPACT: Box = { x: 104, y: 196, w: 1682, h: 860 };
 
 export function bboxOf(points: readonly Pt[]): Box {
   const xs = points.map((p) => p[0]);

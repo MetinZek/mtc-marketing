@@ -21,15 +21,11 @@ export function Construction({ lang }: { lang: Lang }) {
           </p>
         </div>
 
-        {/* Phones: a strip that swipes sideways; vertical swipes still
-            scroll the page (so no data-lenis-prevent, whose stylesheet
-            would contain them). */}
-        <ol
-          className="no-scrollbar -mx-4 mt-14 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-4 pb-2 sm:mx-0 sm:grid sm:grid-cols-2 sm:overflow-visible sm:px-0 lg:grid-cols-4"
-          data-reveal="stagger"
-        >
+        {/* One under another on phones, so every stage shows; two, then
+            four, across on wider screens. */}
+        <ol className="mt-14 grid gap-12 sm:grid-cols-2 sm:gap-x-4 sm:gap-y-12 lg:grid-cols-4" data-reveal="stagger">
           {t.construction.steps.map((step, i) => (
-            <li key={step.src} className="w-[78%] shrink-0 snap-start sm:w-auto">
+            <li key={step.src}>
               <div className="flex items-center gap-3">
                 <span className="gold-foil grid size-8 place-items-center rounded-full text-xs font-bold text-navy tabular">{i + 1}</span>
                 <span className="h-px flex-1 bg-navy-line" />

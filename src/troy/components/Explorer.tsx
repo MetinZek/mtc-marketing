@@ -83,6 +83,9 @@ const PANEL = 380;
 /** How far the page scrolls (in svh) while the camera pulls back from the
  * opening close-up to the whole project. */
 const HERO_VH = 110;
+/** And how much further the whole project then stays pinned, so a flick
+ * that ends a little late still lands on it. */
+const HOLD_VH = 35;
 
 /**
  * The page's opening and its interactive model, in one pinned scene. It
@@ -111,6 +114,7 @@ export function Explorer({ lang }: { lang: Lang }) {
   // React hears only when it crosses a threshold.
   const sectionRef = useRef<HTMLElement>(null);
   const stickyRef = useRef<HTMLDivElement>(null);
+  const anchorRef = useRef<HTMLSpanElement>(null);
   const stageApi = useRef<StageApi | null>(null);
   const heroTextRef = useRef<HTMLDivElement>(null);
   const heroP = useRef(0);
@@ -120,7 +124,8 @@ export function Explorer({ lang }: { lang: Lang }) {
   useEffect(() => {
     const section = sectionRef.current;
     const sticky = stickyRef.current;
-    if (!section || !sticky) return;
+    const anchor = anchorRef.current;
+    if (!section || !sticky || !anchor) return;
     const update = (p: number) => {
       heroP.current = p;
       sticky.style.setProperty("--hero", p.toFixed(4));
@@ -128,10 +133,12 @@ export function Explorer({ lang }: { lang: Lang }) {
       setHeroFaded(p > 0.35);
       setHeroDone(p > 0.82);
     };
+    // From the top of the page to the anchor (#residences): the pull-back.
     const trigger = ScrollTrigger.create({
       trigger: section,
       start: "top top",
-      end: "bottom bottom",
+      endTrigger: anchor,
+      end: "top top",
       onUpdate: (self) => update(self.progress),
       onRefresh: (self) => update(self.progress),
     });
@@ -254,7 +261,9 @@ export function Explorer({ lang }: { lang: Lang }) {
   const sheetInset = desktop ? 0 : sheet;
   const insets = useMemo<Insets>(() => {
     // Room above the roofs for the block pins.
-    if (level === "site") return { top: pickBottom + (desktop ? 64 : 48), right: 16, bottom: desktop ? 0 : sheetInset + 12, left: 16 };
+    // Phones: the towers stand on the sheet, their base tucked under its
+    // rounded top.
+    if (level === "site") return { top: pickBottom + (desktop ? 64 : 48), right: 16, bottom: desktop ? 0 : sheetInset - 6, left: 16 };
     if (desktop) return { top: HEADER + 56, right: PANEL + 48, bottom: 24, left: 24 };
     return { top: HEADER + 44, right: 10, bottom: sheetInset + 10, left: 10 };
   }, [level, pickBottom, desktop, sheetInset]);
@@ -265,9 +274,21 @@ export function Explorer({ lang }: { lang: Lang }) {
   const site = level === "site";
 
   return (
-    <section id="top" ref={sectionRef} aria-label={t.explorer.label} className="relative" style={{ height: `calc(100svh + ${HERO_VH}svh)` }}>
+    <section
+      id="top"
+      ref={sectionRef}
+      aria-label={t.explorer.label}
+      className="relative"
+      style={{ height: `calc(100svh + ${HERO_VH + HOLD_VH}svh)` }}
+    >
       {/* Where the whole project is in view: the menu's "Residences". */}
-      <span id="residences" aria-hidden="true" className="pointer-events-none absolute left-0 h-px w-px" style={{ top: `${HERO_VH}svh` }} />
+      <span
+        id="residences"
+        ref={anchorRef}
+        aria-hidden="true"
+        className="pointer-events-none absolute left-0 h-px w-px"
+        style={{ top: `${HERO_VH}svh` }}
+      />
 
       <div
         ref={stickyRef}
@@ -452,11 +473,11 @@ export function Explorer({ lang }: { lang: Lang }) {
                     key={id}
                     type="button"
                     onClick={() => goBlock(id)}
-                    className="flex items-center gap-2.5 rounded-xl bg-navy/[0.05] p-2.5 text-left"
+                    className="flex items-center gap-2.5 rounded-xl bg-navy/[0.05] p-2.5 text-left max-[379px]:flex-col max-[379px]:items-start max-[379px]:gap-1.5"
                   >
                     <span className="grid size-8 shrink-0 place-items-center rounded-full bg-navy text-xs font-bold leading-none text-white">{id}</span>
                     <span className="min-w-0">
-                      <span className="block text-[13px] font-semibold leading-tight text-navy">{t.block(id)}</span>
+                      <span className="block whitespace-nowrap text-[13px] font-semibold leading-tight text-navy">{t.block(id)}</span>
                       <span className="block truncate text-[11px] leading-tight text-ink-soft">{t.available(s)}</span>
                     </span>
                   </button>

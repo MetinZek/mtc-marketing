@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 import clsx from "clsx";
 import { gsap } from "@/lib/gsap";
-import { FACADE, RENDER, SITE_FRAME, bboxOf, toPoints, type Box } from "../data/facade";
+import { FACADE, RENDER, SITE_FRAME, SITE_FRAME_COMPACT, bboxOf, toPoints, type Box } from "../data/facade";
 import { BLOCKS, blockSummary, floorSummary } from "../data/inventory";
 import type { BlockId } from "../data/plans";
 import { DICTS, type Lang } from "../i18n";
@@ -139,7 +139,10 @@ export function FacadeStage(props: Props) {
     if (!block) {
       const text = heroTextRef.current;
       const below = text ? text.offsetTop + text.offsetHeight : 0;
-      return mix(heroCam(w, h, compact, below), fit(SITE_FRAME, w, h, insets, 1, compact ? "center" : "bottom"), smooth(heroRef.current));
+      // The whole project stands on the bottom inset: the screen's edge, or
+      // on phones the sheet.
+      const site = fit(compact ? SITE_FRAME_COMPACT : SITE_FRAME, w, h, insets, 1, "bottom");
+      return mix(heroCam(w, h, compact, below), site, smooth(heroRef.current));
     }
     const base = fit(FACADE[block].frame, w, h, insets, 0.94, "center");
     if (floor == null) return base;
