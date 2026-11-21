@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
-import { COLORS, CURRENCY, SAMUNS, SANDWICHES, SNACKS, TORTILLAS } from "./config";
+import { COLORS, CURRENCY, SAMUNS, SANDWICHES, SAUCES, SNACKS, TORTILLAS } from "./config";
 import { anton, Camera, drift, inP } from "./lib";
 
 const shadow = "drop-shadow(0 22px 22px rgba(0,0,0,0.28))";
@@ -23,11 +23,15 @@ export const SnacksMenu: React.FC<{ animate?: boolean }> = ({ animate }) => (
   <ProductMenu items={SNACKS} prefix="sn" animate={animate} />
 );
 
+export const SaucesMenu: React.FC<{ animate?: boolean }> = ({ animate }) => (
+  <ProductMenu items={SAUCES} prefix="ss" animate={animate} />
+);
+
 /** Shared single-price menu: first item on the red card, the rest in a grid. */
 const ProductMenu: React.FC<{ items: Item[]; prefix: string; animate?: boolean }> = ({ items, prefix, animate = false }) => {
   const frame = useCurrentFrame();
   const [hero, ...rest] = items;
-  const cols = rest.length === 4 ? 2 : 3;
+  const cols = rest.length === 4 || rest.length === 2 ? 2 : 3;
   const colW = cols === 2 ? 540 : 400;
   const oneRow = rest.length <= 3; // a single row gets bigger photos, centered vertically
   const imgH = oneRow ? 320 : cols === 2 ? 225 : 200;
@@ -59,7 +63,7 @@ const ProductMenu: React.FC<{ items: Item[]; prefix: string; animate?: boolean }
         }}
       >
         <Img src={staticFile("icon-white.png")} style={{ width: 120, marginTop: 56 }} />
-        <div style={{ fontFamily: anton, fontSize: 104, lineHeight: 1, color: COLORS.cream, marginTop: 30, textAlign: "center" }}>
+        <div style={{ fontFamily: anton, fontSize: 104, lineHeight: 1.12, color: COLORS.cream, marginTop: 22, textAlign: "center" }}>
           {hero.line1}
           <br />
           {hero.line2}
@@ -103,7 +107,7 @@ const ProductMenu: React.FC<{ items: Item[]; prefix: string; animate?: boolean }
         return (
           <div key={s.id} style={{ position: "absolute", left: cx - 195, top, width: 390, textAlign: "center", opacity: Math.min(1, p0), transform: `translateY(${(1 - p0) * 90}px)` }}>
             <div style={{ height: imgH, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-              <Img src={staticFile(`${prefix}-${s.id}.png`)} style={{ maxWidth: oneRow ? 380 : cols === 2 ? 420 : 360, maxHeight: imgH, filter: shadow, transform: `translateY(${d(i * 30, 4)}px) translateX(${(1 - p0) * 80}px)` }} />
+              <Img src={staticFile(`${prefix}-${s.id}.png`)} style={{ maxWidth: oneRow ? (cols === 2 ? 420 : 380) : cols === 2 ? 420 : 360, maxHeight: imgH, filter: shadow, transform: `translateY(${d(i * 30, 4)}px) translateX(${(1 - p0) * 80}px)` }} />
             </div>
             <div style={{ fontFamily: anton, fontSize: 46, color: COLORS.dark, marginTop: 16, letterSpacing: 0.5, lineHeight: 1, whiteSpace: "nowrap" }}>
               {[s.line1, s.line2].filter(Boolean).join(" ")}

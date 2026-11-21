@@ -87,3 +87,10 @@ export const SNACKS: { id: string; line1: string; line2: string; price: string }
   { id: "pomfrit", line1: "", line2: "POMFRIT", price: "2.00" },
   { id: "wedges", line1: "PATATE", line2: "TË FËRGUARA", price: "2.50" },
 ];
+
+// ---------- Sauces menu (static image) ----------
+export const SAUCES: { id: string; line1: string; line2: string; price: string }[] = [
+  { id: "shtepie", line1: "SOS", line2: "SHTËPIE", price: "0.30" },
+  { id: "chilli", line1: "CHILLI", line2: "SOS", price: "0.30" },
+  { id: "hudre", line1: "SOS", line2: "HUDRE", price: "0.30" },
+];
