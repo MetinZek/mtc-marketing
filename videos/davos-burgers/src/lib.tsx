@@ -107,3 +107,7 @@ export const WallBg: React.FC<{ darken?: number }> = ({ darken = 0.25 }) => {
     </div>
   );
 };
+
+/** Entrance progress without a hook (usable in loops). Returns 1 when not animating. */
+export const inP = (frame: number, delay: number, animate: boolean, damping = 14) =>
+  animate ? spring({ frame: frame - delay, fps: 60, config: { damping, stiffness: 120, mass: 0.9 } }) : 1;
