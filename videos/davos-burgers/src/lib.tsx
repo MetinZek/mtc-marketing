@@ -80,3 +80,30 @@ export const PriceTag: React.FC<{ text: string; size?: number; bg?: string; colo
     {text}
   </div>
 );
+
+/** Dark wall texture background with a soft vignette. */
+export const WallBg: React.FC<{ darken?: number }> = ({ darken = 0.25 }) => {
+  const frame = useCurrentFrame();
+  return (
+    <div style={{ position: "absolute", inset: 0, overflow: "hidden" }}>
+      <Img
+        src={staticFile("wall.jpg")}
+        style={{
+          position: "absolute",
+          inset: 0,
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+          transform: `scale(${1.06 + frame * 0.00005}) translateX(${drift(frame, 0, 6, 600)}px)`,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: `radial-gradient(circle at 50% 45%, rgba(0,0,0,${darken * 0.4}), rgba(0,0,0,${darken + 0.35}) 100%)`,
+        }}
+      />
+    </div>
+  );
+};

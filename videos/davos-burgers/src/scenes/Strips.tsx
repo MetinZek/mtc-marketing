@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, useCurrentFrame } from "remotion";
 import { BURGERS, COLORS, priceOf, T } from "../config";
-import { anton, At, Burger, Camera, drift, easeInOut, ramp, useEnter } from "../lib";
+import { anton, At, Burger, Camera, drift, easeInOut, ramp, useEnter, WallBg } from "../lib";
 
 // Two columns of horizontal menu cards, like a menu board strip.
 const CARD_W = 780;
@@ -14,8 +14,8 @@ export const Strips: React.FC = () => {
   const wipe = ramp(frame, 0, 40, easeInOut);
   return (
     <AbsoluteFill style={{ clipPath: `inset(0 ${(1 - wipe) * 100}% 0 0)`, background: COLORS.dark }}>
+      <WallBg />
       <Camera dur={T.strips.dur} to={1.04}>
-        <AbsoluteFill style={{ background: `radial-gradient(circle at 50% 50%, ${COLORS.dark2}, ${COLORS.dark} 75%)` }} />
         {BURGERS.map((b, i) => (
           <Strip key={b.id} i={i} />
         ))}

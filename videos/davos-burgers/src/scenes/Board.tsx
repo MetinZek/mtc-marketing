@@ -1,7 +1,7 @@
 import React from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
 import { BURGERS, BurgerId, COLORS, COPY, priceOf, T } from "../config";
-import { anton, At, Burger, Camera, drift, easeInOut, PriceTag, ramp, useEnter } from "../lib";
+import { anton, At, Burger, Camera, CX, CY, drift, easeInOut, PriceTag, ramp, useEnter, WallBg } from "../lib";
 
 // Board layout, relative to canvas center.
 const GRID_X = -300;
@@ -23,8 +23,9 @@ export const Board: React.FC = () => {
 
   return (
     <AbsoluteFill style={{ background: COLORS.dark }}>
+      <WallBg />
       <Camera dur={dur} to={1.035}>
-        <AbsoluteFill style={{ background: `radial-gradient(circle at 30% 50%, ${COLORS.dark2}, ${COLORS.dark} 75%)` }} />
+        <Highlight />
         {BURGERS.map((b, i) => (
           <GridItem key={b.id} i={i} active={frame >= FEATURE_START && b.id === featured} />
         ))}
@@ -65,18 +66,51 @@ const GridItem: React.FC<{ i: number; active: boolean }> = ({ i, active }) => {
       <div style={{ width: 340, textAlign: "center", opacity: Math.min(1, p) }}>
         <div
           style={{
-            transform: `translateY(${drift(frame, i * 30, 4)}px) scale(${active ? 1.08 : 1})`,
-            filter: active ? "drop-shadow(0 0 28px rgba(255,214,10,0.35))" : undefined,
+            transform: `translateY(${drift(frame, i * 30, 4)}px)`,
           }}
         >
           <Burger id={b.id} width={290} style={{ margin: "0 auto" }} />
         </div>
-        <div style={{ fontFamily: anton, fontSize: 44, color: active ? COLORS.red : COLORS.cream, marginTop: 14, letterSpacing: 1 }}>
+        <div style={{ fontFamily: anton, fontSize: 44, color: COLORS.cream, marginTop: 14, letterSpacing: 1 }}>
           {b.line1} {b.line2}
         </div>
         <div style={{ fontFamily: anton, fontSize: 40, color: COLORS.yellow, marginTop: 2 }}>{priceOf(b.id)}</div>
       </div>
     </At>
+  );
+};
+
+const itemPos = (id: BurgerId) => {
+  const i = BURGERS.findIndex((b) => b.id === id);
+  return { x: GRID_X + ((i % 3) - 1) * COL, y: ROW_Y[Math.floor(i / 3)] };
+};
+
+/** Rounded square that marks the featured burger and glides to the next one. */
+const Highlight: React.FC = () => {
+  const frame = useCurrentFrame();
+  const appear = useEnter(FEATURE_START - 10, 15);
+  let pos = itemPos(COPY.featured[0]);
+  for (let k = 1; k < COPY.featured.length; k++) {
+    const t = ramp(frame, FEATURE_START + k * FEATURE_LEN - 10, FEATURE_START + k * FEATURE_LEN + 26, easeInOut);
+    const next = itemPos(COPY.featured[k]);
+    pos = { x: pos.x + (next.x - pos.x) * t, y: pos.y + (next.y - pos.y) * t };
+  }
+  if (appear <= 0) return null;
+  return (
+    <div
+      style={{
+        position: "absolute",
+        left: CX + pos.x,
+        top: CY + pos.y + 6,
+        width: 360,
+        height: 420,
+        transform: `translate(-50%, -50%) scale(${appear})`,
+        borderRadius: 36,
+        border: `5px solid ${COLORS.red}`,
+        background: "rgba(232,18,12,0.16)",
+        boxShadow: "0 20px 50px rgba(0,0,0,0.35)",
+      }}
+    />
   );
 };
 
