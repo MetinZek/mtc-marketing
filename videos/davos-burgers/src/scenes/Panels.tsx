@@ -7,7 +7,8 @@ export const PANEL_COLORS = [COLORS.red, COLORS.cream, COLORS.red, COLORS.cream,
 
 const PW = W / 6;
 const SLANT = 34; // half of the horizontal lean of each panel edge
-const PAD = 80; // extra room on each side of a panel container for the slant
+const PAD = 80;
+const BURGER_SHIFT = 80; // push burgers right so their right side hides behind the next panel // extra room on each side of a panel container for the slant
 
 export const Panels: React.FC = () => {
   const dur = T.panels.dur;
@@ -102,14 +103,14 @@ const Panel: React.FC<{ i: number; exitStart: number }> = ({ i, exitStart }) => 
       <div
         style={{
           position: "absolute",
-          left: "50%",
-          top: 660,
+          left: `calc(50% + ${BURGER_SHIFT}px)`,
+          top: 680,
           transform: `translate(-50%, -50%) translateY(${(1 - burgerIn) * 520 + drift(frame, i * 25, 5) - hopE * 26}px) scale(${
             1 + hopE * 0.07 + drift(frame, i * 25, 0.012, 200)
           }) rotate(${(1 - burgerIn) * (i % 2 ? 12 : -12)}deg)`,
         }}
       >
-        <Burger id={b.id} width={580} />
+        <Burger id={b.id} width={410} />
       </div>
     </div>
   );
