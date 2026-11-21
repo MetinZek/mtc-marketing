@@ -1,14 +1,29 @@
 import React from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
-import { COLORS, CURRENCY, SANDWICHES } from "./config";
+import { COLORS, CURRENCY, SAMUNS, SANDWICHES } from "./config";
 import { anton, Camera, drift, inP } from "./lib";
 
 const shadow = "drop-shadow(0 22px 22px rgba(0,0,0,0.28))";
 const CREAM_BG = "#FBF3E6";
 
-export const SandwichMenu: React.FC<{ animate?: boolean }> = ({ animate = false }) => {
+type Item = { id: string; line1: string; line2: string; price: string };
+
+export const SandwichMenu: React.FC<{ animate?: boolean }> = ({ animate }) => (
+  <ProductMenu items={SANDWICHES} prefix="sw" animate={animate} />
+);
+export const SamunMenu: React.FC<{ animate?: boolean }> = ({ animate }) => (
+  <ProductMenu items={SAMUNS} prefix="sm" animate={animate} />
+);
+
+/** Shared single-price menu: first item on the red card, the rest in a grid. */
+const ProductMenu: React.FC<{ items: Item[]; prefix: string; animate?: boolean }> = ({ items, prefix, animate = false }) => {
   const frame = useCurrentFrame();
-  const [hero, ...rest] = SANDWICHES;
+  const [hero, ...rest] = items;
+  const cols = rest.length === 4 ? 2 : 3;
+  const colW = cols === 2 ? 540 : 400;
+  const imgH = cols === 2 ? 225 : 200; // 2-col grids have room for taller photos
+  const gridTop = cols === 2 ? 290 : 300;
+  const rowGap = cols === 2 ? 380 : 390;
   const card = inP(frame, 0, animate, 16);
   const heroIn = inP(frame, 14, animate, 13);
   const heroPrice = inP(frame, 30, animate);
@@ -40,7 +55,7 @@ export const SandwichMenu: React.FC<{ animate?: boolean }> = ({ animate = false 
           <br />
           {hero.line2}
         </div>
-        <Img src={staticFile(`sw-${hero.id}.png`)} style={{ width: 580, marginTop: 70, filter: "drop-shadow(0 26px 26px rgba(0,0,0,0.45))", opacity: Math.min(1, heroIn * 1.5), transform: `translateX(${(1 - heroIn) * 500}px) translateY(${d(0, 6)}px) rotate(${(1 - heroIn) * 12 + d(40, 1, 260)}deg)` }} />
+        <Img src={staticFile(`${prefix}-${hero.id}.png`)} style={{ maxWidth: 580, maxHeight: 340, marginTop: 50, filter: "drop-shadow(0 26px 26px rgba(0,0,0,0.45))", opacity: Math.min(1, heroIn * 1.5), transform: `translateX(${(1 - heroIn) * 500}px) translateY(${d(0, 6)}px) rotate(${(1 - heroIn) * 12 + d(40, 1, 260)}deg)` }} />
         <div
           style={{
             position: "absolute",
@@ -70,16 +85,16 @@ export const SandwichMenu: React.FC<{ animate?: boolean }> = ({ animate = false 
       {/* 2x2 grid */}
       {rest.map((s, i) => {
         // 3 columns; a shorter last row is centered.
-        const row = Math.floor(i / 3);
-        const inRow = Math.min(3, rest.length - row * 3);
-        const col = i % 3;
-        const cx = 1295 + (col - (inRow - 1) / 2) * 400;
-        const top = 300 + row * 390;
+        const row = Math.floor(i / cols);
+        const inRow = Math.min(cols, rest.length - row * cols);
+        const col = i % cols;
+        const cx = 1295 + (col - (inRow - 1) / 2) * colW;
+        const top = gridTop + row * rowGap;
         const p0 = inP(frame, 18 + i * 5, animate);
         return (
           <div key={s.id} style={{ position: "absolute", left: cx - 195, top, width: 390, textAlign: "center", opacity: Math.min(1, p0), transform: `translateY(${(1 - p0) * 90}px)` }}>
-            <div style={{ height: 210, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-              <Img src={staticFile(`sw-${s.id}.png`)} style={{ maxWidth: 360, maxHeight: 200, filter: shadow, transform: `translateY(${d(i * 30, 4)}px) translateX(${(1 - p0) * 80}px)` }} />
+            <div style={{ height: imgH, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+              <Img src={staticFile(`${prefix}-${s.id}.png`)} style={{ maxWidth: cols === 2 ? 420 : 360, maxHeight: imgH, filter: shadow, transform: `translateY(${d(i * 30, 4)}px) translateX(${(1 - p0) * 80}px)` }} />
             </div>
             <div style={{ fontFamily: anton, fontSize: 46, color: COLORS.dark, marginTop: 16, letterSpacing: 0.5, lineHeight: 1, whiteSpace: "nowrap" }}>
               {s.line1} {s.line2}

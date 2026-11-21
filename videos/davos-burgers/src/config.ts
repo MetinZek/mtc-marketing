@@ -61,3 +61,12 @@ export const SANDWICHES: { id: SandwichId; line1: string; line2: string; price: 
   { id: "tuna", line1: "SANDWICH", line2: "TUNA", price: "2.50" },
   { id: "pete", line1: "SANDWICH", line2: "NË PETE", price: "0.00" },
 ];
+
+// ---------- Samun menu (static image) ----------
+export const SAMUNS: { id: string; line1: string; line2: string; price: string }[] = [
+  { id: "mix", line1: "SAMUN", line2: "DAVOS", price: "0.00" },
+  { id: "pule", line1: "SAMUN", line2: "PULE", price: "0.00" },
+  { id: "porshut", line1: "SAMUN", line2: "PORSHUT", price: "0.00" },
+  { id: "tuna", line1: "SAMUN", line2: "TUNA", price: "0.00" },
+  { id: "suxhuk", line1: "SAMUN", line2: "SUXHUK", price: "0.00" },
+];
