@@ -2,7 +2,7 @@
 export const COLORS = {
   red: "#E8120C",
   redDark: "#B80B07",
-  yellow: "#FFD60A",
+  yellow: "#FDE201", // logo yellow
   cream: "#F7EBD8",
   dark: "#171414",
   dark2: "#221D1C",

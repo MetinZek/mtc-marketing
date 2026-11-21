@@ -61,7 +61,7 @@ export const Burger: React.FC<{ id: BurgerId; width: number; style?: React.CSSPr
 
 /** Price slot: a yellow tag with the price from config. */
 export const PriceTag: React.FC<{ text: string; size?: number; bg?: string; color?: string; style?: React.CSSProperties }> = ({
-  text, size = 56, bg = "#FFD60A", color = "#171414", style,
+  text, size = 56, bg = "#FDE201", color = "#171414", style,
 }) => (
   <div
     style={{

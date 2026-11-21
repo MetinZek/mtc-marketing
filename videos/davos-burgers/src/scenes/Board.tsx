@@ -42,7 +42,7 @@ export const Board: React.FC = () => {
             }}
           >
             <Img
-              src={staticFile("icon.png")}
+              src={staticFile("icon-white.png")}
               style={{ position: "absolute", top: 46, left: "50%", width: 110, transform: `translateX(-50%) rotate(${drift(frame, 0, 3, 240)}deg)` }}
             />
             {COPY.featured.map((id, k) => (
@@ -106,8 +106,8 @@ const Highlight: React.FC = () => {
         height: 420,
         transform: `translate(-50%, -50%) scale(${appear})`,
         borderRadius: 36,
-        border: `5px solid ${COLORS.red}`,
-        background: "rgba(232,18,12,0.16)",
+        border: `8px solid ${COLORS.yellow}`,
+        background: "rgba(253,226,1,0.08)",
         boxShadow: "0 20px 50px rgba(0,0,0,0.35)",
       }}
     />

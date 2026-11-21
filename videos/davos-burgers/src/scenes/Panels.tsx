@@ -103,13 +103,13 @@ const Panel: React.FC<{ i: number; exitStart: number }> = ({ i, exitStart }) => 
         style={{
           position: "absolute",
           left: "50%",
-          top: 790,
+          top: 660,
           transform: `translate(-50%, -50%) translateY(${(1 - burgerIn) * 520 + drift(frame, i * 25, 5) - hopE * 26}px) scale(${
             1 + hopE * 0.07 + drift(frame, i * 25, 0.012, 200)
           }) rotate(${(1 - burgerIn) * (i % 2 ? 12 : -12)}deg)`,
         }}
       >
-        <Burger id={b.id} width={540} />
+        <Burger id={b.id} width={580} />
       </div>
     </div>
   );

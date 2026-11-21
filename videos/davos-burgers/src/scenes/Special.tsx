@@ -19,7 +19,7 @@ export const Special: React.FC = () => {
         <AbsoluteFill style={{ background: `radial-gradient(circle at 70% 55%, #FF3A2E, ${COLORS.red} 45%, ${COLORS.redDark})` }} />
         <div style={{ position: "absolute", left: 150, top: 190, width: 720 }}>
           <Img
-            src={staticFile("icon.png")}
+            src={staticFile("icon-white.png")}
             style={{ width: 120, transform: `scale(${icon}) rotate(${(1 - icon) * -20}deg)`, transformOrigin: "50% 80%" }}
           />
           <div style={{ fontFamily: anton, fontSize: 210, lineHeight: 0.95, color: COLORS.cream, marginTop: 16 }}>
