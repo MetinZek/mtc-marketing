@@ -58,3 +58,25 @@ export const Burger: React.FC<{ id: BurgerId; width: number; style?: React.CSSPr
     style={{ width, display: "block", filter: "drop-shadow(0 24px 30px rgba(0,0,0,0.35))", ...style }}
   />
 );
+
+/** Price slot: a yellow tag with the price from config. */
+export const PriceTag: React.FC<{ text: string; size?: number; bg?: string; color?: string; style?: React.CSSProperties }> = ({
+  text, size = 56, bg = "#FFD60A", color = "#171414", style,
+}) => (
+  <div
+    style={{
+      display: "inline-block",
+      fontFamily: anton,
+      fontSize: size,
+      lineHeight: 1,
+      padding: `${size * 0.16}px ${size * 0.34}px`,
+      background: bg,
+      color,
+      borderRadius: size * 0.18,
+      boxShadow: "0 10px 24px rgba(0,0,0,0.25)",
+      ...style,
+    }}
+  >
+    {text}
+  </div>
+);

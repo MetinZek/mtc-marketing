@@ -1,10 +1,10 @@
 import React from "react";
-import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame } from "remotion";
-import { BURGERS, BurgerId, COLORS, COPY, T } from "../config";
-import { anton, At, Burger, Camera, drift, easeInOut, easeOut, poppins, ramp, useEnter } from "../lib";
+import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
+import { BURGERS, BurgerId, COLORS, COPY, priceOf, T } from "../config";
+import { anton, At, Burger, Camera, drift, easeInOut, PriceTag, ramp, useEnter } from "../lib";
 
 // Board layout, relative to canvas center.
-const GRID_X = -300; // center of the 3x2 grid
+const GRID_X = -300;
 const COL = 380;
 const ROW_Y = [-215, 245];
 const CARD_X = 600;
@@ -24,11 +24,7 @@ export const Board: React.FC = () => {
   return (
     <AbsoluteFill style={{ background: COLORS.dark }}>
       <Camera dur={dur} to={1.035}>
-        <AbsoluteFill
-          style={{
-            background: `radial-gradient(circle at 30% 50%, ${COLORS.dark2}, ${COLORS.dark} 75%)`,
-          }}
-        />
+        <AbsoluteFill style={{ background: `radial-gradient(circle at 30% 50%, ${COLORS.dark2}, ${COLORS.dark} 75%)` }} />
         {BURGERS.map((b, i) => (
           <GridItem key={b.id} i={i} active={frame >= FEATURE_START && b.id === featured} />
         ))}
@@ -48,21 +44,6 @@ export const Board: React.FC = () => {
               src={staticFile("icon.png")}
               style={{ position: "absolute", top: 46, left: "50%", width: 110, transform: `translateX(-50%) rotate(${drift(frame, 0, 3, 240)}deg)` }}
             />
-            <div
-              style={{
-                position: "absolute",
-                top: 210,
-                width: "100%",
-                textAlign: "center",
-                fontFamily: poppins,
-                fontWeight: 700,
-                fontSize: 24,
-                letterSpacing: 6,
-                color: COLORS.yellow,
-              }}
-            >
-              {COPY.boardTag}
-            </div>
             {COPY.featured.map((id, k) => (
               <Featured key={id} id={id} k={k} />
             ))}
@@ -79,34 +60,21 @@ const GridItem: React.FC<{ i: number; active: boolean }> = ({ i, active }) => {
   const p = useEnter(40 + i * 5);
   const x = GRID_X + ((i % 3) - 1) * COL;
   const y = ROW_Y[Math.floor(i / 3)];
-  // Smooth highlight in / out
-  const glow = active ? 1 : 0;
   return (
     <At x={x} y={y + (1 - p) * 80}>
       <div style={{ width: 340, textAlign: "center", opacity: Math.min(1, p) }}>
         <div
           style={{
-            transform: `translateY(${drift(frame, i * 30, 4)}px) scale(${1 + glow * 0.08})`,
-            transition: "none",
+            transform: `translateY(${drift(frame, i * 30, 4)}px) scale(${active ? 1.08 : 1})`,
             filter: active ? "drop-shadow(0 0 28px rgba(255,214,10,0.35))" : undefined,
           }}
         >
           <Burger id={b.id} width={290} style={{ margin: "0 auto" }} />
         </div>
-        <div style={{ fontFamily: anton, fontSize: 44, color: active ? COLORS.yellow : COLORS.cream, marginTop: 14, letterSpacing: 1 }}>
+        <div style={{ fontFamily: anton, fontSize: 44, color: active ? COLORS.red : COLORS.cream, marginTop: 14, letterSpacing: 1 }}>
           {b.line1} {b.line2}
         </div>
-        <div style={{ fontFamily: poppins, fontWeight: 500, fontSize: 19, color: COLORS.cream, opacity: 0.6, marginTop: 4 }}>{b.note}</div>
-        <div
-          style={{
-            height: 4,
-            width: 120,
-            margin: "12px auto 0",
-            background: COLORS.red,
-            borderRadius: 2,
-            transform: `scaleX(${active ? 1 : 0.35})`,
-          }}
-        />
+        <div style={{ fontFamily: anton, fontSize: 40, color: COLORS.yellow, marginTop: 2 }}>{priceOf(b.id)}</div>
       </div>
     </At>
   );
@@ -118,25 +86,25 @@ const Featured: React.FC<{ id: BurgerId; k: number }> = ({ id, k }) => {
   const start = FEATURE_START + k * FEATURE_LEN;
   const end = start + FEATURE_LEN;
   const isLast = k === COPY.featured.length - 1;
-  const inP = k === 0 ? 1 : ramp(frame, start - 8, start + 26, easeInOut);
+  const inP = k === 0 ? ramp(frame, 50, 80, easeInOut) : ramp(frame, start - 8, start + 26, easeInOut);
   const outP = isLast ? 0 : ramp(frame, end - 8, end + 14, (t) => t * t * t);
   if (inP <= 0 || outP >= 1) return null;
   const tx = (1 - inP) * 560 - outP * 560;
-  const textY = (1 - inP) * 40;
+  const vis = inP * (1 - outP);
   return (
     <>
       <div
         style={{
           position: "absolute",
-          top: 260,
+          top: 200,
           width: "100%",
           textAlign: "center",
           fontFamily: anton,
-          fontSize: 92,
+          fontSize: 96,
           lineHeight: 1,
           color: COLORS.cream,
-          opacity: (k === 0 ? interpolate(frame, [50, 76], [0, 1], { extrapolateLeft: "clamp", extrapolateRight: "clamp" }) : inP) * (1 - outP),
-          transform: `translateY(${textY}px)`,
+          opacity: vis,
+          transform: `translateY(${(1 - inP) * 40}px)`,
         }}
       >
         {b.line1}
@@ -146,28 +114,15 @@ const Featured: React.FC<{ id: BurgerId; k: number }> = ({ id, k }) => {
       <div
         style={{
           position: "absolute",
-          top: 460,
+          top: 430,
           left: "50%",
           transform: `translateX(-50%) translateX(${tx}px) translateY(${drift(frame, 0, 6, 180)}px) rotate(${(1 - inP) * 10 - outP * 10}deg)`,
         }}
       >
-        <Burger id={id} width={400} />
+        <Burger id={id} width={420} />
       </div>
-      <div
-        style={{
-          position: "absolute",
-          bottom: 44,
-          width: "100%",
-          textAlign: "center",
-          fontFamily: poppins,
-          fontWeight: 700,
-          fontSize: 22,
-          letterSpacing: 2,
-          color: COLORS.cream,
-          opacity: 0.85 * inP * (1 - outP),
-        }}
-      >
-        {b.note}
+      <div style={{ position: "absolute", bottom: 56, width: "100%", textAlign: "center", opacity: vis, transform: `scale(${0.7 + 0.3 * vis})` }}>
+        <PriceTag text={priceOf(id)} size={70} />
       </div>
     </>
   );
