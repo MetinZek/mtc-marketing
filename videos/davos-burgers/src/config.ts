@@ -49,3 +49,14 @@ export const PIZZAS: { id: PizzaId; name: string; prices: [string, string, strin
   { id: "fungi", name: "FUNGI", prices: ["3.00", "4.00", "15.00"] },
   { id: "chicken", name: "CHICKEN", prices: ["3.50", "4.50", "15.00"] },
 ];
+
+// ---------- Sandwich menu (static image) ----------
+// Put the real price in `price` (e.g. "2.50"). The first one is shown on the red card.
+export type SandwichId = "pule" | "mix" | "salam" | "tuna" | "porshut";
+export const SANDWICHES: { id: SandwichId; line1: string; line2: string; price: string }[] = [
+  { id: "pule", line1: "SANDWICH", line2: "PULE", price: "0.00" },
+  { id: "mix", line1: "SANDWICH", line2: "MIX", price: "0.00" },
+  { id: "porshut", line1: "SANDWICH", line2: "PORSHUT", price: "0.00" },
+  { id: "salam", line1: "SANDWICH", line2: "SALAM", price: "0.00" },
+  { id: "tuna", line1: "SANDWICH", line2: "TUNA", price: "0.00" },
+];

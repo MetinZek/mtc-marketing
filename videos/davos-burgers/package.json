@@ -4,7 +4,8 @@
   "scripts": {
     "studio": "remotion studio",
     "render": "remotion render DavosBurgers out/davos-burgers.mp4 --codec h264 --crf 16 --pixel-format yuv420p",
-    "pizza-menu": "remotion still PizzaMenu out/davos-pizza-menu.png"
+    "pizza-menu": "remotion still PizzaMenu out/davos-pizza-menu.png",
+    "sandwich-menu": "remotion still SandwichMenu out/davos-sandwich-menu.png"
   },
   "dependencies": {
     "@remotion/cli": "^4.0.545",
