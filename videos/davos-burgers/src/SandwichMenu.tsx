@@ -59,16 +59,18 @@ export const SandwichMenu: React.FC = () => {
 
       {/* 2x2 grid */}
       {rest.map((s, i) => {
-        const col = i % 2;
-        const row = Math.floor(i / 2);
-        const cx = 1000 + col * 590;
+        // 3 columns; a shorter last row is centered.
+        const row = Math.floor(i / 3);
+        const inRow = Math.min(3, rest.length - row * 3);
+        const col = i % 3;
+        const cx = 1295 + (col - (inRow - 1) / 2) * 400;
         const top = 300 + row * 390;
         return (
-          <div key={s.id} style={{ position: "absolute", left: cx - 270, top, width: 540, textAlign: "center" }}>
+          <div key={s.id} style={{ position: "absolute", left: cx - 195, top, width: 390, textAlign: "center" }}>
             <div style={{ height: 210, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-              <Img src={staticFile(`sw-${s.id}.png`)} style={{ maxWidth: 470, maxHeight: 210, filter: shadow }} />
+              <Img src={staticFile(`sw-${s.id}.png`)} style={{ maxWidth: 360, maxHeight: 200, filter: shadow }} />
             </div>
-            <div style={{ fontFamily: anton, fontSize: 52, color: COLORS.dark, marginTop: 16, letterSpacing: 1, lineHeight: 1 }}>
+            <div style={{ fontFamily: anton, fontSize: 46, color: COLORS.dark, marginTop: 16, letterSpacing: 0.5, lineHeight: 1, whiteSpace: "nowrap" }}>
               {s.line1} {s.line2}
             </div>
             <div style={{ fontFamily: anton, fontSize: 56, color: COLORS.red, marginTop: 10, lineHeight: 1 }}>
