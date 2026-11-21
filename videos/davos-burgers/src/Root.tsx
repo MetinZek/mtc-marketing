@@ -3,13 +3,20 @@ import { Composition } from "remotion";
 import { FPS, T } from "./config";
 import { DavosBurgers } from "./Video";
 import { PizzaMenu } from "./PizzaMenu";
-import { SamunMenu, SandwichMenu, SaucesMenu, SnacksMenu, TortillaMenu } from "./SandwichMenu";
+import { BurgerMenu, SamunMenu, SandwichMenu, SaucesMenu, SnacksMenu, TortillaMenu } from "./SandwichMenu";
+import { PAIR_TOTAL, PairVideo } from "./PairVideo";
+
+const SamunSnacks: React.FC = () => <PairVideo A={SamunMenu} B={SnacksMenu} />;
+const BurgerSandwich: React.FC = () => <PairVideo A={BurgerMenu} B={SandwichMenu} />;
 import { MENUS_TOTAL, MenusVideo } from "./MenusVideo";
 
 export const Root: React.FC = () => (
   <>
     <Composition id="DavosBurgers" component={DavosBurgers} durationInFrames={T.total} fps={FPS} width={1920} height={1080} />
     <Composition id="MenusVideo" component={MenusVideo} durationInFrames={MENUS_TOTAL} fps={FPS} width={1920} height={1080} />
+    <Composition id="SamunSnacks" component={SamunSnacks} durationInFrames={PAIR_TOTAL} fps={FPS} width={1920} height={1080} />
+    <Composition id="BurgerSandwich" component={BurgerSandwich} durationInFrames={PAIR_TOTAL} fps={FPS} width={1920} height={1080} />
+    <Composition id="BurgerMenu" component={BurgerMenu} durationInFrames={1} fps={FPS} width={1920} height={1080} />
     <Composition id="SaucesMenu" component={SaucesMenu} durationInFrames={1} fps={FPS} width={1920} height={1080} />
     <Composition id="SnacksMenu" component={SnacksMenu} durationInFrames={1} fps={FPS} width={1920} height={1080} />
     <Composition id="TortillaMenu" component={TortillaMenu} durationInFrames={1} fps={FPS} width={1920} height={1080} />

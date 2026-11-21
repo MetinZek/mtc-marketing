@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
-import { COLORS, CURRENCY, SAMUNS, SANDWICHES, SAUCES, SNACKS, TORTILLAS } from "./config";
+import { BURGERS, COLORS, CURRENCY, SAMUNS, SANDWICHES, SAUCES, SNACKS, TORTILLAS } from "./config";
 import { anton, Camera, drift, inP } from "./lib";
 
 const shadow = "drop-shadow(0 22px 22px rgba(0,0,0,0.28))";
@@ -27,6 +27,12 @@ export const SaucesMenu: React.FC<{ animate?: boolean }> = ({ animate }) => (
   <ProductMenu items={SAUCES} prefix="ss" animate={animate} />
 );
 
+// Burger menu: house burger (Davos) on the red card, the other 5 in the grid.
+const BURGER_ITEMS = [...BURGERS.filter((b) => b.id === "davos"), ...BURGERS.filter((b) => b.id !== "davos")];
+export const BurgerMenu: React.FC<{ animate?: boolean }> = ({ animate }) => (
+  <ProductMenu items={BURGER_ITEMS} prefix="burger" animate={animate} />
+);
+
 /** Shared single-price menu: first item on the red card, the rest in a grid. */
 const ProductMenu: React.FC<{ items: Item[]; prefix: string; animate?: boolean }> = ({ items, prefix, animate = false }) => {
   const frame = useCurrentFrame();
@@ -44,7 +50,7 @@ const ProductMenu: React.FC<{ items: Item[]; prefix: string; animate?: boolean }
   const d = (phase: number, amp: number, period = 180) => (animate ? drift(frame, phase, amp, period) : 0);
   return (
     <AbsoluteFill style={{ background: `radial-gradient(circle at 65% 45%, #FFFBF4, ${CREAM_BG} 60%, #F2E4CC)` }}>
-      <Camera dur={255} to={animate ? 1.03 : 1}>
+      <Camera dur={600} to={animate ? 1.03 : 1}>
       {/* Featured sandwich card */}
       <div
         style={{
@@ -68,7 +74,7 @@ const ProductMenu: React.FC<{ items: Item[]; prefix: string; animate?: boolean }
           <br />
           {hero.line2}
         </div>
-        <Img src={staticFile(`${prefix}-${hero.id}.png`)} style={{ maxWidth: 580, maxHeight: 340, marginTop: 50, filter: "drop-shadow(0 26px 26px rgba(0,0,0,0.45))", opacity: Math.min(1, heroIn * 1.5), transform: `translateX(${(1 - heroIn) * 500}px) translateY(${d(0, 6)}px) rotate(${(1 - heroIn) * 12 + d(40, 1, 260)}deg)` }} />
+        <Img src={staticFile(`${prefix}-${hero.id}.png`)} style={{ maxWidth: 580, maxHeight: 290, marginTop: 50, filter: "drop-shadow(0 26px 26px rgba(0,0,0,0.45))", opacity: Math.min(1, heroIn * 1.5), transform: `translateX(${(1 - heroIn) * 500}px) translateY(${d(0, 6)}px) rotate(${(1 - heroIn) * 12 + d(40, 1, 260)}deg)` }} />
         <div
           style={{
             position: "absolute",
