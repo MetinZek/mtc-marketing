@@ -1,10 +1,11 @@
 import React from "react";
 import { AbsoluteFill, Img, staticFile } from "remotion";
 import { COLORS, CURRENCY, PIZZAS, PizzaId, SIZE_LABELS } from "./config";
-import { anton, poppins, WallBg } from "./lib";
+import { anton, poppins } from "./lib";
 
 const pizzaSrc = (id: PizzaId) => staticFile(`pizza-${id}.png`);
-const shadow = "drop-shadow(0 26px 26px rgba(0,0,0,0.5))";
+const shadow = "drop-shadow(0 22px 22px rgba(0,0,0,0.28))";
+const CREAM_BG = "#FBF3E6";
 
 const PriceRow: React.FC<{ prices: string[]; size: number; onRed?: boolean }> = ({ prices, size, onRed }) => (
   <div style={{ display: "flex", justifyContent: "center", gap: size * 0.45 }}>
@@ -16,8 +17,8 @@ const PriceRow: React.FC<{ prices: string[]; size: number; onRed?: boolean }> = 
             fontWeight: 700,
             fontSize: size * 0.4,
             letterSpacing: 1.5,
-            color: COLORS.cream,
-            opacity: onRed ? 0.9 : 0.65,
+            color: onRed ? COLORS.cream : COLORS.dark,
+            opacity: onRed ? 0.9 : 0.6,
             marginBottom: size * 0.12,
           }}
         >
@@ -28,7 +29,7 @@ const PriceRow: React.FC<{ prices: string[]; size: number; onRed?: boolean }> = 
             fontFamily: anton,
             fontSize: size,
             lineHeight: 1,
-            color: onRed ? COLORS.dark : COLORS.yellow,
+            color: onRed ? COLORS.dark : COLORS.red,
             background: onRed ? COLORS.yellow : "transparent",
             padding: onRed ? `${size * 0.14}px ${size * 0.28}px` : 0,
             borderRadius: size * 0.16,
@@ -45,8 +46,7 @@ const PriceRow: React.FC<{ prices: string[]; size: number; onRed?: boolean }> = 
 export const PizzaMenu: React.FC = () => {
   const [house, ...rest] = PIZZAS;
   return (
-    <AbsoluteFill style={{ background: COLORS.dark }}>
-      <WallBg />
+    <AbsoluteFill style={{ background: `radial-gradient(circle at 65% 45%, #FFFBF4, ${CREAM_BG} 60%, #F2E4CC)` }}>
       {/* House pizza card */}
       <div
         style={{
@@ -76,7 +76,7 @@ export const PizzaMenu: React.FC = () => {
       </div>
 
       {/* Logo */}
-      <Img src={staticFile("logo.png")} style={{ position: "absolute", left: 1295 - 230, top: 40, width: 460, filter: shadow }} />
+      <Img src={staticFile("logo.png")} style={{ position: "absolute", left: 1295 - 230, top: 40, width: 460, filter: "drop-shadow(0 4px 6px rgba(0,0,0,0.25))" }} />
 
       {/* Grid of the other 6 pizzas */}
       {rest.map((p, i) => {
@@ -89,7 +89,7 @@ export const PizzaMenu: React.FC = () => {
             <div style={{ height: 190, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
               <Img src={pizzaSrc(p.id)} style={{ maxWidth: 330, maxHeight: 190, filter: shadow }} />
             </div>
-            <div style={{ fontFamily: anton, fontSize: 48, color: COLORS.cream, marginTop: 14, marginBottom: 10, letterSpacing: 1 }}>
+            <div style={{ fontFamily: anton, fontSize: 48, color: COLORS.dark, marginTop: 14, marginBottom: 10, letterSpacing: 1 }}>
               {p.name}
             </div>
             <PriceRow prices={p.prices} size={36} />
