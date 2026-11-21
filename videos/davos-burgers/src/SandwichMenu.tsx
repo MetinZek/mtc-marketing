@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
-import { COLORS, CURRENCY, SAMUNS, SANDWICHES } from "./config";
+import { COLORS, CURRENCY, SAMUNS, SANDWICHES, TORTILLAS } from "./config";
 import { anton, Camera, drift, inP } from "./lib";
 
 const shadow = "drop-shadow(0 22px 22px rgba(0,0,0,0.28))";
@@ -15,14 +15,19 @@ export const SamunMenu: React.FC<{ animate?: boolean }> = ({ animate }) => (
   <ProductMenu items={SAMUNS} prefix="sm" animate={animate} />
 );
 
+export const TortillaMenu: React.FC<{ animate?: boolean }> = ({ animate }) => (
+  <ProductMenu items={TORTILLAS} prefix="tt" animate={animate} />
+);
+
 /** Shared single-price menu: first item on the red card, the rest in a grid. */
 const ProductMenu: React.FC<{ items: Item[]; prefix: string; animate?: boolean }> = ({ items, prefix, animate = false }) => {
   const frame = useCurrentFrame();
   const [hero, ...rest] = items;
   const cols = rest.length === 4 ? 2 : 3;
   const colW = cols === 2 ? 540 : 400;
-  const imgH = cols === 2 ? 225 : 200; // 2-col grids have room for taller photos
-  const gridTop = cols === 2 ? 290 : 300;
+  const oneRow = rest.length <= 3; // a single row gets bigger photos, centered vertically
+  const imgH = oneRow ? 320 : cols === 2 ? 225 : 200;
+  const gridTop = oneRow ? 400 : cols === 2 ? 290 : 300;
   const rowGap = cols === 2 ? 380 : 390;
   const card = inP(frame, 0, animate, 16);
   const heroIn = inP(frame, 14, animate, 13);
@@ -94,7 +99,7 @@ const ProductMenu: React.FC<{ items: Item[]; prefix: string; animate?: boolean }
         return (
           <div key={s.id} style={{ position: "absolute", left: cx - 195, top, width: 390, textAlign: "center", opacity: Math.min(1, p0), transform: `translateY(${(1 - p0) * 90}px)` }}>
             <div style={{ height: imgH, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
-              <Img src={staticFile(`${prefix}-${s.id}.png`)} style={{ maxWidth: cols === 2 ? 420 : 360, maxHeight: imgH, filter: shadow, transform: `translateY(${d(i * 30, 4)}px) translateX(${(1 - p0) * 80}px)` }} />
+              <Img src={staticFile(`${prefix}-${s.id}.png`)} style={{ maxWidth: oneRow ? 380 : cols === 2 ? 420 : 360, maxHeight: imgH, filter: shadow, transform: `translateY(${d(i * 30, 4)}px) translateX(${(1 - p0) * 80}px)` }} />
             </div>
             <div style={{ fontFamily: anton, fontSize: 46, color: COLORS.dark, marginTop: 16, letterSpacing: 0.5, lineHeight: 1, whiteSpace: "nowrap" }}>
               {s.line1} {s.line2}

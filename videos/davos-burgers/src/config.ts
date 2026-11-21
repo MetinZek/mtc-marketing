@@ -70,3 +70,11 @@ export const SAMUNS: { id: string; line1: string; line2: string; price: string }
   { id: "tuna", line1: "SAMUN", line2: "TUNA", price: "3.50" },
   { id: "suxhuk", line1: "SAMUN", line2: "SUXHUK", price: "3.50" },
 ];
+
+// ---------- Tortilla menu (static image) ----------
+export const TORTILLAS: { id: string; line1: string; line2: string; price: string }[] = [
+  { id: "mix", line1: "TORTILLA", line2: "DAVOS", price: "4.50" },
+  { id: "pule", line1: "TORTILLA", line2: "PULE", price: "4.00" },
+  { id: "vici", line1: "TORTILLA", line2: "VIÇI", price: "5.00" },
+  { id: "quesadilla", line1: "CHICKEN", line2: "QUESADILLA", price: "3.50" },
+];
