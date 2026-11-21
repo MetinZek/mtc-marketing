@@ -59,7 +59,7 @@ export const SANDWICHES: { id: SandwichId; line1: string; line2: string; price: 
   { id: "porshut", line1: "SANDWICH", line2: "PORSHUT", price: "2.50" },
   { id: "salam", line1: "SANDWICH", line2: "SUXHUK", price: "2.50" },
   { id: "tuna", line1: "SANDWICH", line2: "TUNA", price: "2.50" },
-  { id: "pete", line1: "SANDWICH", line2: "NË PETE", price: "0.00" },
+  { id: "pete", line1: "SANDWICH", line2: "NË PETE", price: "3.50" },
 ];
 
 // ---------- Samun menu (static image) ----------
