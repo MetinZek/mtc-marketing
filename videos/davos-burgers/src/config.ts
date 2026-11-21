@@ -36,3 +36,16 @@ export const T = {
   special: { from: 1420, dur: 380 },
   total: 1800,
 };
+
+// ---------- Pizza menu (static image) ----------
+export const SIZE_LABELS = ["E VOGËL", "E MESME", "E MADHE"];
+export type PizzaId = "davos" | "margarita" | "porshut" | "tuna" | "peperoni" | "fungi" | "chicken";
+export const PIZZAS: { id: PizzaId; name: string; prices: [string, string, string] }[] = [
+  { id: "davos", name: "PIZZA DAVOS", prices: ["3.50", "4.50", "15.00"] },
+  { id: "margarita", name: "MARGARITA", prices: ["3.00", "4.00", "13.00"] },
+  { id: "porshut", name: "PORSHUT", prices: ["3.00", "4.00", "15.00"] },
+  { id: "tuna", name: "TUNA", prices: ["3.50", "4.50", "15.00"] },
+  { id: "peperoni", name: "PEPERONI", prices: ["3.00", "4.00", "15.00"] },
+  { id: "fungi", name: "FUNGI", prices: ["3.00", "4.00", "15.00"] },
+  { id: "chicken", name: "CHICKEN", prices: ["3.50", "4.50", "15.00"] },
+];

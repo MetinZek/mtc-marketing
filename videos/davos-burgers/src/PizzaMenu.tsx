@@ -1,0 +1,101 @@
+import React from "react";
+import { AbsoluteFill, Img, staticFile } from "remotion";
+import { COLORS, CURRENCY, PIZZAS, PizzaId, SIZE_LABELS } from "./config";
+import { anton, poppins, WallBg } from "./lib";
+
+const pizzaSrc = (id: PizzaId) => staticFile(`pizza-${id}.png`);
+const shadow = "drop-shadow(0 26px 26px rgba(0,0,0,0.5))";
+
+const PriceRow: React.FC<{ prices: string[]; size: number; onRed?: boolean }> = ({ prices, size, onRed }) => (
+  <div style={{ display: "flex", justifyContent: "center", gap: size * 0.45 }}>
+    {prices.map((p, i) => (
+      <div key={i} style={{ textAlign: "center" }}>
+        <div
+          style={{
+            fontFamily: poppins,
+            fontWeight: 700,
+            fontSize: size * 0.4,
+            letterSpacing: 1.5,
+            color: COLORS.cream,
+            opacity: onRed ? 0.9 : 0.65,
+            marginBottom: size * 0.12,
+          }}
+        >
+          {SIZE_LABELS[i]}
+        </div>
+        <div
+          style={{
+            fontFamily: anton,
+            fontSize: size,
+            lineHeight: 1,
+            color: onRed ? COLORS.dark : COLORS.yellow,
+            background: onRed ? COLORS.yellow : "transparent",
+            padding: onRed ? `${size * 0.14}px ${size * 0.28}px` : 0,
+            borderRadius: size * 0.16,
+          }}
+        >
+          {p}
+          {CURRENCY}
+        </div>
+      </div>
+    ))}
+  </div>
+);
+
+export const PizzaMenu: React.FC = () => {
+  const [house, ...rest] = PIZZAS;
+  return (
+    <AbsoluteFill style={{ background: COLORS.dark }}>
+      <WallBg />
+      {/* House pizza card */}
+      <div
+        style={{
+          position: "absolute",
+          left: 50,
+          top: 50,
+          width: 620,
+          height: 980,
+          borderRadius: 32,
+          background: `linear-gradient(160deg, ${COLORS.red}, ${COLORS.redDark})`,
+          boxShadow: "0 30px 60px rgba(0,0,0,0.5)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
+      >
+        <Img src={staticFile("icon-white.png")} style={{ width: 120, marginTop: 56 }} />
+        <div style={{ fontFamily: anton, fontSize: 104, lineHeight: 1, color: COLORS.cream, marginTop: 30, textAlign: "center" }}>
+          PIZZA
+          <br />
+          DAVOS
+        </div>
+        <Img src={pizzaSrc(house.id)} style={{ width: 560, marginTop: 34, filter: shadow }} />
+        <div style={{ position: "absolute", bottom: 60 }}>
+          <PriceRow prices={house.prices} size={52} onRed />
+        </div>
+      </div>
+
+      {/* Logo */}
+      <Img src={staticFile("logo.png")} style={{ position: "absolute", left: 1295 - 230, top: 40, width: 460, filter: shadow }} />
+
+      {/* Grid of the other 6 pizzas */}
+      {rest.map((p, i) => {
+        const col = i % 3;
+        const row = Math.floor(i / 3);
+        const cx = 905 + col * 390;
+        const top = 288 + row * 392;
+        return (
+          <div key={p.id} style={{ position: "absolute", left: cx - 190, top, width: 380, textAlign: "center" }}>
+            <div style={{ height: 190, display: "flex", alignItems: "flex-end", justifyContent: "center" }}>
+              <Img src={pizzaSrc(p.id)} style={{ maxWidth: 330, maxHeight: 190, filter: shadow }} />
+            </div>
+            <div style={{ fontFamily: anton, fontSize: 48, color: COLORS.cream, marginTop: 14, marginBottom: 10, letterSpacing: 1 }}>
+              {p.name}
+            </div>
+            <PriceRow prices={p.prices} size={36} />
+          </div>
+        );
+      })}
+    </AbsoluteFill>
+  );
+};
