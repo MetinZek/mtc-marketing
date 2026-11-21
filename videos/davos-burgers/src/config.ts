@@ -78,3 +78,12 @@ export const TORTILLAS: { id: string; line1: string; line2: string; price: strin
   { id: "vici", line1: "TORTILLA", line2: "VIÇI", price: "5.00" },
   { id: "quesadilla", line1: "CHICKEN", line2: "QUESADILLA", price: "3.50" },
 ];
+
+// ---------- Snacks menu (static image) ----------
+export const SNACKS: { id: string; line1: string; line2: string; price: string }[] = [
+  { id: "wings", line1: "CHICKEN", line2: "WINGS", price: "5.00" },
+  { id: "fingers", line1: "CHICKEN", line2: "FINGERS", price: "5.00" },
+  { id: "nuggets", line1: "CHICKEN", line2: "NUGGETS", price: "4.50" },
+  { id: "pomfrit", line1: "", line2: "POMFRIT", price: "2.00" },
+  { id: "wedges", line1: "PATATE", line2: "TË FËRGUARA", price: "2.50" },
+];

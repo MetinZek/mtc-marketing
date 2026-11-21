@@ -1,6 +1,6 @@
 import React from "react";
 import { AbsoluteFill, Img, staticFile, useCurrentFrame } from "remotion";
-import { COLORS, CURRENCY, SAMUNS, SANDWICHES, TORTILLAS } from "./config";
+import { COLORS, CURRENCY, SAMUNS, SANDWICHES, SNACKS, TORTILLAS } from "./config";
 import { anton, Camera, drift, inP } from "./lib";
 
 const shadow = "drop-shadow(0 22px 22px rgba(0,0,0,0.28))";
@@ -17,6 +17,10 @@ export const SamunMenu: React.FC<{ animate?: boolean }> = ({ animate }) => (
 
 export const TortillaMenu: React.FC<{ animate?: boolean }> = ({ animate }) => (
   <ProductMenu items={TORTILLAS} prefix="tt" animate={animate} />
+);
+
+export const SnacksMenu: React.FC<{ animate?: boolean }> = ({ animate }) => (
+  <ProductMenu items={SNACKS} prefix="sn" animate={animate} />
 );
 
 /** Shared single-price menu: first item on the red card, the rest in a grid. */
@@ -102,7 +106,7 @@ const ProductMenu: React.FC<{ items: Item[]; prefix: string; animate?: boolean }
               <Img src={staticFile(`${prefix}-${s.id}.png`)} style={{ maxWidth: oneRow ? 380 : cols === 2 ? 420 : 360, maxHeight: imgH, filter: shadow, transform: `translateY(${d(i * 30, 4)}px) translateX(${(1 - p0) * 80}px)` }} />
             </div>
             <div style={{ fontFamily: anton, fontSize: 46, color: COLORS.dark, marginTop: 16, letterSpacing: 0.5, lineHeight: 1, whiteSpace: "nowrap" }}>
-              {s.line1} {s.line2}
+              {[s.line1, s.line2].filter(Boolean).join(" ")}
             </div>
             <div style={{ fontFamily: anton, fontSize: 56, color: COLORS.red, marginTop: 10, lineHeight: 1 }}>
               {s.price}
