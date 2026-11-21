@@ -9,7 +9,6 @@ import { easeInOut, ramp, W } from "./lib";
 export const LOOP_TOTAL = 2400;
 const WIPE = 30;
 const SETTLED = 120; // A starts 2 s into its own animation, so everything is already in place
-const SWITCH = 1200 - WIPE / 2;
 
 type Menu = React.FC<{ animate?: boolean }>;
 
@@ -35,14 +34,21 @@ const SettledA: React.FC<{ A: Menu }> = ({ A }) => (
   </Sequence>
 );
 
+// A 10 s -> B 10 s -> A 10 s -> B 10 s -> back to A (seamless loop).
+const SEG = 600;
 export const LoopPairVideo: React.FC<{ A: Menu; B: Menu }> = ({ A, B }) => (
   <AbsoluteFill style={{ background: COLORS.cream }}>
-    <Sequence from={0} durationInFrames={SWITCH + WIPE}>
+    <Sequence from={0} durationInFrames={SEG - WIPE / 2 + WIPE}>
       <SettledA A={A} />
     </Sequence>
-    <Sequence from={SWITCH} durationInFrames={LOOP_TOTAL - SWITCH}>
-      <Wipe M={B} />
-    </Sequence>
+    {[B, A, B].map((M, k) => {
+      const start = (k + 1) * SEG - WIPE / 2;
+      return (
+        <Sequence key={k} from={start} durationInFrames={SEG + WIPE}>
+          <Wipe M={M} />
+        </Sequence>
+      );
+    })}
     {/* wipe back to A, timed so A's local frame at the end equals its frame at the start */}
     <Sequence from={LOOP_TOTAL - WIPE} durationInFrames={WIPE}>
       <Wipe M={(p) => <Sequence from={-(SETTLED - WIPE)} layout="none"><A {...p} /></Sequence>} />

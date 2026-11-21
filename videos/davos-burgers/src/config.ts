@@ -13,7 +13,7 @@ export type BurgerId = "classic" | "cheese" | "egg" | "double" | "davos" | "chic
 // Prices: put the real price in `price` (e.g. "3.50"). The currency sign is added automatically.
 export const CURRENCY = "€";
 export const BURGERS: { id: BurgerId; line1: string; line2: string; price: string }[] = [
-  { id: "classic", line1: "CLASSIC", line2: "BURGER", price: "2.20" },
+  { id: "classic", line1: "CLASSIC", line2: "BURGER", price: "2.00" },
   { id: "cheese", line1: "CHEESE", line2: "BURGER", price: "2.50" },
   { id: "egg", line1: "EGG", line2: "BURGER", price: "2.50" },
   { id: "double", line1: "DOUBLE", line2: "BURGER", price: "3.50" },
