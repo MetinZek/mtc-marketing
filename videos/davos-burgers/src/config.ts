@@ -94,3 +94,12 @@ export const SAUCES: { id: string; line1: string; line2: string; price: string }
   { id: "chilli", line1: "CHILLI", line2: "SOS", price: "0.30" },
   { id: "hudre", line1: "SOS", line2: "HUDRE", price: "0.30" },
 ];
+
+// ---------- Night combo promo (animation) ----------
+export const COMBO = {
+  title: "OFERTA E NATËS",
+  items: "BURGER + POMFRIT + COCA-COLA",
+  price: "2.90",
+  hours: "ÇDO DITË · 22:00 – 10:00",
+  giant: "OFERTË",
+};
