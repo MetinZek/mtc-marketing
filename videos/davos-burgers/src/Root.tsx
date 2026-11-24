@@ -19,6 +19,7 @@ export const Root: React.FC = () => (
   <>
     <Composition id="DavosBurgers" component={DavosBurgers} durationInFrames={T.total} fps={FPS} width={1920} height={1080} />
     <Composition id="MenusVideo" component={MenusVideo} durationInFrames={MENUS_TOTAL} fps={FPS} width={1920} height={1080} />
+    <Composition id="ComboNightStory" component={ComboNight} durationInFrames={COMBO_TOTAL} fps={FPS} width={1080} height={1920} />
     <Composition id="ComboNight" component={ComboNight} durationInFrames={COMBO_TOTAL} fps={FPS} width={1920} height={1080} />
     <Composition id="SamunSnacksLoop" component={SamunSnacksLoop} durationInFrames={LOOP_TOTAL} fps={FPS} width={1920} height={1080} />
     <Composition id="BurgerSandwichLoop" component={BurgerSandwichLoop} durationInFrames={LOOP_TOTAL} fps={FPS} width={1920} height={1080} />

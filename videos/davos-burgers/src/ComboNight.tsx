@@ -1,7 +1,31 @@
 import React from "react";
-import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame } from "remotion";
+import { AbsoluteFill, Img, interpolate, staticFile, useCurrentFrame, useVideoConfig } from "remotion";
 import { COLORS, COMBO, CURRENCY } from "./config";
-import { anton, At, drift, easeIn, easeInOut, easeOut, H, inP, poppins, ramp, W } from "./lib";
+import { anton, drift, easeIn, easeInOut, easeOut, inP, poppins, ramp } from "./lib";
+
+/** Positions relative to the canvas center; works for both 16:9 TV and 9:16 Story. */
+const At: React.FC<{ x?: number; y?: number; children: React.ReactNode }> = ({ x = 0, y = 0, children }) => {
+  const { width, height } = useVideoConfig();
+  return (
+    <div style={{ position: "absolute", left: width / 2 + x, top: height / 2 + y, transform: "translate(-50%, -50%)" }}>{children}</div>
+  );
+};
+
+// Layout per orientation. Story keeps text out of the top ~250px and bottom ~340px (app UI).
+const TV = {
+  title: { y: -410, size: 116, stacked: false }, fries: { x: -500, y: 70, w: 430 }, can: { x: 500, y: 90, h: 430 },
+  burger: { y: 30, w: 680 }, price: { x: 470, y: -235, d: 270 }, items: { y: 385, size: 44 }, hours: { y: 465, size: 54 },
+  rows: [-390, -130, 130, 390], giant: 1150, logo: 900,
+};
+const STORY = {
+  title: { y: -600, size: 150, stacked: true }, fries: { x: -320, y: 250, w: 400 }, can: { x: 340, y: 250, h: 380 },
+  burger: { y: 0, w: 720 }, price: { x: 300, y: -290, d: 260 }, items: { y: 480, size: 40 }, hours: { y: 565, size: 58 },
+  rows: [-780, -520, -260, 0, 260, 520, 780], giant: 1300, logo: 860,
+};
+const useL = () => {
+  const { width, height } = useVideoConfig();
+  return height > width ? STORY : TV;
+};
 
 // 12 s @60fps, loops: giant-letter sweep -> combo hero -> yellow arcs wipe to logo -> loops.
 export const COMBO_TOTAL = 720;
@@ -41,6 +65,7 @@ const Can: React.FC<{ h: number }> = ({ h }) => {
 /** Opening: giant yellow letters sweep across the red screen (like a kinetic type intro). */
 const GiantSweep: React.FC = () => {
   const frame = useCurrentFrame();
+  const L = useL();
   const t = ramp(frame, 0, 85, easeInOut);
   const x = interpolate(t, [0, 1], [1500, -3900]);
   const fade = 1 - ramp(frame, 66, 86, easeIn);
@@ -53,7 +78,7 @@ const GiantSweep: React.FC = () => {
           left: 0,
           transform: `translate(${x}px, -50%) skewX(-6deg)`,
           fontFamily: anton,
-          fontSize: 1150,
+          fontSize: L.giant,
           lineHeight: 1,
           color: COLORS.yellow,
           whiteSpace: "nowrap",
@@ -68,7 +93,8 @@ const GiantSweep: React.FC = () => {
 /** Faint repeated words scrolling behind the hero (depth, never fully still). */
 const BackWords: React.FC = () => {
   const frame = useCurrentFrame();
-  const rows = [-390, -130, 130, 390];
+  const { height: H } = useVideoConfig();
+  const rows = useL().rows;
   return (
     <>
       {rows.map((y, i) => (
@@ -95,6 +121,7 @@ const BackWords: React.FC = () => {
 
 const Hero: React.FC = () => {
   const frame = useCurrentFrame();
+  const L = useL();
   const f = frame - HERO_IN;
   const show = ramp(frame, HERO_IN - 14, HERO_IN + 6, easeOut);
   if (frame > OUTRO + 52) return null; // fully covered by the outro; end on plain red for a clean loop
@@ -114,28 +141,28 @@ const Hero: React.FC = () => {
       <BackWords />
       <AbsoluteFill style={{ transform: `scale(${push})` }}>
         {/* title */}
-        <At y={-410}>
-          <div style={{ display: "flex", alignItems: "center", gap: 26, opacity: Math.min(1, title), transform: `translateY(${(1 - title) * -80}px)` }}>
-            <Img src={staticFile("icon-white.png")} style={{ width: 96 }} />
-            <div style={{ fontFamily: anton, fontSize: 116, color: COLORS.yellow, lineHeight: 1, whiteSpace: "nowrap" }}>{COMBO.title}</div>
+        <At y={L.title.y}>
+          <div style={{ display: "flex", flexDirection: L.title.stacked ? "column" : "row", alignItems: "center", gap: L.title.stacked ? 18 : 26, opacity: Math.min(1, title), transform: `translateY(${(1 - title) * -80}px)` }}>
+            <Img src={staticFile("icon-white.png")} style={{ width: L.title.stacked ? 130 : 96 }} />
+            <div style={{ fontFamily: anton, fontSize: L.title.size, color: COLORS.yellow, lineHeight: 1, whiteSpace: "nowrap" }}>{COMBO.title}</div>
           </div>
         </At>
         {/* fries, behind-left */}
-        <At x={-500 - (1 - fries) * 900} y={70 + drift(frame, 20, 5)}>
-          <Img src={staticFile("sn-pomfrit.png")} style={{ width: 430, transform: `rotate(${-8 + (1 - fries) * -30}deg)`, filter: "drop-shadow(0 24px 24px rgba(0,0,0,0.4))" }} />
+        <At x={L.fries.x - (1 - fries) * 900} y={L.fries.y + drift(frame, 20, 5)}>
+          <Img src={staticFile("sn-pomfrit.png")} style={{ width: L.fries.w, transform: `rotate(${-8 + (1 - fries) * -30}deg)`, filter: "drop-shadow(0 24px 24px rgba(0,0,0,0.4))" }} />
         </At>
         {/* can, behind-right */}
-        <At x={500 + (1 - can) * 900} y={90 + drift(frame, 60, 5)}>
+        <At x={L.can.x + (1 - can) * 900} y={L.can.y + drift(frame, 60, 5)}>
           <div style={{ transform: `rotate(${8 + (1 - can) * 30}deg)` }}>
-            <Can h={430} />
+            <Can h={L.can.h} />
           </div>
         </At>
         {/* burger */}
-        <At y={30 + drift(frame, 0, 6, 180)}>
+        <At y={L.burger.y + drift(frame, 0, 6, 180)}>
           <Img
             src={staticFile("combo-burger.png")}
             style={{
-              width: 680,
+              width: L.burger.w,
               opacity: Math.min(1, burger * 2),
               transform: `scale(${0.3 + 0.7 * burger}) rotate(${(1 - burger) * -20}deg)`,
               filter: "drop-shadow(0 40px 40px rgba(0,0,0,0.45))",
@@ -143,11 +170,11 @@ const Hero: React.FC = () => {
           />
         </At>
         {/* price badge */}
-        <At x={470} y={-235}>
+        <At x={L.price.x} y={L.price.y}>
           <div
             style={{
-              width: 270,
-              height: 270,
+              width: L.price.d,
+              height: L.price.d,
               borderRadius: "50%",
               background: COLORS.yellow,
               border: `8px solid ${COLORS.cream}`,
@@ -166,17 +193,17 @@ const Hero: React.FC = () => {
           </div>
         </At>
         {/* items line */}
-        <At y={385}>
-          <div style={{ fontFamily: poppins, fontWeight: 700, fontSize: 44, letterSpacing: 3, color: COLORS.cream, whiteSpace: "nowrap", opacity: Math.min(1, items), transform: `translateY(${(1 - items) * 40}px)` }}>
+        <At y={L.items.y}>
+          <div style={{ fontFamily: poppins, fontWeight: 700, fontSize: L.items.size, letterSpacing: 3, color: COLORS.cream, whiteSpace: "nowrap", opacity: Math.min(1, items), transform: `translateY(${(1 - items) * 40}px)` }}>
             {COMBO.items}
           </div>
         </At>
         {/* hours pill */}
-        <At y={465}>
+        <At y={L.hours.y}>
           <div
             style={{
               fontFamily: anton,
-              fontSize: 54,
+              fontSize: L.hours.size,
               lineHeight: 1,
               padding: "12px 40px",
               borderRadius: 60,
@@ -198,6 +225,8 @@ const Hero: React.FC = () => {
 /** Outro: two yellow arcs sweep in from the sides and reveal the logo on red. */
 const Outro: React.FC = () => {
   const frame = useCurrentFrame();
+  const { width: W, height: H } = useVideoConfig();
+  const L = useL();
   const f = frame - OUTRO;
   if (f < 0) return null;
   const arcs = ramp(f, 0, 34, easeInOut);
@@ -215,7 +244,7 @@ const Outro: React.FC = () => {
       <At y={-20}>
         <Img
           src={staticFile("logo.png")}
-          style={{ width: 900, opacity: Math.min(1, logo) * (1 - out), transform: `scale(${0.6 + 0.4 * logo})`, filter: "drop-shadow(0 6px 10px rgba(0,0,0,0.25))" }}
+          style={{ width: L.logo, opacity: Math.min(1, logo) * (1 - out), transform: `scale(${0.6 + 0.4 * logo})`, filter: "drop-shadow(0 6px 10px rgba(0,0,0,0.25))" }}
         />
       </At>
     </AbsoluteFill>
